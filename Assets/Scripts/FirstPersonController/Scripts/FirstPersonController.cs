@@ -137,9 +137,9 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			_move.Value = _controls.Player.Move.ReadValue<Vector2>();
 			_sprint.Value = _controls.Player.Sprint.ReadValue<float>().AsBool();
+			Vector2 lookInput = _controls.Mouse.Look.ReadValue<Vector2>();
 
 			// Camera rotation
-			Vector2 lookInput = _controls.Player.Look.ReadValue<Vector2>();
 			// if there is an input
 			if (lookInput.sqrMagnitude >= _threshold)
 			{
