@@ -184,22 +184,16 @@ namespace ExoplanetStudios.ExtractionShooter
 
 				// stop our velocity dropping infinitely when grounded
 				if (_verticalVelocity < 0.0f)
-				{
 					_verticalVelocity = -2f;
-				}
 
 				// Jump
 				if (jump && _jumpTimeoutDelta <= 0.0f)
-				{
 					// the square root of H * -2 * G = how much velocity needed to reach desired height
-					_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
-				}
+					_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity); 
 
 				// jump timeout
 				if (_jumpTimeoutDelta >= 0.0f)
-				{
 					_jumpTimeoutDelta -= Time.deltaTime;
-				}
 			}
 			else
 			{
@@ -208,9 +202,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
 				// fall timeout
 				if (_fallTimeoutDelta >= 0.0f)
-				{
 					_fallTimeoutDelta -= Time.deltaTime;
-				}
 			}
 
 			// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
