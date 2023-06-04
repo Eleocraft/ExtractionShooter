@@ -8,50 +8,46 @@ namespace ExoplanetStudios.ExtractionShooter
 	{
 		[Header("Player")]
 		[Tooltip("Move speed of the character in m/s")]
-		public float MoveSpeed = 4.0f;
+		[SerializeField] private float MoveSpeed = 4.0f;
 		[Tooltip("Sprint speed of the character in m/s")]
-		public float SprintSpeed = 6.0f;
+		[SerializeField] private float SprintSpeed = 6.0f;
 		[Tooltip("Rotation speed of the character")]
-		public float RotationSpeed = 1.0f;
+		[SerializeField] private float RotationSpeed = 1.0f;
 		[Tooltip("Acceleration and deceleration")]
-		public float SpeedChangeRate = 10.0f;
+		[SerializeField] private float SpeedChangeRate = 10.0f;
 
 		[Space(10)]
 		[Tooltip("The height the player can jump")]
-		public float JumpHeight = 1.2f;
+		[SerializeField] private float JumpHeight = 1.2f;
 		[Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
-		public float Gravity = -15.0f;
+		[SerializeField] private float Gravity = -15.0f;
 
 		[Space(10)]
 		[Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
-		public float JumpTimeout = 0.1f;
+		[SerializeField] private float JumpTimeout = 0.1f;
 		[Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
-		public float FallTimeout = 0.15f;
+		[SerializeField] private float FallTimeout = 0.15f;
 
 		[Header("Player Grounded")]
 		[Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
-		public bool Grounded = true;
+		[SerializeField] private bool Grounded = true;
 		[Tooltip("Useful for rough ground")]
-		public float GroundedOffset = -0.14f;
+		[SerializeField] private float GroundedOffset = -0.14f;
 		[Tooltip("The radius of the grounded check. Should match the radius of the CharacterController")]
-		public float GroundedRadius = 0.5f;
+		[SerializeField] private float GroundedRadius = 0.5f;
 		[Tooltip("What layers the character uses as ground")]
-		public LayerMask GroundLayers;
+		[SerializeField] private LayerMask GroundLayers;
 
 		[Header("Cinemachine")]
 		[Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
-		public GameObject CinemachineCameraTarget;
+		[SerializeField] private GameObject CinemachineCameraTarget;
 		[Tooltip("How far in degrees can you move the camera up")]
-		public float TopClamp = 90.0f;
+		[SerializeField] private float TopClamp = 90.0f;
 		[Tooltip("How far in degrees can you move the camera down")]
-		public float BottomClamp = -90.0f;
-
-		// cinemachine
-		private float _cinemachineTargetPitch;
+		[SerializeField] private float BottomClamp = -90.0f;
 
 		// player
 		private float _speed;
-		private float _rotationVelocity;
 		private float _verticalVelocity;
 		private float _terminalVelocity = 53.0f;
 
@@ -66,35 +62,98 @@ namespace ExoplanetStudios.ExtractionShooter
 		private CharacterController _controller;
 
 		private const float _threshold = 0.01f;
+		private const float _positionAsyncDist = 0.1f;
 
+		// Input Network Variables
+		private NetworkVariable<Vector2> _move = new NetworkVariable<Vector2>(writePerm: NetworkVariableWritePermission.Owner);
+		private NetworkVariable<float> _xRotation = new NetworkVariable<float>(writePerm: NetworkVariableWritePermission.Owner);
+		private NetworkVariable<bool> _sprint = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
+		private NetworkVariable<float> _cinemachineTargetPitch = new NetworkVariable<float>(writePerm: NetworkVariableWritePermission.Owner);
+
+		// Sync Network Variables
+		private NetworkVariable<Vector3> _position = new NetworkVariable<Vector3>();
 
 		private void Start()
 		{
-			if (!IsOwner) return;
-
-			GameObject.FindGameObjectWithTag("PlayerCam").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = CinemachineCameraTarget.transform;
 			_controller = GetComponent<CharacterController>();
-			_controls = GI.Controls;
-
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
-		}
-
-		private void Update()
-		{
-			if (!IsOwner && !IsServer) return;
-
-			JumpAndGravity();
-			GroundedCheck();
 
 			if (IsOwner)
+			{
+				GameObject.FindGameObjectWithTag("PlayerCam").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = CinemachineCameraTarget.transform;
+				_controls = GI.Controls;
+				_controls.Player.Jump.started += JumpInput;
+			}
+		}
+		public override void OnNetworkSpawn()
+		{
+			if (!IsServer)
+				_position.OnValueChanged += SyncPosition;
+		}
+		public override void OnDestroy()
+		{
+			base.OnDestroy();
+			if (!IsServer)
+				_position.OnValueChanged -= SyncPosition;
+
+			if (IsOwner)
+				_controls.Player.Jump.started -= JumpInput;
+		}
+
+		private void JumpInput(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
+		{
+			Jump();
+			if (!IsHost)
+				JumpServerRpc();
+		}
+		[ServerRpc()]
+		private void JumpServerRpc() => Jump();
+		private void Jump()
+		{
+			// Jump
+			if (Grounded && _jumpTimeoutDelta <= 0.0f)
+				// the square root of H * -2 * G = how much velocity needed to reach desired height
+				_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity); 
+		}
+		private void Update()
+		{
+			if (IsOwner)
+				ReadInput();
+				
+			if (IsServer || IsOwner)
+			{
+				CalculateGravity();
+				GroundedCheck();
 				Move();
+			}
+			if (IsServer)
+				_position.Value = transform.position;
+		}
+		private void ReadInput()
+		{
+			_move.Value = _controls.Player.Move.ReadValue<Vector2>();
+			_sprint.Value = _controls.Player.Sprint.ReadValue<float>().AsBool();
+
+			// Camera rotation
+			Vector2 lookInput = _controls.Player.Look.ReadValue<Vector2>();
+			// if there is an input
+			if (lookInput.sqrMagnitude >= _threshold)
+			{
+				_cinemachineTargetPitch.Value += lookInput.y * RotationSpeed;
+				float _rotationVelocity = lookInput.x * RotationSpeed;
+
+				// clamp our pitch rotation
+				_cinemachineTargetPitch.Value = ClampAngle(_cinemachineTargetPitch.Value, BottomClamp, TopClamp);
+
+				_xRotation.Value += _rotationVelocity;
+			}
 		}
 
 		private void LateUpdate()
 		{
-			if (!IsOwner) return;
+			if (!IsOwner && !IsServer) return;
 
 			CameraRotation();
 		}
@@ -108,36 +167,23 @@ namespace ExoplanetStudios.ExtractionShooter
 
 		private void CameraRotation()
 		{
-			Vector2 look = _controls.Player.Look.ReadValue<Vector2>();
-			// if there is an input
-			if (look.sqrMagnitude >= _threshold)
-			{
-				
-				_cinemachineTargetPitch += look.y * RotationSpeed;
-				_rotationVelocity = look.x * RotationSpeed;
+			// Update Cinemachine camera target pitch
+			CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch.Value, 0.0f, 0.0f);
 
-				// clamp our pitch rotation
-				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
-
-				// Update Cinemachine camera target pitch
-				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
-
-				// rotate the player left and right
-				transform.Rotate(Vector3.up * _rotationVelocity);
-			}
+			// rotate the player left and right
+			transform.rotation = Quaternion.Euler(0, _xRotation.Value, 0);
 		}
 
 		private void Move()
 		{
-			Vector2 move = _controls.Player.Move.ReadValue<Vector2>();
 			// set target speed based on move speed, sprint speed and if sprint is pressed
-			float targetSpeed = _controls.Player.Sprint.ReadValue<float>().AsBool() ? SprintSpeed : MoveSpeed;
+			float targetSpeed = _sprint.Value ? SprintSpeed : MoveSpeed;
 
 			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
 			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
 			// if there is no input, set the target speed to 0
-			if (move == Vector2.zero) targetSpeed = 0.0f;
+			if (_move.Value == Vector2.zero) targetSpeed = 0.0f;
 
 			// a reference to the players current horizontal velocity
 			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
@@ -152,44 +198,27 @@ namespace ExoplanetStudios.ExtractionShooter
 				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
 				// round speed to 3 decimal places
-				_speed = Mathf.Round(_speed * 1000f) / 1000f;
+				_speed = Utility.Round(_speed, 0.001f);
 			}
 			else
-			{
 				_speed = targetSpeed;
-			}
 
-			// normalise input direction
-			Vector3 inputDirection = new Vector3(move.x, 0.0f, move.y).normalized;
-
-			// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-			// if there is a move input rotate player when the player is moving
-			if (move != Vector2.zero)
-			{
-				// move
-				inputDirection = transform.right * move.x + transform.forward * move.y;
-			}
+			Vector3 inputDirection = transform.right * _move.Value.x + transform.forward * _move.Value.y;
 
 			// move the player
 			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 		}
 
-		private void JumpAndGravity()
+		private void CalculateGravity()
 		{
 			if (Grounded)
 			{
-				bool jump = _controls.Player.Jump.ReadValue<float>().AsBool();
 				// reset the fall timeout timer
 				_fallTimeoutDelta = FallTimeout;
 
 				// stop our velocity dropping infinitely when grounded
 				if (_verticalVelocity < 0.0f)
 					_verticalVelocity = -2f;
-
-				// Jump
-				if (jump && _jumpTimeoutDelta <= 0.0f)
-					// the square root of H * -2 * G = how much velocity needed to reach desired height
-					_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity); 
 
 				// jump timeout
 				if (_jumpTimeoutDelta >= 0.0f)
@@ -207,9 +236,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
 			// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
 			if (_verticalVelocity < _terminalVelocity)
-			{
 				_verticalVelocity += Gravity * Time.deltaTime;
-			}
 		}
 
 		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
@@ -217,6 +244,17 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (lfAngle < -360f) lfAngle += 360f;
 			if (lfAngle > 360f) lfAngle -= 360f;
 			return Mathf.Clamp(lfAngle, lfMin, lfMax);
+		}
+		private void SyncPosition(Vector3 oldPosition, Vector3 position)
+		{
+			if (IsOwner)
+			{
+				if (position.sqrMagnitude - transform.position.sqrMagnitude > _positionAsyncDist)
+					transform.position = position;
+				return;	
+			}
+			// Interpolation here
+			transform.position = position;
 		}
 	}
 }
