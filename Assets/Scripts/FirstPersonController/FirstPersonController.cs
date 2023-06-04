@@ -64,16 +64,12 @@ namespace ExoplanetStudios.ExtractionShooter
 		private CharacterController _controller;
 
 		private const float _threshold = 0.01f;
-		private const float _positionAsyncDist = 0.1f;
 
 		// Input Network Variables
 		private NetworkVariable<Vector2> _move = new NetworkVariable<Vector2>(writePerm: NetworkVariableWritePermission.Owner);
 		private NetworkVariable<float> _xRotation = new NetworkVariable<float>(writePerm: NetworkVariableWritePermission.Owner);
 		private NetworkVariable<bool> _sprint = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
 		private NetworkVariable<float> _cinemachineTargetPitch = new NetworkVariable<float>(writePerm: NetworkVariableWritePermission.Owner);
-
-		// Sync Network Variables
-		private NetworkVariable<Vector3> _position = new NetworkVariable<Vector3>();
 
 		private void Start()
 		{
@@ -89,16 +85,9 @@ namespace ExoplanetStudios.ExtractionShooter
 				_controls.Player.Jump.started += JumpInput;
 			}
 		}
-		public override void OnNetworkSpawn()
-		{
-			if (!IsServer)
-				_position.OnValueChanged += SyncPosition;
-		}
 		public override void OnDestroy()
 		{
 			base.OnDestroy();
-			if (!IsServer)
-				_position.OnValueChanged -= SyncPosition;
 
 			if (IsOwner)
 				_controls.Player.Jump.started -= JumpInput;
@@ -130,8 +119,6 @@ namespace ExoplanetStudios.ExtractionShooter
 				GroundedCheck();
 				Move();
 			}
-			if (IsServer)
-				_position.Value = transform.position;
 		}
 		private void ReadInput()
 		{
@@ -252,17 +239,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (lfAngle < -360f) lfAngle += 360f;
 			if (lfAngle > 360f) lfAngle -= 360f;
 			return Mathf.Clamp(lfAngle, lfMin, lfMax);
-		}
-		private void SyncPosition(Vector3 oldPosition, Vector3 position)
-		{
-			if (IsOwner)
-			{
-				if (position.sqrMagnitude - transform.position.sqrMagnitude > _positionAsyncDist)
-					transform.position = position;
-				return;	
-			}
-			// Interpolation here
-			transform.position = position;
 		}
 	}
 }
