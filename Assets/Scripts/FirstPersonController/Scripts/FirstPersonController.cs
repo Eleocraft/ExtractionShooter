@@ -14,7 +14,8 @@ namespace ExoplanetStudios.ExtractionShooter
 		[Tooltip("Rotation speed of the character")]
 		[SerializeField] private float RotationSpeed = 1.0f;
 		[Tooltip("Acceleration and deceleration")]
-		[SerializeField] private float SpeedChangeRate = 10.0f;
+		[SerializeField] private float GroundSpeedChangeRate = 8.0f;
+		[SerializeField] private float AirSpeedChangeRate = 3.0f;
 
 		[Space(10)]
 		[Tooltip("The height the player can jump")]
@@ -50,6 +51,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private float _speed;
 		private float _verticalVelocity;
 		private float _terminalVelocity = 53.0f;
+		private float _speedChangeRate = 10.0f;
 
 		// timeout deltatime
 		private float _jumpTimeoutDelta;
@@ -195,7 +197,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				// creates curved result rather than a linear one giving a more organic speed change
 				// note T in Lerp is clamped, so we don't need to clamp our speed
-				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed, Time.deltaTime * SpeedChangeRate);
+				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed, Time.deltaTime * _speedChangeRate);
 
 				// round speed to 3 decimal places
 				_speed = Utility.Round(_speed, 0.001f);
@@ -216,6 +218,9 @@ namespace ExoplanetStudios.ExtractionShooter
 				// reset the fall timeout timer
 				_fallTimeoutDelta = FallTimeout;
 
+				// SpeedChangeRate
+				_speedChangeRate = GroundSpeedChangeRate;
+
 				// stop our velocity dropping infinitely when grounded
 				if (_verticalVelocity < 0.0f)
 					_verticalVelocity = -2f;
@@ -228,6 +233,9 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				// reset the jump timeout timer
 				_jumpTimeoutDelta = JumpTimeout;
+
+				// SpeedChangeRate
+				_speedChangeRate = AirSpeedChangeRate;
 
 				// fall timeout
 				if (_fallTimeoutDelta >= 0.0f)
