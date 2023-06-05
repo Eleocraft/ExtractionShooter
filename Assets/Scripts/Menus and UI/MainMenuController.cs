@@ -8,36 +8,31 @@ using System.Linq;
 
 public class MainMenuController : MonoBehaviour
 {
+    private const string localhost = "127.0.0.1";
     [SerializeField] private TMP_InputField IpInputField;
     [SerializeField] private string mainSceneName;
     public void StartHost()
     {
-        Destroy(NetworkManager.Singleton.gameObject);
-        SceneManager.LoadScene(mainSceneName);
+        NetworkManager.Singleton.StartHost();
+        NetworkManager.Singleton.SceneManager.LoadScene(mainSceneName, LoadSceneMode.Single);
     }
     public void StartClient()
     {
-        if (string.IsNullOrEmpty(IpInputField.text))
-            IpInputField.text = "localhost";
-
         NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = GetIPfromURL(IpInputField.text);
         NetworkManager.Singleton.StartClient();
     }
     private string GetIPfromURL(string URL)
     {
+        if (string.IsNullOrEmpty(URL))
+            return localhost;
         if (!URL.Any(x => !char.IsLetter(x)))
             return URL;
-        if (URL == "localhost")
-            return "127.0.0.1";
         try 
         {
             IPHostEntry Hosts = Dns.GetHostEntry(URL);
             return Hosts.AddressList[0].ToString();
         }
-        catch
-        {
-            throw new WrongAdressException();
-        }
+        catch { throw new WrongAdressException(); }
     }
     public class WrongAdressException : System.Exception
     {

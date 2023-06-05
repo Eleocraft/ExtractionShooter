@@ -5,7 +5,7 @@ using Unity.Netcode.Transports.UTP;
 public class StartHost : MonoBehaviour
 {
     [SerializeField] private bool SimulatedDelay;
-    void Start()
+    void Awake()
     {
         if (NetworkManager.Singleton.SceneManager == null)
         {

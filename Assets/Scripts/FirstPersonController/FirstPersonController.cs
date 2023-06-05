@@ -41,7 +41,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
 		[Header("Cinemachine")]
 		[Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
-		[SerializeField] private GameObject CinemachineCameraTarget;
+		[SerializeField] private GameObject CameraSocket;
 		[Tooltip("How far in degrees can you move the camera up")]
 		[SerializeField] private float TopClamp = 90.0f;
 		[Tooltip("How far in degrees can you move the camera down")]
@@ -50,12 +50,19 @@ namespace ExoplanetStudios.ExtractionShooter
 		// player
 		private float _speed;
 		private float _verticalVelocity;
-		private float _terminalVelocity = 53.0f;
-		private float _speedChangeRate = 10.0f;
+		private float _speedChangeRate;
+		private float _jumpVelocity;
+		private float _xRotation;
+		private float _yRotation;
+		private const float TERMINAL_VELOCITY = 53.0f;
 
 		// timeout deltatime
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
+		private const float SPEED_OFFSET = 0.05f;
+		// tick system
+		private float _lastTickTime;
+		private float _tickDeltaTime;
 
 		[SerializeField]
 		private GlobalInputs GI;
@@ -63,24 +70,27 @@ namespace ExoplanetStudios.ExtractionShooter
 		private InputMaster _controls;
 		private CharacterController _controller;
 
-		private const float _threshold = 0.01f;
-
-		// Input Network Variables
-		private NetworkVariable<Vector2> _move = new NetworkVariable<Vector2>(writePerm: NetworkVariableWritePermission.Owner);
-		private NetworkVariable<float> _xRotation = new NetworkVariable<float>(writePerm: NetworkVariableWritePermission.Owner);
-		private NetworkVariable<bool> _sprint = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
-		private NetworkVariable<float> _cinemachineTargetPitch = new NetworkVariable<float>(writePerm: NetworkVariableWritePermission.Owner);
+		// Buffer and CSP
+		private const int BUFFER_SIZE = 1024;
+		private NetworkInputState[] _inputStates = new NetworkInputState[BUFFER_SIZE];
+		private NetworkTransformState[] _transformStates = new NetworkTransformState[BUFFER_SIZE];
+		public NetworkVariable<NetworkTransformState> ServerTransformState = new NetworkVariable<NetworkTransformState>();
+		public NetworkTransformState _previousTransformState;
 
 		private void Start()
 		{
+			// the square root of H * -2 * G = how much velocity needed to reach desired height
+			_jumpVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 			_controller = GetComponent<CharacterController>();
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
+			NetworkManager.NetworkTickSystem.Tick += Tick;
+			ServerTransformState.OnValueChanged += OnServerStateChanged;
 
 			if (IsOwner)
 			{
-				GameObject.FindGameObjectWithTag("PlayerCam").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = CinemachineCameraTarget.transform;
+				GameObject.FindGameObjectWithTag("PlayerCam").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = CameraSocket.transform;
 				_controls = GI.Controls;
 				_controls.Player.Jump.started += JumpInput;
 			}
@@ -88,9 +98,18 @@ namespace ExoplanetStudios.ExtractionShooter
 		public override void OnDestroy()
 		{
 			base.OnDestroy();
+			
+			ServerTransformState.OnValueChanged -= OnServerStateChanged;
+
+			if (NetworkManager.Singleton != null)
+				NetworkManager.NetworkTickSystem.Tick -= Tick;
 
 			if (IsOwner)
 				_controls.Player.Jump.started -= JumpInput;
+		}
+		private void OnServerStateChanged(NetworkTransformState previouseState, NetworkTransformState newState)
+		{
+			_previousTransformState = previouseState;
 		}
 
 		private void JumpInput(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
@@ -99,52 +118,70 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (!IsHost)
 				JumpServerRpc();
 		}
-		[ServerRpc()]
+		[ServerRpc]
 		private void JumpServerRpc() => Jump();
 		private void Jump()
 		{
 			// Jump
 			if (Grounded && _jumpTimeoutDelta <= 0.0f)
-				// the square root of H * -2 * G = how much velocity needed to reach desired height
-				_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity); 
+				_verticalVelocity = _jumpVelocity; 
 		}
-		private void Update()
+		private void Tick()
 		{
-			if (IsOwner)
-				ReadInput();
-				
+			_tickDeltaTime = Time.time - _lastTickTime;
+			_lastTickTime = Time.time;
+
+			int bufferIndex = NetworkManager.NetworkTickSystem.LocalTime.Tick % BUFFER_SIZE;
+
 			if (IsServer || IsOwner)
 			{
 				CalculateGravity();
 				GroundedCheck();
-				Move();
 			}
-		}
-		private void ReadInput()
-		{
-			_move.Value = _controls.Player.Move.ReadValue<Vector2>();
-			_sprint.Value = _controls.Player.Sprint.ReadValue<float>().AsBool();
-			Vector2 lookInput = _controls.Mouse.Look.ReadValue<Vector2>();
-
-			// Camera rotation
-			// if there is an input
-			if (lookInput.sqrMagnitude >= _threshold)
+			if (IsOwner)
 			{
-				_cinemachineTargetPitch.Value += lookInput.y * RotationSpeed;
-				float _rotationVelocity = lookInput.x * RotationSpeed;
+				NetworkInputState inputState = ReadInput();
 
-				// clamp our pitch rotation
-				_cinemachineTargetPitch.Value = ClampAngle(_cinemachineTargetPitch.Value, BottomClamp, TopClamp);
+				MoveServerRpc(inputState.MovementInput, inputState.Sprint);
+				Move(inputState.MovementInput, inputState.Sprint);
 
-				_xRotation.Value += _rotationVelocity;
+				NetworkTransformState transformState = ReadTransformState();
+
+				_inputStates[bufferIndex] = inputState;
+				_transformStates[bufferIndex] = transformState;
+			}
+			else
+			{
+				transform.position = ServerTransformState.Value.Position;
+				transform.rotation = ServerTransformState.Value.Rotation;
 			}
 		}
-
-		private void LateUpdate()
+		private void Update()
 		{
-			if (!IsOwner && !IsServer) return;
-
-			CameraRotation();
+			if (IsOwner)
+			{
+				CalculateRotation();
+				Rotate(new(_xRotation, _yRotation));
+			}
+		}
+		private NetworkInputState ReadInput()
+		{
+			return new NetworkInputState()
+			{
+				Tick = NetworkManager.NetworkTickSystem.LocalTime.Tick,
+				MovementInput = _controls.Player.Move.ReadValue<Vector2>(),
+				Sprint = _controls.Player.Sprint.ReadValue<float>().AsBool(),
+				LookRotation = new Vector2(_xRotation, _yRotation)
+			};
+		}
+		private NetworkTransformState ReadTransformState()
+		{
+			return new NetworkTransformState()
+			{
+				Tick = NetworkManager.NetworkTickSystem.LocalTime.Tick,
+				Position = transform.position,
+				Rotation = transform.rotation
+			};
 		}
 
 		private void GroundedCheck()
@@ -153,49 +190,64 @@ namespace ExoplanetStudios.ExtractionShooter
 			Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
 			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 		}
-
-		private void CameraRotation()
+		private void CalculateRotation()
 		{
-			// Update Cinemachine camera target pitch
-			CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch.Value, 0.0f, 0.0f);
+			Vector2 lookInput = _controls.Mouse.Look.ReadValue<Vector2>();
 
-			// rotate the player left and right
-			transform.rotation = Quaternion.Euler(0, _xRotation.Value, 0);
+			// Camera rotation
+			_xRotation += lookInput.y * RotationSpeed;
+			float _rotationVelocity = lookInput.x * RotationSpeed;
+
+			// clamp our pitch rotation
+			_xRotation = Mathf.Clamp(_xRotation, BottomClamp, TopClamp);
+
+			_yRotation += _rotationVelocity;
 		}
 
-		private void Move()
+		private void Rotate(Vector2 LookRotation)
+		{
+			// Update camera target pitch
+			CameraSocket.transform.localRotation = Quaternion.Euler(LookRotation.x, 0.0f, 0.0f);
+
+			// rotate the player left and right
+			transform.rotation = Quaternion.Euler(0, LookRotation.y, 0);
+		}
+
+		[ServerRpc]
+		private void MoveServerRpc(Vector2 moveInput, bool sprint)
+		{
+			Move(moveInput, sprint);
+			NetworkTransformState transformState = ReadTransformState();
+			// ??!!
+			_previousTransformState = ServerTransformState.Value;
+
+			ServerTransformState.Value = transformState;
+		}
+		private void Move(Vector2 moveInput, bool sprint)
 		{
 			// set target speed based on move speed, sprint speed and if sprint is pressed
-			float targetSpeed = _sprint.Value ? SprintSpeed : MoveSpeed;
+			float targetSpeed = sprint ? SprintSpeed : MoveSpeed;
 
-			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-			// if there is no input, set the target speed to 0
-			if (_move.Value == Vector2.zero) targetSpeed = 0.0f;
+			// target speed is 0 if no key is pressed
+			if (moveInput == Vector2.zero) targetSpeed = 0.0f;
 
 			// a reference to the players current horizontal velocity
 			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
-			float speedOffset = 0.1f;
-
 			// accelerate or decelerate to target speed
-			if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
+			if (currentHorizontalSpeed < targetSpeed - SPEED_OFFSET || currentHorizontalSpeed > targetSpeed + SPEED_OFFSET)
 			{
-				// creates curved result rather than a linear one giving a more organic speed change
-				// note T in Lerp is clamped, so we don't need to clamp our speed
-				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed, Time.deltaTime * _speedChangeRate);
-
-				// round speed to 3 decimal places
+				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed, _tickDeltaTime * _speedChangeRate);
 				_speed = Utility.Round(_speed, 0.001f);
 			}
 			else
 				_speed = targetSpeed;
 
-			Vector3 inputDirection = transform.right * _move.Value.x + transform.forward * _move.Value.y;
+			Vector3 inputDirection = transform.right * moveInput.x + transform.forward * moveInput.y;
 
 			// move the player
-			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+			// -----------> TARGET SPEED FIX
+			_controller.Move(inputDirection.normalized * (targetSpeed * _tickDeltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * _tickDeltaTime);
 		}
 
 		private void CalculateGravity()
@@ -214,7 +266,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
 				// jump timeout
 				if (_jumpTimeoutDelta >= 0.0f)
-					_jumpTimeoutDelta -= Time.deltaTime;
+					_jumpTimeoutDelta -= _tickDeltaTime;
 			}
 			else
 			{
@@ -226,19 +278,12 @@ namespace ExoplanetStudios.ExtractionShooter
 
 				// fall timeout
 				if (_fallTimeoutDelta >= 0.0f)
-					_fallTimeoutDelta -= Time.deltaTime;
+					_fallTimeoutDelta -= _tickDeltaTime;
 			}
 
 			// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-			if (_verticalVelocity < _terminalVelocity)
-				_verticalVelocity += Gravity * Time.deltaTime;
-		}
-
-		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
-		{
-			if (lfAngle < -360f) lfAngle += 360f;
-			if (lfAngle > 360f) lfAngle -= 360f;
-			return Mathf.Clamp(lfAngle, lfMin, lfMax);
+			if (_verticalVelocity < TERMINAL_VELOCITY)
+				_verticalVelocity += Gravity * _tickDeltaTime;
 		}
 	}
 }
