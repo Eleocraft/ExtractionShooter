@@ -214,13 +214,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55919ac34a26952479f3fc91f777b2fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 4.68
-  SprintSpeed: 7.23
+  MoveSpeed: 4
+  SprintSpeed: 10
   RotationSpeed: 0.3
   GroundSpeedChangeRate: 7
   AirSpeedChangeRate: 1.5
   JumpHeight: 1.71
-  Gravity: -22.2
+  Gravity: -25
   JumpTimeout: 0.1
   FallTimeout: 0.15
   Grounded: 1

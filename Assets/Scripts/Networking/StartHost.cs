@@ -1,19 +1,24 @@
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using UnityEngine.SceneManagement;
 
-public class StartHost : MonoBehaviour
+namespace ExoplanetStudios.ExtractionShooter
 {
-    [SerializeField] private bool SimulatedDelay;
-    void Awake()
+    public class StartHost : MonoBehaviour
     {
-        if (NetworkManager.Singleton.SceneManager == null)
+        [SerializeField] private bool SimulatedDelay;
+        void Awake()
         {
-            NetworkManager.Singleton.StartHost();
-            if (SimulatedDelay)
-                NetworkManager.Singleton.GetComponent<UnityTransport>().SetDebugSimulatorParameters(120, 5, 3);
+            if (NetworkManager.Singleton.SceneManager == null)
+            {
+                NetworkManager.Singleton.StartHost();
+                NetworkManager.Singleton.SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+                if (SimulatedDelay)
+                    NetworkManager.Singleton.GetComponent<UnityTransport>().SetDebugSimulatorParameters(120, 5, 3);
+            }
+            else
+                Destroy(this.gameObject);
         }
-        else
-            Destroy(this.gameObject);
     }
 }

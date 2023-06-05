@@ -1,19 +1,22 @@
 using UnityEngine;
 
-public class PauseMenu : MonoBehaviour
+namespace ExoplanetStudios.ExtractionShooter
 {
-    [SerializeField] private GameObject pauseMenu;
-    private void Start()
+    public class PauseMenu : MonoBehaviour
     {
-        EscQueue.pauseMenu += ToggleMenu;
-    }
-    private void OnDestroy()
-    {
-        EscQueue.pauseMenu -= ToggleMenu;
-    }
-    private void ToggleMenu()
-    {
-        pauseMenu.SetActive(!pauseMenu.activeSelf);
-        CursorStateMachine.ChangeCursorState(!pauseMenu.activeSelf, this);
+        [SerializeField] private GameObject pauseMenu;
+        private void Start()
+        {
+            EscQueue.pauseMenu += ToggleMenu;
+        }
+        private void OnDestroy()
+        {
+            EscQueue.pauseMenu -= ToggleMenu;
+        }
+        private void ToggleMenu()
+        {
+            pauseMenu.SetActive(!pauseMenu.activeSelf);
+            CursorStateMachine.ChangeCursorState(!pauseMenu.activeSelf, this);
+        }
     }
 }

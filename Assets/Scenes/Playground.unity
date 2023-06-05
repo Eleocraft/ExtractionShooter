@@ -441,6 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08be8915165091f4788add903640f100, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _targetFrameRate: 60
 --- !u!4 &507968750
 Transform:
   m_ObjectHideFlags: 0
@@ -1053,7 +1054,7 @@ MonoBehaviour:
     PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists:
-      - {fileID: 11400000, guid: e54ec082f84f9ca45a5c34fbeb70506d, type: 2}
+      - {fileID: 11400000, guid: e80bf9508534fc1429f3ad488c6299de, type: 2}
     TickRate: 50
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0

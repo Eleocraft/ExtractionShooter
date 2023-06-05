@@ -1,27 +1,30 @@
 using UnityEngine;
 using Unity.Netcode;
 
-public class NetworkTransformState : INetworkSerializable
+namespace ExoplanetStudios.ExtractionShooter
 {
-    public int Tick;
-    public Vector3 Position;
-    public Quaternion Rotation;
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    public class NetworkTransformState : INetworkSerializable
     {
-        if (serializer.IsReader)
+        public int Tick;
+        public Vector3 Position;
+        public Vector2 LookRotation;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            FastBufferReader reader = serializer.GetFastBufferReader();
-            reader.ReadValueSafe(out Tick);
-            reader.ReadValueSafe(out Position);
-            reader.ReadValueSafe(out Rotation);
-        }
-        else
-        {
-            FastBufferWriter writer = serializer.GetFastBufferWriter();
-            writer.WriteValueSafe(Tick);
-            writer.WriteValueSafe(Position);
-            writer.WriteValueSafe(Rotation);
+            if (serializer.IsReader)
+            {
+                FastBufferReader reader = serializer.GetFastBufferReader();
+                reader.ReadValueSafe(out Tick);
+                reader.ReadValueSafe(out Position);
+                reader.ReadValueSafe(out LookRotation);
+            }
+            else
+            {
+                FastBufferWriter writer = serializer.GetFastBufferWriter();
+                writer.WriteValueSafe(Tick);
+                writer.WriteValueSafe(Position);
+                writer.WriteValueSafe(LookRotation);
+            }
         }
     }
 }
