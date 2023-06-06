@@ -78,10 +78,7 @@ namespace ExoplanetStudios
             float sin = Mathf.Sin(radians);
             float cos = Mathf.Cos(radians);
             
-            float tx = v.x;
-            float ty = v.y;
-    
-            return new Vector2(cos * tx - sin * ty, sin * tx + cos * ty);
+            return new Vector2(cos * v.x + sin * v.y, cos * v.y - sin * v.x);
         }
 
         // Vector2Int cast
