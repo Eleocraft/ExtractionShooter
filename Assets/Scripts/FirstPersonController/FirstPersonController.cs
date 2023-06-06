@@ -70,9 +70,11 @@ namespace ExoplanetStudios.ExtractionShooter
 		// Buffer and CSP
 		private List<BufferedState> _bufferedStates = new List<BufferedState>();
 		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>();
-		private NetworkVariable<NetworkInputState> _clientInputs = new NetworkVariable<NetworkInputState>(writePerm: NetworkVariableWritePermission.Owner);
 		private NetworkTransformState _lastTransformOnServerUpdate;
 		private const int BUFFER_SIZE = 200;
+		private const float ERROR_THRESHOLD = 0.03f;
+		private NetworkInputState _inputState;
+		private NetworkInputState _nextInputState;
 
 		private void Start()
 		{
@@ -89,12 +91,14 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (IsServer)
 				_serverTransformState.Value = CreateTransformState();
 
+			_inputState = new NetworkInputState() { Tick = NetworkManager.NetworkTickSystem.LocalTime.Tick };
+			_nextInputState = _inputState;
+
 			if (IsOwner)
 			{
 				GameObject.FindGameObjectWithTag("PlayerCam").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = CameraSocket.transform;
 				_controls = GI.Controls;
 				_controls.Player.Jump.started += JumpInput;
-				_clientInputs.Value = CreateInputState();
 			}
 		}
 		public override void OnDestroy()
@@ -128,16 +132,14 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			if (IsOwner)
 				CalculateRotation();
-			
-			if (IsServer || IsOwner)
+
+			if (IsOwner || IsServer)
 			{
 				GroundedCheck();
+				if (_inputState == null) return;
+				Move(_inputState.MovementInput, _inputState.Sprint, Time.deltaTime);
+				Rotate(_inputState.LookRotation);
 				CalculateGravity(Time.deltaTime);
-
-				if (_clientInputs.Value == null) return;
-
-				Move(_clientInputs.Value.MovementInput, _clientInputs.Value.Sprint, Time.deltaTime);
-				Rotate(_clientInputs.Value.LookRotation);
 			}
 			else
 			{
@@ -150,15 +152,34 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			if (IsOwner)
 			{
-				NetworkInputState inputState = CreateInputState();
-				_clientInputs.Value = inputState;
-				_bufferedStates.Add(new(NetworkManager.NetworkTickSystem.LocalTime.Tick, inputState, CreateTransformState()));
+				_inputState = CreateInputState();
+				_bufferedStates.Add(new(NetworkManager.NetworkTickSystem.LocalTime.Tick, _inputState, CreateTransformState()));
 
-				if (_bufferedStates.Count > BUFFER_SIZE)
+				if (_bufferedStates.Count >= BUFFER_SIZE)
 					_bufferedStates.RemoveAt(0);
+				
+				OnInputServerRpc(_inputState);
 			}
-			if (IsServer)
+			else if (IsServer)
+			{
+				if (_nextInputState.Tick <= NetworkManager.NetworkTickSystem.LocalTime.Tick && _nextInputState != _inputState)
+				{
+					_inputState = _nextInputState;
+					_serverTransformState.Value = CreateTransformState();
+				}
+			}
+		}
+		[ServerRpc]
+		private void OnInputServerRpc(NetworkInputState inputState)
+		{
+			if (IsOwner) return;
+
+			_nextInputState = inputState;
+			if (_nextInputState.Tick <= NetworkManager.NetworkTickSystem.LocalTime.Tick)
+			{
+				_inputState = _nextInputState;
 				_serverTransformState.Value = CreateTransformState();
+			}
 		}
 		private void OnServerStateChanged(NetworkTransformState previouseState, NetworkTransformState receivedState)
 		{
@@ -166,19 +187,13 @@ namespace ExoplanetStudios.ExtractionShooter
 
 			if (IsOwner)
 			{
-				if (_bufferedStates.Count > 0)
-				{
-					Debug.Log("<>>>>>><><<<>>");
-					Debug.Log("TS: " + _bufferedStates[_bufferedStates.Count - 1].Tick);
-					Debug.Log(StateBuffered(receivedState.Tick, out BufferedState temp));
-					Debug.Log("RS: " + receivedState.Tick);
-				}
 				if (StateBuffered(receivedState.Tick, out BufferedState state))
 				{
-					if (state.TransformState.Position != receivedState.Position)
+					if ((state.TransformState.Position - receivedState.Position).sqrMagnitude > ERROR_THRESHOLD)
 					{
 						// Rewind logic
 						Debug.Log("error found");
+						Debug.Log((state.TransformState.Position - receivedState.Position).magnitude);
 					}
 				}
 				else
@@ -259,6 +274,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			Vector3 inputDirection = transform.right * moveInput.x + transform.forward * moveInput.y;
 
 			// move the player
+			// ---> TARGET SPEED FIX
 			_controller.Move(inputDirection.normalized * (_speed * deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * deltaTime);
 		}
 
