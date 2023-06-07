@@ -441,7 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08be8915165091f4788add903640f100, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _targetFrameRate: 60
+  _targetFrameRate: 144
 --- !u!4 &507968750
 Transform:
   m_ObjectHideFlags: 0
@@ -1098,7 +1098,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dbe70843796df046aa8c885abee4a75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SimulatedDelay: 0
 --- !u!1 &1695022533
 GameObject:
   m_ObjectHideFlags: 0
@@ -1401,7 +1400,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2056410043}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.5512333, y: 1.2722449, z: 1.7437149}
+  m_LocalPosition: {x: 0, y: 1.2722449, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -8,6 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
 	public class FirstPersonController : NetworkBehaviour
 	{
 		[Header("Player")]
+		[SerializeField] private Transform Playermodel;
 		[Tooltip("Move speed of the character in m/s")]
 		[SerializeField] private float MoveSpeed = 4.0f;
 		[Tooltip("Sprint speed of the character in m/s")]
@@ -38,21 +39,20 @@ namespace ExoplanetStudios.ExtractionShooter
 		[Tooltip("What layers the character uses as ground")]
 		[SerializeField] private LayerMask GroundLayers;
 
-		[Header("Cinemachine")]
-		[Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
-		[SerializeField] private GameObject CameraSocket;
+		[Header("Camera")]
+		[SerializeField] private Transform CameraSocket;
 		[Tooltip("How far in degrees can you move the camera up")]
 		[SerializeField] private float TopClamp = 90.0f;
 		[Tooltip("How far in degrees can you move the camera down")]
 		[SerializeField] private float BottomClamp = -90.0f;
 
 		// player
-		private float _speed;
-		private float _verticalVelocity;
-		private float _speedChangeRate;
 		private float _jumpVelocity;
-		private Vector2 _lookRotation; // owner only
+		private bool _jump; // Owner only
+		private Vector2 _lookRotation;
 		private const float TERMINAL_VELOCITY = 100.0f;
+		private const string CAMERA_SOCKET_NAME = "CameraSocket";
+		private const string PLAYER_CAM_TAG = "PlayerCam";
 
 		// timeout deltatime
 		private float _jumpTimeoutDelta;
@@ -70,8 +70,8 @@ namespace ExoplanetStudios.ExtractionShooter
 		private Dictionary<int, NetworkInputState> _inputsReceived; // Serveronly
 		private NetworkInputState _lastReceivedInput; // Serveronly
 		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>();
-		private NetworkTransformState _lastTransformState = new();
-		private NetworkTransformState _currentTransformState = new();
+		private NetworkTransformState _lerpStartTransformState = new(0);
+		private NetworkTransformState _currentTransformState = new(0);
 		private float _currentTickDeltaTime;
 		private const int BUFFER_SIZE = 200;
 		private const float ERROR_THRESHOLD = 0.03f;
@@ -92,12 +92,12 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				_serverTransformState.Value = CreateTransformState();
 				_inputsReceived = new Dictionary<int, NetworkInputState>();
-				_lastReceivedInput = new NetworkInputState() { Tick = NetworkManager.LocalTime.Tick };
+				_lastReceivedInput = new NetworkInputState(NetworkManager.LocalTime.Tick);
 			}
 
 			if (IsOwner)
 			{
-				GameObject.FindGameObjectWithTag("PlayerCam").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = CameraSocket.transform;
+				GameObject.FindGameObjectWithTag(PLAYER_CAM_TAG).GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = CameraSocket;
 				_controls = GI.Controls;
 				_controls.Player.Jump.started += JumpInput;
 				_bufferedStates = new List<BufferedState>();
@@ -106,70 +106,60 @@ namespace ExoplanetStudios.ExtractionShooter
 		public override void OnDestroy()
 		{
 			base.OnDestroy();
+
+			if (NetworkManager.enabled)
+				NetworkManager.NetworkTickSystem.Tick -= Tick;
 			
 			_serverTransformState.OnValueChanged -= OnServerStateChanged;
-
-			if (NetworkManager.Singleton != null)
-				NetworkManager.NetworkTickSystem.Tick -= Tick;
 
 			if (IsOwner)
 				_controls.Player.Jump.started -= JumpInput;
 		}
 
-		private void JumpInput(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
-		{
-			Jump();
-			if (!IsHost)
-				JumpServerRpc();
-		}
-		[ServerRpc]
-		private void JumpServerRpc() => Jump();
-		private void Jump()
-		{
-			// Jump
-			if (GroundedCheck() && _jumpTimeoutDelta <= 0.0f)
-				_verticalVelocity = _jumpVelocity; 
-		}
+		private void JumpInput(UnityEngine.InputSystem.InputAction.CallbackContext ctx) => _jump = true;
 		private void Update()
 		{
-			if (IsOwner)
-				CalculateRotation();
-			
 			_currentTickDeltaTime += Time.deltaTime;
 			float relativeDeltaTime = _currentTickDeltaTime / NetworkManager.LocalTime.FixedDeltaTime;
 
-			Vector3 position = Vector3.Lerp(_lastTransformState.Position, _currentTransformState.Position, relativeDeltaTime);
+			Vector3 position = Vector3.LerpUnclamped(_lerpStartTransformState.Position, _currentTransformState.Position, relativeDeltaTime);
 			// the owner should always have the most accurate lookrotation possible
-			Vector2 lookRotation = IsOwner ? _lookRotation : _currentTransformState.LookRotation;//Vector2.Lerp(_lastTransformState.LookRotation, _currentTransformState.LookRotation, relativeDeltaTime);
-			Transform(position, lookRotation);
+			if (IsOwner)
+				CalculateRotation();
+			else
+				_lookRotation = Utility.Vector2RotateLerpUnclamped(_lerpStartTransformState.LookRotation, _currentTransformState.LookRotation, relativeDeltaTime);
+			Transform(position, _lookRotation);
 		}
 		private void Tick()
 		{
 			if (IsOwner)
 			{
 				NetworkInputState inputState = CreateInputState();
-				CalculateTransformState(inputState);
+				CalculateTransformStates(inputState);
 				
 				_bufferedStates.Add(new(NetworkManager.LocalTime.Tick, inputState, _currentTransformState));
 				if (_bufferedStates.Count >= BUFFER_SIZE)
 					_bufferedStates.RemoveAt(0);
 				
-				if (IsServer)
+				if (IsHost)
 					_serverTransformState.Value = _currentTransformState;
 				else
 					OnInputServerRpc(inputState);
+				
+				if (_jump)
+					_jump = false;
 			}
 			else if (IsServer)
 			{
 				if (_serverTransformState.Value.Tick < NetworkManager.LocalTime.Tick - 1) // missed a tick
 				{
-					CalculateTransformState(_lastReceivedInput);
+					CalculateTransformStates(_lastReceivedInput, NetworkManager.LocalTime.Tick - 1);
 
 					_serverTransformState.Value = _currentTransformState;
 				}
 				if (_inputsReceived.ContainsKey(NetworkManager.LocalTime.Tick)) // Applying received input
 				{
-					CalculateTransformState(_inputsReceived[NetworkManager.LocalTime.Tick]);
+					CalculateTransformStates(_inputsReceived[NetworkManager.LocalTime.Tick]);
 					_lastReceivedInput = _inputsReceived[NetworkManager.LocalTime.Tick];
 					_inputsReceived.Remove(NetworkManager.LocalTime.Tick);
 
@@ -180,12 +170,10 @@ namespace ExoplanetStudios.ExtractionShooter
 		[ServerRpc]
 		private void OnInputServerRpc(NetworkInputState inputState)
 		{
-			Debug.Log(inputState.Tick + "  " + NetworkManager.LocalTime.Tick);
-
 			// Input should be executed instantly
 			if (inputState.Tick == NetworkManager.LocalTime.Tick)
 			{
-				CalculateTransformState(inputState);
+				CalculateTransformStates(inputState);
 				_lastReceivedInput = inputState;
 				
 				_serverTransformState.Value = _currentTransformState;
@@ -197,14 +185,23 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			if (IsOwner && !IsServer)
 			{
-				if (StateBuffered(receivedState.Tick, out BufferedState state))
+				if (StateBuffered(receivedState.Tick, out int stateId))
 				{
-					if ((state.TransformState.Position - receivedState.Position).sqrMagnitude > ERROR_THRESHOLD)
+					if ((_bufferedStates[stateId].TransformState.Position - receivedState.Position).sqrMagnitude <= ERROR_THRESHOLD)
+						return;
+
+					// Rewind logic
+					Debug.Log("reconceliation");
+					_currentTransformState = receivedState;
+					_controller.Move(receivedState.Position - transform.position);
+					for (int i = stateId; i < _bufferedStates.Count; i++)
 					{
-						// Rewind logic
-						Debug.Log("error found");
-						Debug.Log((state.TransformState.Position - receivedState.Position).magnitude);
+						CalculateTransformStates(_bufferedStates[i].InputState, _bufferedStates[i].Tick);
+						_bufferedStates[i].TransformState = _currentTransformState;
 					}
+					// Delete outdated data
+					for (int i = stateId - 1; i >= 0; i--)
+						_bufferedStates.RemoveAt(0);
 				}
 				else
 				{
@@ -212,54 +209,38 @@ namespace ExoplanetStudios.ExtractionShooter
 					Debug.Log("desync");
 				}
 			}
-			if (!IsOwner && !IsServer)
+			else if (!IsServer)
 			{
 				_currentTickDeltaTime = 0;
-				_lastTransformState = CreateTransformState();
+				_lerpStartTransformState = CreateTransformState();
 				_currentTransformState = receivedState;
 			}
 		}
 		private NetworkInputState CreateInputState()
 		{
-			return new NetworkInputState()
-			{
-				Tick = NetworkManager.NetworkTickSystem.LocalTime.Tick,
-				MovementInput = _controls.Player.Move.ReadValue<Vector2>(),
-				Sprint = _controls.Player.Sprint.ReadValue<float>().AsBool(),
-				LookRotation = _lookRotation
-			};
+			return new NetworkInputState(NetworkManager.NetworkTickSystem.LocalTime.Tick,
+				_controls.Player.Move.ReadValue<Vector2>(), _lookRotation,
+				_controls.Player.Sprint.ReadValue<float>().AsBool(), _jump);
 		}
-		private NetworkTransformState CreateTransformState(Vector3 position, Vector2 lookRotation)
-		{
-			return new NetworkTransformState()
-			{
-				Tick = NetworkManager.LocalTime.Tick,
-				Position = position,
-				LookRotation = lookRotation
-			};
-		}
-		private NetworkTransformState CreateTransformState()
-		{
-			return new NetworkTransformState()
-			{
-				Tick = NetworkManager.LocalTime.Tick,
-				Position = transform.position,
-				LookRotation = _lookRotation
-			};
-		}
-		private void CalculateTransformState(NetworkInputState inputState)
+		private NetworkTransformState CreateTransformState() =>
+			new NetworkTransformState(NetworkManager.LocalTime.Tick, Playermodel.position, _lookRotation, _currentTransformState.CurrentHorizontalSpeed, _currentTransformState.VerticalVelocity);
+
+		private void CalculateTransformStates(NetworkInputState inputState) => 
+			CalculateTransformStates(inputState, NetworkManager.LocalTime.Tick);
+		private void CalculateTransformStates(NetworkInputState inputState, int tick)
 		{
 			_currentTickDeltaTime = 0;
+			_lerpStartTransformState = CreateTransformState();
 
-			Vector3 nextPosition = CalculateMovement(inputState.MovementInput, inputState.LookRotation, inputState.Sprint);
-			_currentTransformState = CreateTransformState(nextPosition, inputState.LookRotation);
-			_lastTransformState = CreateTransformState();
+			MovementUpdate results = CalculateMovement(inputState);
+			_controller.Move(results.Movement);
+			_currentTransformState = new NetworkTransformState(tick, transform.position, inputState.LookRotation, results.Speed, results.VerticalVelocity);
 		}
 
 		private bool GroundedCheck()
 		{
 			// set sphere position, with offset
-			Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
+			Vector3 spherePosition = _currentTransformState.Position + Vector3.down * GroundedOffset;
 			return Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 		}
 		private void CalculateRotation()
@@ -276,99 +257,110 @@ namespace ExoplanetStudios.ExtractionShooter
 			_lookRotation.y += _rotationVelocity;
 			_lookRotation.y = _lookRotation.y.ClampToAngle();
 		}
-		private Vector3 CalculateMovement(Vector2 moveInput, Vector2 lookRotation, bool sprint)
+		private MovementUpdate CalculateMovement(NetworkInputState inputState)
 		{
-			CalculateGravity();
-
+			bool grounded = GroundedCheck();
+			float verticalVelocity = CalculateGravity(inputState.Jump, grounded);
+			
 			// set target speed based on move speed, sprint speed and if sprint is pressed
-			float targetSpeed = sprint ? SprintSpeed : MoveSpeed;
+			float targetSpeed = inputState.Sprint ? SprintSpeed : MoveSpeed;
 
 			// target speed is 0 if no key is pressed
-			if (moveInput == Vector2.zero) targetSpeed = 0.0f;
+			if (inputState.MovementInput == Vector2.zero) targetSpeed = 0.0f;
 
-			// a reference to the players current horizontal velocity
-			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
+			float speed;
 			// accelerate or decelerate to target speed
-			if (currentHorizontalSpeed < targetSpeed - SPEED_OFFSET || currentHorizontalSpeed > targetSpeed + SPEED_OFFSET)
+			if (_currentTransformState.CurrentHorizontalSpeed < targetSpeed - SPEED_OFFSET || _currentTransformState.CurrentHorizontalSpeed > targetSpeed + SPEED_OFFSET)
 			{
-				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed, NetworkManager.LocalTime.FixedDeltaTime * _speedChangeRate);
-				_speed = Utility.Round(_speed, 0.001f);
+				float speedChangeRate = grounded ? GroundSpeedChangeRate : AirSpeedChangeRate;
+				speed = Mathf.Lerp(_currentTransformState.CurrentHorizontalSpeed, targetSpeed, NetworkManager.LocalTime.FixedDeltaTime * speedChangeRate);
+				speed = Utility.Round(speed, 0.001f);
 			}
 			else
-				_speed = targetSpeed;
+				speed = targetSpeed;
 
-			Vector3 inputDirection = moveInput.Rotate(lookRotation.y).AddHeight(0).normalized;
+			Vector3 input = inputState.MovementInput.Rotate(inputState.LookRotation.y).AddHeight(0).normalized * speed;
 
-			// move the player
-			// ---> TARGET SPEED FIX
-			return transform.position + inputDirection * (targetSpeed * NetworkManager.LocalTime.FixedDeltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * NetworkManager.LocalTime.FixedDeltaTime;
+			return new(input * NetworkManager.LocalTime.FixedDeltaTime + new Vector3(0.0f, verticalVelocity, 0.0f) * NetworkManager.LocalTime.FixedDeltaTime, input.magnitude, verticalVelocity);
 		}
 
-		private void CalculateGravity()
+		private float CalculateGravity(bool jump, bool grounded)
 		{
-			if (GroundedCheck())
+			float verticalVelocity = _currentTransformState.VerticalVelocity;
+			if (grounded)
 			{
-				// reset the fall timeout timer
-				_fallTimeoutDelta = FallTimeout;
+				if (jump && _jumpTimeoutDelta <= 0.0f) // if jump
+					verticalVelocity = _jumpVelocity;
+				else
+				{
+					// reset the fall timeout timer
+					_fallTimeoutDelta = FallTimeout;
 
-				// SpeedChangeRate
-				_speedChangeRate = GroundSpeedChangeRate;
+					// stop our velocity dropping infinitely when grounded
+					if (verticalVelocity < 0.0f)
+						verticalVelocity = -2f;
 
-				// stop our velocity dropping infinitely when grounded
-				if (_verticalVelocity < 0.0f)
-					_verticalVelocity = -2f;
-
-				// jump timeout
-				if (_jumpTimeoutDelta >= 0.0f)
-					_jumpTimeoutDelta -= NetworkManager.LocalTime.FixedDeltaTime;
+					// jump timeout
+					if (_jumpTimeoutDelta >= 0.0f)
+						_jumpTimeoutDelta -= NetworkManager.LocalTime.FixedDeltaTime;
+				}
 			}
 			else
 			{
 				// reset the jump timeout timer
 				_jumpTimeoutDelta = JumpTimeout;
 
-				// SpeedChangeRate
-				_speedChangeRate = AirSpeedChangeRate;
-
 				// fall timeout
 				if (_fallTimeoutDelta >= 0.0f)
 					_fallTimeoutDelta -= NetworkManager.LocalTime.FixedDeltaTime;
 			}
 
-			// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-			if (_verticalVelocity < TERMINAL_VELOCITY)
-				_verticalVelocity += Gravity * NetworkManager.LocalTime.FixedDeltaTime;
+			// apply gravity over time if under terminal
+			if (verticalVelocity < TERMINAL_VELOCITY)
+				verticalVelocity += Gravity * NetworkManager.LocalTime.FixedDeltaTime;
+			
+			return verticalVelocity;
 		}
 		private void Transform(Vector3 position, Vector2 lookRotation)
 		{
 			// Update camera target pitch
-			CameraSocket.transform.localRotation = Quaternion.Euler(lookRotation.x, 0.0f, 0.0f);
+			CameraSocket.localRotation = Quaternion.Euler(lookRotation.x, 0.0f, 0.0f);
 
 			// rotate the player left and right
-			transform.rotation = Quaternion.Euler(0, lookRotation.y, 0);
+			Playermodel.rotation = Quaternion.Euler(0, lookRotation.y, 0);
 
-			// move player
-			Vector3 movement = position - transform.position;
-			_controller.Move(movement);
+			// move playermodel
+			Playermodel.position = position;
 		}
-		private bool StateBuffered(int Tick, out BufferedState state)
+		private bool StateBuffered(int Tick, out int stateId)
 		{
 			for (int i = _bufferedStates.Count - 1; i >= 0; i--)
 			{
 				if (_bufferedStates[i].Tick == Tick)
 				{
-					state = _bufferedStates[i];
+					stateId = i;
 					return true;
 				}
 			}
-			state = null;
+			stateId = 0;
 			return false;
+		}
+		private class MovementUpdate
+		{
+			public Vector3 Movement;
+			public float Speed;
+			public float VerticalVelocity;
+			public MovementUpdate(Vector3 movement, float speed, float verticalVelocity)
+			{
+				Movement = movement;
+				Speed = speed;
+				VerticalVelocity = verticalVelocity;
+			}
 		}
 		private class BufferedState
 		{
 			public readonly int Tick;
-			public readonly NetworkTransformState TransformState;
+			public NetworkTransformState TransformState;
 			public readonly NetworkInputState InputState;
 
 			public BufferedState(int tick, NetworkInputState inputState, NetworkTransformState transformState)

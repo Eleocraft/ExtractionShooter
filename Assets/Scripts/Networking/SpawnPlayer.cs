@@ -13,7 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [ServerRpc(RequireOwnership = false)]
         private void SpawnPlayerServerRpc(ulong clientId)
         {
-            NetworkObject newPlayer = Instantiate(Player, transform.position, transform.rotation);
+            NetworkObject newPlayer = Instantiate(Player);
             newPlayer.SpawnAsPlayerObject(clientId);
         }
     }
