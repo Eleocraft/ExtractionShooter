@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using UnityEngine.SceneManagement;
 
 namespace ExoplanetStudios.ExtractionShooter

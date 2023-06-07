@@ -299,15 +299,14 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
-    "com.unity.visualscripting": {
-      "version": "1.8.0",
+    "com.unity.visualeffectgraph": {
+      "version": "12.1.11",
       "depth": 0,
-      "source": "registry",
+      "source": "builtin",
       "dependencies": {
-        "com.unity.ugui": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
+        "com.unity.shadergraph": "12.1.11",
+        "com.unity.render-pipelines.core": "12.1.11"
+      }
     },
     "com.veriorpies.parrelsync": {
       "version": "https://github.com/VeriorPies/ParrelSync.git?path=/ParrelSync",

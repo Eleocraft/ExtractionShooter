@@ -31,6 +31,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Interaction",
+                    "type": "Button",
+                    "id": "fff38a59-6558-463f-991c-eac14b901a7d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -154,6 +163,17 @@
                     "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3e83cf9e-0465-4ae3-9b57-e658e598763a",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interaction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -208,6 +228,74 @@
                     "processors": "",
                     "groups": "",
                     "action": "Escape",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Debug",
+            "id": "e7231fe7-4d4c-4c0e-afba-60ac8b3eecf8",
+            "actions": [
+                {
+                    "name": "Open",
+                    "type": "Button",
+                    "id": "a20754b8-5111-4d9a-af45-012aed6539ab",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LoadCommand",
+                    "type": "Button",
+                    "id": "06491454-e648-4289-ba3a-015310ccd53c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AutoComplete",
+                    "type": "Button",
+                    "id": "2f27aac8-0544-4ce7-9ae3-6c043f81858c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "3536517a-5475-4e6a-903e-2a35ba7af01d",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Open",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5672c310-2345-4ae9-a55a-5b85b5ff5894",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LoadCommand",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d4ee87ee-674c-48c4-a1fb-e256c56d7793",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AutoComplete",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

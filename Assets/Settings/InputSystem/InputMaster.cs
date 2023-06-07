@@ -53,6 +53,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interaction"",
+                    ""type"": ""Button"",
+                    ""id"": ""fff38a59-6558-463f-991c-eac14b901a7d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -176,6 +185,17 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3e83cf9e-0465-4ae3-9b57-e658e598763a"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interaction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -234,6 +254,74 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Debug"",
+            ""id"": ""e7231fe7-4d4c-4c0e-afba-60ac8b3eecf8"",
+            ""actions"": [
+                {
+                    ""name"": ""Open"",
+                    ""type"": ""Button"",
+                    ""id"": ""a20754b8-5111-4d9a-af45-012aed6539ab"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LoadCommand"",
+                    ""type"": ""Button"",
+                    ""id"": ""06491454-e648-4289-ba3a-015310ccd53c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AutoComplete"",
+                    ""type"": ""Button"",
+                    ""id"": ""2f27aac8-0544-4ce7-9ae3-6c043f81858c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""3536517a-5475-4e6a-903e-2a35ba7af01d"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Open"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5672c310-2345-4ae9-a55a-5b85b5ff5894"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LoadCommand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d4ee87ee-674c-48c4-a1fb-e256c56d7793"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AutoComplete"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -260,12 +348,18 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+        m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
         // Mouse
         m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
         m_Mouse_Look = m_Mouse.FindAction("Look", throwIfNotFound: true);
         // Menus
         m_Menus = asset.FindActionMap("Menus", throwIfNotFound: true);
         m_Menus_Escape = m_Menus.FindAction("Escape", throwIfNotFound: true);
+        // Debug
+        m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
+        m_Debug_Open = m_Debug.FindAction("Open", throwIfNotFound: true);
+        m_Debug_LoadCommand = m_Debug.FindAction("LoadCommand", throwIfNotFound: true);
+        m_Debug_AutoComplete = m_Debug.FindAction("AutoComplete", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -330,6 +424,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
+    private readonly InputAction m_Player_Interaction;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -337,6 +432,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+        public InputAction @Interaction => m_Wrapper.m_Player_Interaction;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -355,6 +451,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+            @Interaction.started += instance.OnInteraction;
+            @Interaction.performed += instance.OnInteraction;
+            @Interaction.canceled += instance.OnInteraction;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -368,6 +467,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+            @Interaction.started -= instance.OnInteraction;
+            @Interaction.performed -= instance.OnInteraction;
+            @Interaction.canceled -= instance.OnInteraction;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -477,6 +579,68 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         }
     }
     public MenusActions @Menus => new MenusActions(this);
+
+    // Debug
+    private readonly InputActionMap m_Debug;
+    private List<IDebugActions> m_DebugActionsCallbackInterfaces = new List<IDebugActions>();
+    private readonly InputAction m_Debug_Open;
+    private readonly InputAction m_Debug_LoadCommand;
+    private readonly InputAction m_Debug_AutoComplete;
+    public struct DebugActions
+    {
+        private @InputMaster m_Wrapper;
+        public DebugActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Open => m_Wrapper.m_Debug_Open;
+        public InputAction @LoadCommand => m_Wrapper.m_Debug_LoadCommand;
+        public InputAction @AutoComplete => m_Wrapper.m_Debug_AutoComplete;
+        public InputActionMap Get() { return m_Wrapper.m_Debug; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(DebugActions set) { return set.Get(); }
+        public void AddCallbacks(IDebugActions instance)
+        {
+            if (instance == null || m_Wrapper.m_DebugActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_DebugActionsCallbackInterfaces.Add(instance);
+            @Open.started += instance.OnOpen;
+            @Open.performed += instance.OnOpen;
+            @Open.canceled += instance.OnOpen;
+            @LoadCommand.started += instance.OnLoadCommand;
+            @LoadCommand.performed += instance.OnLoadCommand;
+            @LoadCommand.canceled += instance.OnLoadCommand;
+            @AutoComplete.started += instance.OnAutoComplete;
+            @AutoComplete.performed += instance.OnAutoComplete;
+            @AutoComplete.canceled += instance.OnAutoComplete;
+        }
+
+        private void UnregisterCallbacks(IDebugActions instance)
+        {
+            @Open.started -= instance.OnOpen;
+            @Open.performed -= instance.OnOpen;
+            @Open.canceled -= instance.OnOpen;
+            @LoadCommand.started -= instance.OnLoadCommand;
+            @LoadCommand.performed -= instance.OnLoadCommand;
+            @LoadCommand.canceled -= instance.OnLoadCommand;
+            @AutoComplete.started -= instance.OnAutoComplete;
+            @AutoComplete.performed -= instance.OnAutoComplete;
+            @AutoComplete.canceled -= instance.OnAutoComplete;
+        }
+
+        public void RemoveCallbacks(IDebugActions instance)
+        {
+            if (m_Wrapper.m_DebugActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IDebugActions instance)
+        {
+            foreach (var item in m_Wrapper.m_DebugActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_DebugActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public DebugActions @Debug => new DebugActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -491,6 +655,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
+        void OnInteraction(InputAction.CallbackContext context);
     }
     public interface IMouseActions
     {
@@ -499,5 +664,11 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     public interface IMenusActions
     {
         void OnEscape(InputAction.CallbackContext context);
+    }
+    public interface IDebugActions
+    {
+        void OnOpen(InputAction.CallbackContext context);
+        void OnLoadCommand(InputAction.CallbackContext context);
+        void OnAutoComplete(InputAction.CallbackContext context);
     }
 }

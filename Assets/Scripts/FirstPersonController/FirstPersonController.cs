@@ -107,7 +107,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			base.OnDestroy();
 
-			if (NetworkManager.enabled)
+			if (NetworkManager?.NetworkTickSystem != null)
 				NetworkManager.NetworkTickSystem.Tick -= Tick;
 			
 			_serverTransformState.OnValueChanged -= OnServerStateChanged;
@@ -194,7 +194,7 @@ namespace ExoplanetStudios.ExtractionShooter
 					Debug.Log("reconceliation");
 					_currentTransformState = receivedState;
 					_controller.Move(receivedState.Position - transform.position);
-					for (int i = stateId; i < _bufferedStates.Count; i++)
+					for (int i = stateId + 1; i < _bufferedStates.Count; i++)
 					{
 						CalculateTransformStates(_bufferedStates[i].InputState, _bufferedStates[i].Tick);
 						_bufferedStates[i].TransformState = _currentTransformState;
