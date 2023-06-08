@@ -8,9 +8,11 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private GlobalInputs GI;
         [SerializeField] private Transform CameraSocket;
-        [SerializeField] private Weapon Weapon;
+        [SerializeField] private Weapon MainWeapon;
+        private Weapon _weapon;
         private void Start()
         {
+            _weapon = Instantiate(MainWeapon);
             if (!IsOwner)
                 return;
 
@@ -32,15 +34,15 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void StartMainAction(InputAction.CallbackContext ctx)
         {
-            Weapon.StartMainAction(CameraSocket.position, CameraSocket.rotation * Vector3.forward);
             if (!IsServer)
-                StartMainActionServerRpc();
+                _weapon.StartMainAction(CameraSocket.position, CameraSocket.rotation * Vector3.forward);
+            StartMainActionServerRpc();
         }
         [ServerRpc]
         private void StartMainActionServerRpc()
         {
             Vector3 direction = CameraSocket.rotation * Vector3.forward;
-            Weapon.StartMainAction(CameraSocket.position, direction);
+            _weapon.StartMainAction(CameraSocket.position, direction);
             StartMainActionClientRpc(CameraSocket.position, direction);
 
         }
@@ -48,70 +50,70 @@ namespace ExoplanetStudios.ExtractionShooter
         private void StartMainActionClientRpc(Vector3 position, Vector3 direction)
         {
             if (!IsOwner)
-                Weapon.StartMainAction(position, direction);
+                _weapon.StartMainAction(position, direction);
         }
 
         private void StopMainAction(InputAction.CallbackContext ctx)
         {
-            Weapon.StopMainAction();
-            if (!IsServer)
-                StopMainActionServerRpc();
+            _weapon.StopMainAction();
+            StopMainActionServerRpc();
         }
         [ServerRpc]
         private void StopMainActionServerRpc()
         {
-            Weapon.StopMainAction();
+            if (!IsServer)
+                _weapon.StopMainAction();
             StopMainActionClientRpc();
         }
         [ClientRpc]
         private void StopMainActionClientRpc()
         {
             if (!IsOwner)
-                Weapon.StopMainAction();
+                _weapon.StopMainAction();
         }
         private void StartSecondaryAction(InputAction.CallbackContext ctx)
         {
-            Weapon.StartSecondaryAction(CameraSocket.position, CameraSocket.rotation * Vector3.forward);
             if (!IsServer)
-                StartSecondaryActionServerRpc();
+                _weapon.StartSecondaryAction(CameraSocket.position, CameraSocket.rotation * Vector3.forward);
+            StartSecondaryActionServerRpc();
         }
         [ServerRpc] 
         private void StartSecondaryActionServerRpc()
         {
             Vector3 direction = CameraSocket.rotation * Vector3.forward;
-            Weapon.StartSecondaryAction(CameraSocket.position, direction);
+            _weapon.StartSecondaryAction(CameraSocket.position, direction);
             StartSecondaryActionClientRpc(CameraSocket.position, direction);
         }
         [ClientRpc]
         private void StartSecondaryActionClientRpc(Vector3 position, Vector3 direction)
         {
             if (!IsOwner)
-                Weapon.StartSecondaryAction(position, direction);
+                _weapon.StartSecondaryAction(position, direction);
         }
         private void StopSecondaryAction(InputAction.CallbackContext ctx)
         {
-            Weapon.StopSecondaryAction();
             if (!IsServer)
-                StopSecondaryActionServerRpc();
+                _weapon.StopSecondaryAction();
+            StopSecondaryActionServerRpc();
         }
         [ServerRpc]
         private void StopSecondaryActionServerRpc()
         {
-            Weapon.StopSecondaryAction();
+            _weapon.StopSecondaryAction();
             StopSecondaryActionClientRpc();
         }
         [ClientRpc]
         private void StopSecondaryActionClientRpc()
         {
             if (!IsOwner)
-                Weapon.StopSecondaryAction();
+                _weapon.StopSecondaryAction();
         }
         private void Update()
         {
             if (!IsOwner)
                 return;
 
-            Weapon.UpdateWeapon(CameraSocket.position, CameraSocket.forward);
+            _weapon.UpdateWeapon(CameraSocket.position, CameraSocket.forward);
         }
     }
 }

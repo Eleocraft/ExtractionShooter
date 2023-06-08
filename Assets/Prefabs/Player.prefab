@@ -487,7 +487,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
   CameraSocket: {fileID: 9014681774267492856}
-  Weapon: {fileID: 11400000, guid: df19f8a519faa114985a045d504aeefd, type: 2}
+  MainWeapon: {fileID: 11400000, guid: df19f8a519faa114985a045d504aeefd, type: 2}
 --- !u!114 &1913713854082369193
 MonoBehaviour:
   m_ObjectHideFlags: 0
