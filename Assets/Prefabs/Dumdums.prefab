@@ -223,6 +223,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2640967497211059280}
+  - component: {fileID: 7391258311189254995}
   - component: {fileID: 5671159204248133760}
   - component: {fileID: 5377428046784653716}
   m_Layer: 0
@@ -253,6 +254,25 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 128.379, z: 0}
+--- !u!114 &7391258311189254995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3453497160093288170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &5671159204248133760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,8 +286,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxLife: 150
-  HitParticles: {fileID: 8575092435121950466, guid: adb0c5e100999ab44b168c830eae7736,
-    type: 3}
   BreakParticles: {fileID: 3067503941469130448, guid: 818484abae03282489445f5901526bf0,
     type: 3}
 --- !u!54 &5377428046784653716

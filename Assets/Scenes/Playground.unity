@@ -244,7 +244,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 138124376}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 349462395bc115840af1d4b99121054a, type: 3}
+  m_Script: {fileID: 11500000, guid: c26edf8f1b7b14646b1b6d72e0f6b0dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &141261023
@@ -481,6 +481,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dumdums (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7391258311189254995, guid: c45cb1aae5dba364da5de4e1f16cd388,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 48906272
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -563,6 +568,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Dumdums
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391258311189254995, guid: c45cb1aae5dba364da5de4e1f16cd388,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1977484217
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -746,6 +756,7 @@ GameObject:
   - component: {fileID: 507968753}
   - component: {fileID: 507968752}
   - component: {fileID: 507968755}
+  - component: {fileID: 507968757}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -850,6 +861,24 @@ MonoBehaviour:
   AllowConsole: 1
   ConsolePanelFadeController: {fileID: 138124381}
   ConsoleText: {fileID: 1095193203}
+--- !u!114 &507968757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507968748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67144848d6bb167439c8a45a83d7a2ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabs:
+    values:
+    - name: Projectile
+      key: 0
+      value: {fileID: 5057328359918851080, guid: 35db20243febf2d43ad7898d9bb95328,
+        type: 3}
 --- !u!1 &542508511
 GameObject:
   m_ObjectHideFlags: 0
@@ -2369,6 +2398,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dumdums (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7391258311189254995, guid: c45cb1aae5dba364da5de4e1f16cd388,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 139385272
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2804,7 +2838,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 0}
   m_Lens:
-    FieldOfView: 40
+    FieldOfView: 70
     OrthographicSize: 10
     NearClipPlane: 0.2
     FarClipPlane: 1200
@@ -3188,6 +3222,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dummydummy (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7391258311189254995, guid: c45cb1aae5dba364da5de4e1f16cd388,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4236433340
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3311,7 +3350,7 @@ Camera:
     height: 1
   near clip plane: 0.2
   far clip plane: 1200
-  field of view: 40
+  field of view: 70
   orthographic: 0
   orthographic size: 10
   m_Depth: -1

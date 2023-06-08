@@ -19,7 +19,7 @@ namespace ExoplanetStudios
         [SerializeField] private GameObject InputFieldObject;
         [SerializeField] private bool AllowConsole;
         [Header("ConsoleOutput")]
-        [SerializeField] private ImageFadeController ConsolePanelFadeController;
+        [SerializeField] private FadeController ConsolePanelFadeController;
         [SerializeField] private TMP_Text ConsoleText;
         private ScrollRect consoleScrollRect;
 

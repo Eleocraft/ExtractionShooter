@@ -11,5 +11,6 @@ namespace ExoplanetStudios.ExtractionShooter
         public float Damage;
         public float LifeTime;
         public GameObject Prefab;
+        public GameObject HitMarker;
     }
 }
