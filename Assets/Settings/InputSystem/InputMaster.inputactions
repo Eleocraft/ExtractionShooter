@@ -31,11 +31,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
                 },
                 {
                     "name": "Interaction",
@@ -45,8 +40,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-<<<<<<< Updated upstream
-=======
                 },
                 {
                     "name": "MainAction",
@@ -65,8 +58,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
->>>>>>> Stashed changes
->>>>>>> Stashed changes
                 }
             ],
             "bindings": [
@@ -190,11 +181,6 @@
                     "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
                 },
                 {
                     "name": "",
@@ -206,8 +192,6 @@
                     "action": "Interaction",
                     "isComposite": false,
                     "isPartOfComposite": false
-<<<<<<< Updated upstream
-=======
                 },
                 {
                     "name": "",
@@ -230,8 +214,6 @@
                     "action": "SecondaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
->>>>>>> Stashed changes
->>>>>>> Stashed changes
                 }
             ]
         },
