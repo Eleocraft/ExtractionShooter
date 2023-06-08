@@ -44,7 +44,6 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 direction = CameraSocket.rotation * Vector3.forward;
             _weapon.StartMainAction(CameraSocket.position, direction);
             StartMainActionClientRpc(CameraSocket.position, direction);
-
         }
         [ClientRpc]
         private void StartMainActionClientRpc(Vector3 position, Vector3 direction)
@@ -110,9 +109,6 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void Update()
         {
-            if (!IsOwner && !IsServer)
-                return;
-
             _weapon.UpdateWeapon(CameraSocket.position, CameraSocket.forward);
         }
     }

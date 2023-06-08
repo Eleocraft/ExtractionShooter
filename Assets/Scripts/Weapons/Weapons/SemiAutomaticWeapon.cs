@@ -11,7 +11,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void StartMainAction(Vector3 position, Vector3 direction)
         {
             if (_cooldown > 0) return;
-            
+
             Projectile.SpawnProjectile(projectileInfo, position, direction);
             _cooldown = Cooldown;
         }
