@@ -31,6 +31,11 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
                 },
                 {
                     "name": "Interaction",
@@ -40,6 +45,28 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+<<<<<<< Updated upstream
+=======
+                },
+                {
+                    "name": "MainAction",
+                    "type": "Button",
+                    "id": "2ee1e1cd-35c1-49e9-84a1-15eac63863f9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SecondaryAction",
+                    "type": "Button",
+                    "id": "fb1f2264-f400-4101-966d-ba373d052e40",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                 }
             ],
             "bindings": [
@@ -163,6 +190,11 @@
                     "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
                 },
                 {
                     "name": "",
@@ -174,6 +206,32 @@
                     "action": "Interaction",
                     "isComposite": false,
                     "isPartOfComposite": false
+<<<<<<< Updated upstream
+=======
+                },
+                {
+                    "name": "",
+                    "id": "2f3decd9-dfdf-43a2-bb07-1d9a6b58c5d2",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardMouse",
+                    "action": "MainAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "998c53e6-5532-4923-bfdf-e9f1648fd043",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SecondaryAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                 }
             ]
         },

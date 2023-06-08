@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Custom/GlobalInputs")]
+[CreateAssetMenu(fileName = "New Global Inputs", menuName = "CustomObjects/Inputs")]
 public class GlobalInputs : ScriptableObject
 {
     private InputMaster _controls;

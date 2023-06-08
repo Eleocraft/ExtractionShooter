@@ -53,6 +53,11 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
                 },
                 {
                     ""name"": ""Interaction"",
@@ -62,6 +67,28 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+<<<<<<< Updated upstream
+=======
+                },
+                {
+                    ""name"": ""MainAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""2ee1e1cd-35c1-49e9-84a1-15eac63863f9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SecondaryAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""fb1f2264-f400-4101-966d-ba373d052e40"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                 }
             ],
             ""bindings"": [
@@ -185,6 +212,11 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
                 },
                 {
                     ""name"": """",
@@ -196,6 +228,32 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""action"": ""Interaction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+<<<<<<< Updated upstream
+=======
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2f3decd9-dfdf-43a2-bb07-1d9a6b58c5d2"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""MainAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""998c53e6-5532-4923-bfdf-e9f1648fd043"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SecondaryAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                 }
             ]
         },
@@ -348,7 +406,16 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+<<<<<<< Updated upstream
         m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
+=======
+<<<<<<< Updated upstream
+=======
+        m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
+        m_Player_MainAction = m_Player.FindAction("MainAction", throwIfNotFound: true);
+        m_Player_SecondaryAction = m_Player.FindAction("SecondaryAction", throwIfNotFound: true);
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
         // Mouse
         m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
         m_Mouse_Look = m_Mouse.FindAction("Look", throwIfNotFound: true);
@@ -424,7 +491,16 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
+<<<<<<< Updated upstream
     private readonly InputAction m_Player_Interaction;
+=======
+<<<<<<< Updated upstream
+=======
+    private readonly InputAction m_Player_Interaction;
+    private readonly InputAction m_Player_MainAction;
+    private readonly InputAction m_Player_SecondaryAction;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -432,7 +508,16 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+<<<<<<< Updated upstream
         public InputAction @Interaction => m_Wrapper.m_Player_Interaction;
+=======
+<<<<<<< Updated upstream
+=======
+        public InputAction @Interaction => m_Wrapper.m_Player_Interaction;
+        public InputAction @MainAction => m_Wrapper.m_Player_MainAction;
+        public InputAction @SecondaryAction => m_Wrapper.m_Player_SecondaryAction;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -451,9 +536,24 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+<<<<<<< Updated upstream
             @Interaction.started += instance.OnInteraction;
             @Interaction.performed += instance.OnInteraction;
             @Interaction.canceled += instance.OnInteraction;
+=======
+<<<<<<< Updated upstream
+=======
+            @Interaction.started += instance.OnInteraction;
+            @Interaction.performed += instance.OnInteraction;
+            @Interaction.canceled += instance.OnInteraction;
+            @MainAction.started += instance.OnMainAction;
+            @MainAction.performed += instance.OnMainAction;
+            @MainAction.canceled += instance.OnMainAction;
+            @SecondaryAction.started += instance.OnSecondaryAction;
+            @SecondaryAction.performed += instance.OnSecondaryAction;
+            @SecondaryAction.canceled += instance.OnSecondaryAction;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -467,9 +567,24 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+<<<<<<< Updated upstream
             @Interaction.started -= instance.OnInteraction;
             @Interaction.performed -= instance.OnInteraction;
             @Interaction.canceled -= instance.OnInteraction;
+=======
+<<<<<<< Updated upstream
+=======
+            @Interaction.started -= instance.OnInteraction;
+            @Interaction.performed -= instance.OnInteraction;
+            @Interaction.canceled -= instance.OnInteraction;
+            @MainAction.started -= instance.OnMainAction;
+            @MainAction.performed -= instance.OnMainAction;
+            @MainAction.canceled -= instance.OnMainAction;
+            @SecondaryAction.started -= instance.OnSecondaryAction;
+            @SecondaryAction.performed -= instance.OnSecondaryAction;
+            @SecondaryAction.canceled -= instance.OnSecondaryAction;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -655,7 +770,16 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
+<<<<<<< Updated upstream
         void OnInteraction(InputAction.CallbackContext context);
+=======
+<<<<<<< Updated upstream
+=======
+        void OnInteraction(InputAction.CallbackContext context);
+        void OnMainAction(InputAction.CallbackContext context);
+        void OnSecondaryAction(InputAction.CallbackContext context);
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     }
     public interface IMouseActions
     {
