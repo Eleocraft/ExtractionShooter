@@ -55,14 +55,14 @@ namespace ExoplanetStudios.ExtractionShooter
 
         private void StopMainAction(InputAction.CallbackContext ctx)
         {
-            _weapon.StopMainAction();
+            if (!IsServer)
+                _weapon.StopMainAction();
             StopMainActionServerRpc();
         }
         [ServerRpc]
         private void StopMainActionServerRpc()
         {
-            if (!IsServer)
-                _weapon.StopMainAction();
+            _weapon.StopMainAction();
             StopMainActionClientRpc();
         }
         [ClientRpc]
@@ -110,7 +110,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void Update()
         {
-            if (!IsOwner)
+            if (!IsOwner && !IsServer)
                 return;
 
             _weapon.UpdateWeapon(CameraSocket.position, CameraSocket.forward);
