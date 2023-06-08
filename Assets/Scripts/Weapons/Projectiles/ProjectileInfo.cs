@@ -9,8 +9,9 @@ namespace ExoplanetStudios.ExtractionShooter
         public float Drag;
         public float Dropoff;
         public float Damage;
-        public float LifeTime;
+        public float MaxDistance;
         public GameObject Prefab;
         public GameObject HitMarker;
+        public LayerMask CanHit;
     }
 }

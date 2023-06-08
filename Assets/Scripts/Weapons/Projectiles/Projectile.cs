@@ -4,10 +4,11 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class Projectile : MonoBehaviour
     {
+        private Vector3 _spawnPosition;
         private Vector3 _lastPosition;
         private Vector3 _velocity;
         private ProjectileInfo _info;
-        private float _lifeTime;
+        private float _maxDistanceSqr;
         private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction)
         {
             // Graphics
@@ -15,8 +16,9 @@ namespace ExoplanetStudios.ExtractionShooter
             // Physics
             _velocity = direction.normalized * info.MuzzleVelocity;
 
-            _lifeTime = info.LifeTime;
             _lastPosition = transform.position;
+            _spawnPosition = transform.position;
+            _maxDistanceSqr = info.MaxDistance * info.MaxDistance;
             _info = info;
         }
         public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction)
@@ -30,16 +32,16 @@ namespace ExoplanetStudios.ExtractionShooter
             transform.position += movement;
             transform.rotation = Quaternion.FromToRotation(Vector3.up, _velocity);
             // Spherecast
-            if (Physics.Raycast(_lastPosition, movement, out RaycastHit hitInfo, movement.magnitude))
+            if (Physics.Raycast(_lastPosition, movement, out RaycastHit hitInfo, movement.magnitude, _info.CanHit))
             {
                 if (hitInfo.transform.TryGetComponent(out IDamagable damagable))
                     damagable.OnHit(_info.Damage);
-                Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity);
+                GameObject hitMarker = Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform);
+                hitMarker.transform.localScale = new Vector3(1/hitInfo.transform.lossyScale.x, 1/hitInfo.transform.lossyScale.y, 1/hitInfo.transform.lossyScale.z);
                 Destroy(gameObject);
             }
             // Lifetime
-            _lifeTime -= Time.deltaTime;
-            if (_lifeTime < 0)
+            if ((transform.position - _spawnPosition).sqrMagnitude > _maxDistanceSqr)
                 Destroy(gameObject);
             // Physics
             _velocity -= _info.Drag * _velocity * Time.deltaTime; // Drag

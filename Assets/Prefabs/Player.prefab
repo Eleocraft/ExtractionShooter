@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6765443463166211738}
-  m_Layer: 3
+  m_Layer: 7
   m_Name: Playermodel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,7 +46,8 @@ GameObject:
   - component: {fileID: 1054014544494167230}
   - component: {fileID: 1054014544494167231}
   - component: {fileID: 1054014544494167216}
-  m_Layer: 3
+  - component: {fileID: 8976158443239882743}
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -135,12 +136,26 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8976158443239882743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1054014544494167218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 422c942d55c3d1b49aaf25635b9c3701, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentDamagable: {fileID: 1913713854082369193}
+  Multiplier: 1
 --- !u!1 &4396800112081113008
 GameObject:
   m_ObjectHideFlags: 0
@@ -152,7 +167,7 @@ GameObject:
   - component: {fileID: 6031871648341332819}
   - component: {fileID: 8065022823315025438}
   - component: {fileID: 5912127529764596200}
-  m_Layer: 3
+  m_Layer: 7
   m_Name: Googles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -236,7 +251,8 @@ GameObject:
   - component: {fileID: 1918609618202166406}
   - component: {fileID: 934266166022892297}
   - component: {fileID: 8874087429664769677}
-  m_Layer: 3
+  - component: {fileID: 567136954903571226}
+  m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -326,10 +342,24 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &567136954903571226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5974827785664440417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 422c942d55c3d1b49aaf25635b9c3701, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentDamagable: {fileID: 1913713854082369193}
+  Multiplier: 2
 --- !u!1 &8294874906314298200
 GameObject:
   m_ObjectHideFlags: 0
@@ -470,9 +500,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 022104b5e5a0b3349b1341ca5610f53d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxLife: 100
+  MaxLife: 150
   BreakParticles: {fileID: 3067503941469130448, guid: 818484abae03282489445f5901526bf0,
     type: 3}
+  SpawnPoint: {x: 0, y: 2, z: 0}
 --- !u!1 &9014681774267492863
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,7 +513,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9014681774267492856}
-  m_Layer: 3
+  m_Layer: 7
   m_Name: CameraSocket
   m_TagString: CinemachineTarget
   m_Icon: {fileID: 0}

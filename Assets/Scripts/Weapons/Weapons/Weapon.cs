@@ -6,8 +6,8 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         public abstract void UpdateWeapon(Vector3 position, Vector3 direction);
         public abstract void StartMainAction(Vector3 position, Vector3 direction);
-        public virtual void StopMainAction(Vector3 position, Vector3 direction) { }
+        public virtual void StopMainAction() { }
         public virtual void StartSecondaryAction(Vector3 position, Vector3 direction) { }
-        public virtual void StopSecondaryAction(Vector3 position, Vector3 direction) { }
+        public virtual void StopSecondaryAction() { }
     }
 }

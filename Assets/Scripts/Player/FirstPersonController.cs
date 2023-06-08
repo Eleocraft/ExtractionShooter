@@ -117,6 +117,12 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 
 		private void JumpInput(UnityEngine.InputSystem.InputAction.CallbackContext ctx) => _jump = true;
+		public void SetPosition(Vector3 position)
+		{
+			if (!IsServer) return;
+
+			transform.position = position;
+		}
 		private void Update()
 		{
 			_currentTickDeltaTime += Time.deltaTime;
@@ -193,7 +199,7 @@ namespace ExoplanetStudios.ExtractionShooter
 					// Rewind logic
 					Debug.Log("reconceliation");
 					_currentTransformState = receivedState;
-					_controller.Move(receivedState.Position - transform.position);
+					transform.position = receivedState.Position;
 					for (int i = stateId + 1; i < _bufferedStates.Count; i++)
 					{
 						CalculateTransformStates(_bufferedStates[i].InputState, _bufferedStates[i].Tick);

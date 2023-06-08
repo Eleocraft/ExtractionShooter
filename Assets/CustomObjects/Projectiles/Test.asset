@@ -12,11 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c07420cc09fb4c409ba3c4fcdd04df7, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
-  MuzzleVelocity: 80
+  MuzzleVelocity: 150
   Drag: 0.1
-  Dropoff: 10
+  Dropoff: 9.81
   Damage: 30
-  LifeTime: 10
+  MaxDistance: 100
   Prefab: {fileID: 1300443509257007520, guid: dde4e3477d432684d90158d6e538fb9d, type: 3}
   HitMarker: {fileID: 8575092435121950466, guid: adb0c5e100999ab44b168c830eae7736,
     type: 3}
+  CanHit:
+    serializedVersion: 2
+    m_Bits: 247
