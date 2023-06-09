@@ -45,6 +45,9 @@ namespace ExoplanetStudios.ExtractionShooter
 		[SerializeField] private float TopClamp = 90.0f;
 		[Tooltip("How far in degrees can you move the camera down")]
 		[SerializeField] private float BottomClamp = -90.0f;
+		// [Header("Interpolation")]
+		// [Tooltip("The maximum amout the player can move horizontally each second. must be higher than the Sprint speed")]
+		// [SerializeField] private float MaxInterpolationMovement = 15;
 
 		// player
 		private float _jumpVelocity;
@@ -70,7 +73,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private Dictionary<int, NetworkInputState> _inputsReceived; // Serveronly
 		private NetworkInputState _lastReceivedInput; // Serveronly
 		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>();
-		private NetworkTransformState _lerpStartTransformState = new(0);
+		private InterpolationState _lerpStartInterpolationState;
 		private NetworkTransformState _currentTransformState = new(0);
 		private float _currentTickDeltaTime;
 		private const int BUFFER_SIZE = 200;
@@ -78,6 +81,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
 		private void Start()
 		{
+			_lerpStartInterpolationState = new InterpolationState(Playermodel.position, _lookRotation);
 			// the square root of H * -2 * G = how much velocity needed to reach desired height
 			_jumpVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 			_controller = GetComponent<CharacterController>();
@@ -128,12 +132,13 @@ namespace ExoplanetStudios.ExtractionShooter
 			_currentTickDeltaTime += Time.deltaTime;
 			float relativeDeltaTime = _currentTickDeltaTime / NetworkManager.LocalTime.FixedDeltaTime;
 
-			Vector3 position = Vector3.LerpUnclamped(_lerpStartTransformState.Position, _currentTransformState.Position, relativeDeltaTime);
+			Vector3 position = Vector3.LerpUnclamped(_lerpStartInterpolationState.Position, _currentTransformState.Position, relativeDeltaTime);
+
 			// the owner should always have the most accurate lookrotation possible
 			if (IsOwner)
 				CalculateRotation();
 			else
-				_lookRotation = Utility.Vector2RotateLerpUnclamped(_lerpStartTransformState.LookRotation, _currentTransformState.LookRotation, relativeDeltaTime);
+				_lookRotation = Utility.Vector2RotateLerpUnclamped(_lerpStartInterpolationState.LookRotation, _currentTransformState.LookRotation, relativeDeltaTime);
 			Transform(position, _lookRotation);
 		}
 		private void Tick()
@@ -225,7 +230,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			else if (!IsServer)
 			{
 				_currentTickDeltaTime = 0;
-				_lerpStartTransformState = CreateTransformState();
+				_lerpStartInterpolationState = new InterpolationState(Playermodel.position, _lookRotation);
 				_currentTransformState = receivedState;
 			}
 		}
@@ -243,7 +248,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private void CalculateTransformStates(NetworkInputState inputState, int tick)
 		{
 			_currentTickDeltaTime = 0;
-			_lerpStartTransformState = CreateTransformState();
+			_lerpStartInterpolationState = new InterpolationState(Playermodel.position, _lookRotation);
 
 			Vector3 velocity = CalculateVelocity(inputState);
 			Vector3 movement = velocity * NetworkManager.LocalTime.FixedDeltaTime;
@@ -382,6 +387,16 @@ namespace ExoplanetStudios.ExtractionShooter
 				Tick = tick;
 				TransformState = transformState;
 				InputState = inputState;
+			}
+		}
+		private class InterpolationState
+		{
+			public readonly Vector3 Position;
+			public readonly Vector2 LookRotation;
+			public InterpolationState(Vector3 position, Vector2 lookRotation)
+			{
+				Position = position;
+				LookRotation = lookRotation;
 			}
 		}
 	}

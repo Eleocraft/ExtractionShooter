@@ -15,6 +15,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             NetworkObject newPlayer = Instantiate(Player);
             newPlayer.SpawnAsPlayerObject(clientId);
+            newPlayer.GetComponent<FirstPersonController>().SetPosition(SpawnPoints.GetSpawnPoint());
         }
     }
 }

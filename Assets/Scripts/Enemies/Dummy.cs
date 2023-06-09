@@ -18,11 +18,11 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             base.OnDestroy();
         }
-        public void OnHit(float damage, Vector3 point)
+        public void OnHit(float damage, Vector3 point, ulong ownerId)
         {
-            if (!IsServer) return;
-
             Instantiate(HitParticles, point, Quaternion.identity);
+            if (!IsServer) return;
+            
             _life.Value -= damage;
             if (_life.Value < 0)
                 GetComponent<NetworkObject>().Despawn();

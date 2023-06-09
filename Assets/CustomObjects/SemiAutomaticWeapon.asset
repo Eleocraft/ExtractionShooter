@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94beb7537bf7af842a05e90da99e8c0c, type: 3}
   m_Name: SemiAutomaticWeapon
   m_EditorClassIdentifier: 
+  OwnerId: 0
   projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}
-  Cooldown: 0.2
+  Cooldown: 0.15

@@ -9,8 +9,9 @@ namespace ExoplanetStudios.ExtractionShooter
         private Vector3 _velocity;
         private ProjectileInfo _info;
         private float _maxDistanceSqr;
-        private bool _friendly;
-        private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction, bool friendly)
+        private ulong _ownerId;
+        private const float HIT_OFFSET = 0.001f;
+        private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId)
         {
             // Graphics
             Instantiate(info.Prefab, transform.position, Quaternion.identity, transform);
@@ -20,13 +21,13 @@ namespace ExoplanetStudios.ExtractionShooter
             _lastPosition = transform.position;
             _spawnPosition = transform.position;
             _maxDistanceSqr = info.MaxDistance * info.MaxDistance;
-            _friendly = friendly;
+            _ownerId = ownerId;
             _info = info;
         }
-        public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, bool friendly)
+        public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId)
         {
             GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Projectile], position, Quaternion.identity);
-            projectileObj.GetComponent<Projectile>().Initialize(info, position, direction, friendly);
+            projectileObj.GetComponent<Projectile>().Initialize(info, position, direction, ownerId);
         }
         private void FixedUpdate()
         {
@@ -40,7 +41,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 currentMovement = movement;
             while (Hit == true)
             {
-                bool ray = Physics.Raycast(startPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, _friendly ? ProjectileHitLayer.CanHitFriendly : ProjectileHitLayer.CanHitFromEnemy);
+                bool ray = Physics.Raycast(startPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, ProjectileHitLayer.CanHit);
 
                 bool penetration = Physics.Raycast(startPos, currentMovement, out RaycastHit penetrableHitInfo, currentMovement.magnitude, ProjectileHitLayer.Penetrable);
 
@@ -55,7 +56,7 @@ namespace ExoplanetStudios.ExtractionShooter
                     {
                         if (PenetrationHit(penetrableHitInfo))
                         {
-                            startPos = penetrableHitInfo.point;
+                            startPos = penetrableHitInfo.point + currentMovement.normalized * HIT_OFFSET;
                             currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
                         }
                         else
@@ -71,9 +72,11 @@ namespace ExoplanetStudios.ExtractionShooter
                 {
                     if (PenetrationHit(penetrableHitInfo))
                     {
-                        startPos = penetrableHitInfo.point;
+                        startPos = penetrableHitInfo.point + currentMovement.normalized * HIT_OFFSET;
                         currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
                     }
+                    else
+                        break;
                 }
                 else
                     Hit = false;
@@ -95,7 +98,7 @@ namespace ExoplanetStudios.ExtractionShooter
             void MainHit(RaycastHit hitInfo)
             {
                 if (hitInfo.transform.TryGetComponent(out IDamagable damagable))
-                    damagable.OnHit(_info.Damage, hitInfo.point);
+                    damagable.OnHit(_info.Damage, hitInfo.point, _ownerId);
                 else
                     Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, _velocity);
                 Destroy(gameObject);

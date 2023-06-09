@@ -11,5 +11,9 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             prefabs.Update();
         }
+        private void Start()
+        {
+            prefabs.Update();
+        }
     }
 }

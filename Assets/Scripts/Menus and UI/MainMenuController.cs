@@ -11,6 +11,11 @@ public class MainMenuController : MonoBehaviour
     private const string localhost = "127.0.0.1";
     [SerializeField] private TMP_InputField IpInputField;
     [SerializeField] private string mainSceneName;
+    public static bool UsedMainMenu;
+    void Start()
+    {
+        UsedMainMenu = true;
+    }
     public void StartHost()
     {
         NetworkManager.Singleton.StartHost();
@@ -20,6 +25,11 @@ public class MainMenuController : MonoBehaviour
     {
         NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = GetIPfromURL(IpInputField.text);
         NetworkManager.Singleton.StartClient();
+    }
+    public void StartServer()
+    {
+        NetworkManager.Singleton.StartServer();
+        NetworkManager.Singleton.SceneManager.LoadScene(mainSceneName, LoadSceneMode.Single);
     }
     private string GetIPfromURL(string URL)
     {

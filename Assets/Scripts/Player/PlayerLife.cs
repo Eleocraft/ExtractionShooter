@@ -7,9 +7,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private float MaxLife;
         [SerializeField] private GameObject BreakParticles;
-        [SerializeField] private Vector3 SpawnPoint;
         private NetworkVariable<float> _life = new NetworkVariable<float>();
-
         private FirstPersonController _firstPersonController; // Serveronly
         private void Start()
         {
@@ -25,7 +23,7 @@ namespace ExoplanetStudios.ExtractionShooter
             base.OnDestroy();
             _life.OnValueChanged -= OnLifeChanged;
         }
-        public void OnHit(float damage, Vector3 point)
+        public void OnHit(float damage, Vector3 point, ulong ownerId)
         {
             if (IsServer)
             {
@@ -34,14 +32,14 @@ namespace ExoplanetStudios.ExtractionShooter
                 {
                     _life.Value = MaxLife;
                     PlayerDeadClientRpc(transform.position);
-                    _firstPersonController.SetPosition(SpawnPoint);
+                    _firstPersonController.SetPosition(SpawnPoints.GetSpawnPoint());
                 }
             }
         }
         [ClientRpc]
         private void PlayerDeadClientRpc(Vector3 position)
         {
-            Instantiate(BreakParticles, position, Quaternion.identity);
+            Instantiate(BreakParticles, position + Vector3.up, Quaternion.identity);
             if (IsOwner)
                 Debug.Log("You Died");
         }

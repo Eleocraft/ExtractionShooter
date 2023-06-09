@@ -19,16 +19,16 @@ namespace ExoplanetStudios.ExtractionShooter
         private void Start()
         {
             _weapon = Instantiate(MainWeapon);
+            _weapon.OwnerId = OwnerClientId;
             _firstPersonController = GetComponent<FirstPersonController>();
             _cameraYOffset = CameraSocket.localPosition.y;
             NetworkManager.NetworkTickSystem.Tick += Tick;
             if (!IsOwner)
                 return;
 
-            _weapon.Friendly = true;
             GI.Controls.Mouse.MainAction.started += StartMainAction;
             GI.Controls.Mouse.SecondaryAction.started += StartSecondaryAction;
-            GI.Controls.Mouse.MainAction.canceled += StopSecondaryAction;
+            GI.Controls.Mouse.MainAction.canceled += StopMainAction;
             GI.Controls.Mouse.SecondaryAction.canceled += StopSecondaryAction;
         }
         public override void OnDestroy()
@@ -43,7 +43,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
             GI.Controls.Mouse.MainAction.started -= StartMainAction;
             GI.Controls.Mouse.SecondaryAction.started -= StartSecondaryAction;
-            GI.Controls.Mouse.MainAction.canceled -= StopSecondaryAction;
+            GI.Controls.Mouse.MainAction.canceled -= StopMainAction;
             GI.Controls.Mouse.SecondaryAction.canceled -= StopSecondaryAction;
         }
         private void StartMainAction(InputAction.CallbackContext ctx)
@@ -82,7 +82,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private void PerformAction(ActionType type, Vector3 direction, int tick)
         {
             if(!_firstPersonController.GetState(tick, out NetworkTransformState transformState)) return;
-                
+            
             Vector3 position = transformState.Position + Vector3.up * _cameraYOffset;
             PerformActionAtPos(type, direction, position);
 
