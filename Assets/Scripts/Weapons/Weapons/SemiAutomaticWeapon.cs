@@ -12,7 +12,8 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (_cooldown > 0) return;
 
-            Projectile.SpawnProjectile(projectileInfo, position, direction);
+            //Debug.DrawLine(position, position + direction * 5, Color.red, 10f);
+            Projectile.SpawnProjectile(projectileInfo, position, direction, Friendly);
             _cooldown = Cooldown;
         }
         public override void UpdateWeapon(Vector3 position, Vector3 direction)

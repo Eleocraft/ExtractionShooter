@@ -10,8 +10,8 @@ namespace ExoplanetStudios.ExtractionShooter
         public float Dropoff;
         public float Damage;
         public float MaxDistance;
+        [Range(0, 1)] public float PenetrationForce;
         public GameObject Prefab;
-        public GameObject HitMarker;
-        public LayerMask CanHit;
+        public HitMarker HitMarker;
     }
 }

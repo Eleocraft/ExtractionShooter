@@ -4,6 +4,7 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public abstract class Weapon : ScriptableObject
     {
+        public bool Friendly;
         public abstract void UpdateWeapon(Vector3 position, Vector3 direction);
         public abstract void StartMainAction(Vector3 position, Vector3 direction);
         public virtual void StopMainAction() { }

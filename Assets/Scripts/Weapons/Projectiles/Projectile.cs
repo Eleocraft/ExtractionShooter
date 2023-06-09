@@ -9,7 +9,8 @@ namespace ExoplanetStudios.ExtractionShooter
         private Vector3 _velocity;
         private ProjectileInfo _info;
         private float _maxDistanceSqr;
-        private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction)
+        private bool _friendly;
+        private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction, bool friendly)
         {
             // Graphics
             Instantiate(info.Prefab, transform.position, Quaternion.identity, transform);
@@ -19,36 +20,98 @@ namespace ExoplanetStudios.ExtractionShooter
             _lastPosition = transform.position;
             _spawnPosition = transform.position;
             _maxDistanceSqr = info.MaxDistance * info.MaxDistance;
+            _friendly = friendly;
             _info = info;
         }
-        public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction)
+        public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, bool friendly)
         {
             GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Projectile], position, Quaternion.identity);
-            projectileObj.GetComponent<Projectile>().Initialize(info, position, direction);
+            projectileObj.GetComponent<Projectile>().Initialize(info, position, direction, friendly);
         }
-        private void Update()
+        private void FixedUpdate()
         {
-            Vector3 movement = _velocity * Time.deltaTime;
+            Vector3 oldVelocity = _velocity;
+            Vector3 movement = _velocity * Time.fixedDeltaTime;
             transform.position += movement;
             transform.rotation = Quaternion.FromToRotation(Vector3.up, _velocity);
-            // Spherecast
-            if (Physics.Raycast(_lastPosition, movement, out RaycastHit hitInfo, movement.magnitude, _info.CanHit))
+            
+            bool Hit = true;
+            Vector3 startPos = _lastPosition;
+            Vector3 currentMovement = movement;
+            while (Hit == true)
             {
-                if (hitInfo.transform.TryGetComponent(out IDamagable damagable))
-                    damagable.OnHit(_info.Damage);
-                GameObject hitMarker = Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform);
-                hitMarker.transform.localScale = new Vector3(1/hitInfo.transform.lossyScale.x, 1/hitInfo.transform.lossyScale.y, 1/hitInfo.transform.lossyScale.z);
-                Destroy(gameObject);
+                bool ray = Physics.Raycast(startPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, _friendly ? ProjectileHitLayer.CanHitFriendly : ProjectileHitLayer.CanHitFromEnemy);
+
+                bool penetration = Physics.Raycast(startPos, currentMovement, out RaycastHit penetrableHitInfo, currentMovement.magnitude, ProjectileHitLayer.Penetrable);
+
+                if (ray && penetration)
+                {
+                    if (hitInfo.distance < penetrableHitInfo.distance)
+                    {
+                        MainHit(hitInfo);
+                        break;
+                    }
+                    else
+                    {
+                        if (PenetrationHit(penetrableHitInfo))
+                        {
+                            startPos = penetrableHitInfo.point;
+                            currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
+                        }
+                        else
+                            break;
+                    }
+                }
+                else if (ray)
+                {
+                    MainHit(hitInfo);
+                    break;
+                }
+                else if (penetration)
+                {
+                    if (PenetrationHit(penetrableHitInfo))
+                    {
+                        startPos = penetrableHitInfo.point;
+                        currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
+                    }
+                }
+                else
+                    Hit = false;
             }
+
             // Lifetime
             if ((transform.position - _spawnPosition).sqrMagnitude > _maxDistanceSqr)
                 Destroy(gameObject);
             // Physics
-            _velocity -= _info.Drag * _velocity * Time.deltaTime; // Drag
-            _velocity += Vector3.down * _info.Dropoff * Time.deltaTime; // Gravity
-
+            _velocity -= _info.Drag * _velocity * Time.fixedDeltaTime; // Drag
+            _velocity += Vector3.down * _info.Dropoff * Time.fixedDeltaTime; // Gravity
+            // Check for reversed velocity
+            if (_velocity.x / Mathf.Abs(_velocity.x) != oldVelocity.x / Mathf.Abs(oldVelocity.x) ||
+                _velocity.z / Mathf.Abs(_velocity.z) != oldVelocity.z / Mathf.Abs(oldVelocity.z))
+                Destroy(gameObject);
 
             _lastPosition = transform.position;
+            
+            void MainHit(RaycastHit hitInfo)
+            {
+                if (hitInfo.transform.TryGetComponent(out IDamagable damagable))
+                    damagable.OnHit(_info.Damage, hitInfo.point);
+                else
+                    Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, _velocity);
+                Destroy(gameObject);
+            }
+            bool PenetrationHit(RaycastHit penetrableHitInfo)
+            {
+                Instantiate(_info.HitMarker, penetrableHitInfo.point, Quaternion.identity, penetrableHitInfo.transform).Initialize(penetrableHitInfo.normal, _velocity);
+                if (penetrableHitInfo.transform.TryGetComponent(out Penetrable penetrable) && penetrable.Resistance < _info.PenetrationForce)
+                {
+                    penetrable.Penetrate();
+                    _velocity *= _info.PenetrationForce - penetrable.Resistance;
+                    return true;
+                }
+                Destroy(gameObject);
+                return false;
+            }
         }
     }
 }

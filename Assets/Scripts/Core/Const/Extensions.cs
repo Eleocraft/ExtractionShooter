@@ -128,5 +128,11 @@ namespace ExoplanetStudios
         }
         // Layer mask
         public static bool Contains(this LayerMask mask, int layer) => mask == (mask | (1 << layer));
+
+        public static void SetLayerOfAllChilds(this Transform tr, int layerNumber)
+        {
+            foreach (Transform childTr in tr.GetComponentsInChildren<Transform>(true))
+                childTr.gameObject.layer = layerNumber;
+        }
     }
 }

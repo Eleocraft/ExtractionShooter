@@ -6,9 +6,11 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private PlayerLife parentDamagable;
         [SerializeField] private float Multiplier;
-        public void OnHit(float damage)
+        [SerializeField] private GameObject HitParticle;
+        public void OnHit(float damage, Vector3 point)
         {
-            parentDamagable.OnHit(damage * Multiplier);
+            Instantiate(HitParticle, point, Quaternion.identity);
+            parentDamagable.OnHit(damage * Multiplier, point);
         }
     }
 }

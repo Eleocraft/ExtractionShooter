@@ -25,7 +25,7 @@ namespace ExoplanetStudios.ExtractionShooter
             base.OnDestroy();
             _life.OnValueChanged -= OnLifeChanged;
         }
-        public void OnHit(float damage)
+        public void OnHit(float damage, Vector3 point)
         {
             if (IsServer)
             {

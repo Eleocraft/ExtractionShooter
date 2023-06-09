@@ -64,18 +64,18 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""MainAction"",
+                    ""name"": ""Utility"",
                     ""type"": ""Button"",
-                    ""id"": ""2ee1e1cd-35c1-49e9-84a1-15eac63863f9"",
+                    ""id"": ""6a6fe15b-dca2-408c-a801-d974917e4b80"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""SecondaryAction"",
+                    ""name"": ""Reload"",
                     ""type"": ""Button"",
-                    ""id"": ""fb1f2264-f400-4101-966d-ba373d052e40"",
+                    ""id"": ""39c03052-a025-4f37-8d70-5b7acd922024"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -217,23 +217,23 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""2f3decd9-dfdf-43a2-bb07-1d9a6b58c5d2"",
-                    ""path"": ""<Mouse>/leftButton"",
+                    ""id"": ""b25799db-06be-41dc-b21d-4f8d0c8f9996"",
+                    ""path"": ""<Keyboard>/f"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardMouse"",
-                    ""action"": ""MainAction"",
+                    ""groups"": """",
+                    ""action"": ""Utility"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""998c53e6-5532-4923-bfdf-e9f1648fd043"",
-                    ""path"": ""<Mouse>/rightButton"",
+                    ""id"": ""f4ac2c94-5503-4765-88fe-82d146c74d9b"",
+                    ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""SecondaryAction"",
+                    ""action"": ""Reload"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -251,6 +251,24 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MainAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""e5eacb3f-6e83-4512-9d5d-1a7ca79ee605"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SecondaryAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""a10d733d-c7be-44d2-a3b4-1d7b17c2fd07"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -262,6 +280,28 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": ""InvertVector2(invertX=false),ScaleVector2(x=0.1,y=0.1)"",
                     ""groups"": ""KeyboardMouse"",
                     ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3bb11db5-c2f3-48e4-9bf5-cd927bac3059"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""MainAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5f862850-6b92-44df-99d3-3d544e5880c8"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SecondaryAction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -389,11 +429,13 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
-        m_Player_MainAction = m_Player.FindAction("MainAction", throwIfNotFound: true);
-        m_Player_SecondaryAction = m_Player.FindAction("SecondaryAction", throwIfNotFound: true);
+        m_Player_Utility = m_Player.FindAction("Utility", throwIfNotFound: true);
+        m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
         // Mouse
         m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
         m_Mouse_Look = m_Mouse.FindAction("Look", throwIfNotFound: true);
+        m_Mouse_MainAction = m_Mouse.FindAction("MainAction", throwIfNotFound: true);
+        m_Mouse_SecondaryAction = m_Mouse.FindAction("SecondaryAction", throwIfNotFound: true);
         // Menus
         m_Menus = asset.FindActionMap("Menus", throwIfNotFound: true);
         m_Menus_Escape = m_Menus.FindAction("Escape", throwIfNotFound: true);
@@ -467,8 +509,8 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Interaction;
-    private readonly InputAction m_Player_MainAction;
-    private readonly InputAction m_Player_SecondaryAction;
+    private readonly InputAction m_Player_Utility;
+    private readonly InputAction m_Player_Reload;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -477,8 +519,8 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @Interaction => m_Wrapper.m_Player_Interaction;
-        public InputAction @MainAction => m_Wrapper.m_Player_MainAction;
-        public InputAction @SecondaryAction => m_Wrapper.m_Player_SecondaryAction;
+        public InputAction @Utility => m_Wrapper.m_Player_Utility;
+        public InputAction @Reload => m_Wrapper.m_Player_Reload;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -500,12 +542,12 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Interaction.started += instance.OnInteraction;
             @Interaction.performed += instance.OnInteraction;
             @Interaction.canceled += instance.OnInteraction;
-            @MainAction.started += instance.OnMainAction;
-            @MainAction.performed += instance.OnMainAction;
-            @MainAction.canceled += instance.OnMainAction;
-            @SecondaryAction.started += instance.OnSecondaryAction;
-            @SecondaryAction.performed += instance.OnSecondaryAction;
-            @SecondaryAction.canceled += instance.OnSecondaryAction;
+            @Utility.started += instance.OnUtility;
+            @Utility.performed += instance.OnUtility;
+            @Utility.canceled += instance.OnUtility;
+            @Reload.started += instance.OnReload;
+            @Reload.performed += instance.OnReload;
+            @Reload.canceled += instance.OnReload;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -522,12 +564,12 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Interaction.started -= instance.OnInteraction;
             @Interaction.performed -= instance.OnInteraction;
             @Interaction.canceled -= instance.OnInteraction;
-            @MainAction.started -= instance.OnMainAction;
-            @MainAction.performed -= instance.OnMainAction;
-            @MainAction.canceled -= instance.OnMainAction;
-            @SecondaryAction.started -= instance.OnSecondaryAction;
-            @SecondaryAction.performed -= instance.OnSecondaryAction;
-            @SecondaryAction.canceled -= instance.OnSecondaryAction;
+            @Utility.started -= instance.OnUtility;
+            @Utility.performed -= instance.OnUtility;
+            @Utility.canceled -= instance.OnUtility;
+            @Reload.started -= instance.OnReload;
+            @Reload.performed -= instance.OnReload;
+            @Reload.canceled -= instance.OnReload;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -550,11 +592,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Mouse;
     private List<IMouseActions> m_MouseActionsCallbackInterfaces = new List<IMouseActions>();
     private readonly InputAction m_Mouse_Look;
+    private readonly InputAction m_Mouse_MainAction;
+    private readonly InputAction m_Mouse_SecondaryAction;
     public struct MouseActions
     {
         private @InputMaster m_Wrapper;
         public MouseActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
         public InputAction @Look => m_Wrapper.m_Mouse_Look;
+        public InputAction @MainAction => m_Wrapper.m_Mouse_MainAction;
+        public InputAction @SecondaryAction => m_Wrapper.m_Mouse_SecondaryAction;
         public InputActionMap Get() { return m_Wrapper.m_Mouse; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -567,6 +613,12 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @MainAction.started += instance.OnMainAction;
+            @MainAction.performed += instance.OnMainAction;
+            @MainAction.canceled += instance.OnMainAction;
+            @SecondaryAction.started += instance.OnSecondaryAction;
+            @SecondaryAction.performed += instance.OnSecondaryAction;
+            @SecondaryAction.canceled += instance.OnSecondaryAction;
         }
 
         private void UnregisterCallbacks(IMouseActions instance)
@@ -574,6 +626,12 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @MainAction.started -= instance.OnMainAction;
+            @MainAction.performed -= instance.OnMainAction;
+            @MainAction.canceled -= instance.OnMainAction;
+            @SecondaryAction.started -= instance.OnSecondaryAction;
+            @SecondaryAction.performed -= instance.OnSecondaryAction;
+            @SecondaryAction.canceled -= instance.OnSecondaryAction;
         }
 
         public void RemoveCallbacks(IMouseActions instance)
@@ -714,12 +772,14 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnInteraction(InputAction.CallbackContext context);
-        void OnMainAction(InputAction.CallbackContext context);
-        void OnSecondaryAction(InputAction.CallbackContext context);
+        void OnUtility(InputAction.CallbackContext context);
+        void OnReload(InputAction.CallbackContext context);
     }
     public interface IMouseActions
     {
         void OnLook(InputAction.CallbackContext context);
+        void OnMainAction(InputAction.CallbackContext context);
+        void OnSecondaryAction(InputAction.CallbackContext context);
     }
     public interface IMenusActions
     {

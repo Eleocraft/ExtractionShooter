@@ -8,21 +8,19 @@ namespace ExoplanetStudios.ExtractionShooter
         public int Tick;
         public Vector3 Position;
         public Vector2 LookRotation;
-        public float CurrentHorizontalSpeed;
-        public float VerticalVelocity;
+        public Vector3 Velocity;
 
         public NetworkTransformState() {}
         public NetworkTransformState(int tick)
         {
             Tick = tick;
         }
-        public NetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, float currentHorizontalSpeed, float verticalVelocity)
+        public NetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, Vector3 veloctiy)
         {
             Tick = tick;
             Position = position;
             LookRotation = lookRotation;
-            CurrentHorizontalSpeed = currentHorizontalSpeed;
-            VerticalVelocity = verticalVelocity;
+            Velocity = veloctiy;
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
@@ -32,8 +30,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 reader.ReadValueSafe(out Tick);
                 reader.ReadValueSafe(out Position);
                 reader.ReadValueSafe(out LookRotation);
-                reader.ReadValueSafe(out CurrentHorizontalSpeed);
-                reader.ReadValueSafe(out VerticalVelocity);
+                reader.ReadValueSafe(out Velocity);
             }
             else
             {
@@ -41,8 +38,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(Tick);
                 writer.WriteValueSafe(Position);
                 writer.WriteValueSafe(LookRotation);
-                writer.WriteValueSafe(CurrentHorizontalSpeed);
-                writer.WriteValueSafe(VerticalVelocity);
+                writer.WriteValueSafe(Velocity);
             }
         }
     }
