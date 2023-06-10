@@ -4,6 +4,7 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     interface IDamagable
     {
-        public void OnHit(float damage, Vector3 point, ulong ownerId);
+        void OnHit(float damage, Vector3 point, ulong ownerId);
+        bool CanHit(ulong ownerId);
     }
 }

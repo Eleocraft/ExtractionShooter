@@ -49,8 +49,13 @@ namespace ExoplanetStudios.ExtractionShooter
                 {
                     if (hitInfo.distance < penetrableHitInfo.distance)
                     {
-                        MainHit(hitInfo);
-                        break;
+                        if (MainHit(hitInfo))
+                            break;
+                        else
+                        {
+                            startPos = hitInfo.point + currentMovement.normalized * HIT_OFFSET;
+                            currentMovement *= 1 - (hitInfo.distance / currentMovement.magnitude);
+                        }
                     }
                     else
                     {
@@ -65,8 +70,13 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
                 else if (ray)
                 {
-                    MainHit(hitInfo);
-                    break;
+                    if (MainHit(hitInfo))
+                        break;
+                    else
+                    {
+                        startPos = hitInfo.point + currentMovement.normalized * HIT_OFFSET;
+                        currentMovement *= 1 - (hitInfo.distance / currentMovement.magnitude);
+                    }
                 }
                 else if (penetration)
                 {
@@ -95,13 +105,19 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _lastPosition = transform.position;
             
-            void MainHit(RaycastHit hitInfo)
+            bool MainHit(RaycastHit hitInfo)
             {
                 if (hitInfo.transform.TryGetComponent(out IDamagable damagable))
+                {
+                    if (!damagable.CanHit(_ownerId))
+                        return false;
+                    
                     damagable.OnHit(_info.Damage, hitInfo.point, _ownerId);
+                }
                 else
                     Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, _velocity);
                 Destroy(gameObject);
+                return true;
             }
             bool PenetrationHit(RaycastHit penetrableHitInfo)
             {

@@ -61,9 +61,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5255584293743356100}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.766, z: 0}
-  m_LocalScale: {x: 0.65, y: 0.65, z: 0.65}
-  m_ConstrainProportionsScale: 1
+  m_LocalPosition: {x: 0, y: 1.711, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 226064527645312917}
   m_Father: {fileID: 7674277861609550067}
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 422c942d55c3d1b49aaf25635b9c3701, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentDamagable: {fileID: 3974214662581333730}
+  ParentDamagable: {fileID: 3974214662581333730}
   Multiplier: 2
   HitParticle: {fileID: 3313443488370423343, guid: fc58c1c40dae764479f85d6860fb8477,
     type: 3}
@@ -280,6 +280,7 @@ MonoBehaviour:
   CameraSocket: {fileID: 8896425387986890181}
   TopClamp: 89
   BottomClamp: -89
+  MaxHorizontalMovement: 8
   GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
 --- !u!114 &6289551013835034741
 MonoBehaviour:
@@ -468,7 +469,7 @@ Transform:
   m_GameObject: {fileID: 7363589851616392590}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.706, z: 0}
-  m_LocalScale: {x: 1, y: 0.8, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.8, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7674277861609550067}
@@ -559,7 +560,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 422c942d55c3d1b49aaf25635b9c3701, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentDamagable: {fileID: 3974214662581333730}
+  ParentDamagable: {fileID: 3974214662581333730}
   Multiplier: 1
   HitParticle: {fileID: 3313443488370423343, guid: 2733d37c3af2844419411c33afcec7c2,
     type: 3}

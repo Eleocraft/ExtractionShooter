@@ -27,6 +27,7 @@ namespace ExoplanetStudios.ExtractionShooter
             if (_life.Value < 0)
                 GetComponent<NetworkObject>().Despawn();
         }
+        public bool CanHit(ulong ownerId) => true;
         public override void OnNetworkDespawn()
         {
             Instantiate(BreakParticles, transform.position, Quaternion.identity);

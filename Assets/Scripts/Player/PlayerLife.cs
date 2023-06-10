@@ -36,6 +36,10 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
             }
         }
+        public bool CanHit(ulong ownerId)
+        {
+            return ownerId != OwnerClientId;
+        }
         [ClientRpc]
         private void PlayerDeadClientRpc(Vector3 position)
         {
