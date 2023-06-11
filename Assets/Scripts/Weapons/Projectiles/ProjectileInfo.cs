@@ -13,5 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [Range(0, 1)] public float PenetrationForce;
         public GameObject Prefab;
         public HitMarker HitMarker;
+        public HitMarker PenetrateMarker;
+        public HitMarker ExitMarker;
     }
 }

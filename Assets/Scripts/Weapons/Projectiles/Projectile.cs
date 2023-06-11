@@ -36,10 +36,10 @@ namespace ExoplanetStudios.ExtractionShooter
             transform.position += movement;
             transform.rotation = Quaternion.FromToRotation(Vector3.up, _velocity);
             
-            bool Hit = true;
             Vector3 startPos = _lastPosition;
             Vector3 currentMovement = movement;
-            while (Hit == true)
+            // Main hitscan
+            while (true)
             {
                 bool ray = Physics.Raycast(startPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, ProjectileHitLayer.CanHit);
 
@@ -59,8 +59,9 @@ namespace ExoplanetStudios.ExtractionShooter
                     }
                     else
                     {
-                        if (PenetrationHit(penetrableHitInfo))
+                        if (PenetrationHit(penetrableHitInfo, true, out Penetrable penetrable))
                         {
+                            _velocity *= _info.PenetrationForce - penetrable.Resistance;
                             startPos = penetrableHitInfo.point + currentMovement.normalized * HIT_OFFSET;
                             currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
                         }
@@ -80,8 +81,9 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
                 else if (penetration)
                 {
-                    if (PenetrationHit(penetrableHitInfo))
+                    if (PenetrationHit(penetrableHitInfo, true, out Penetrable penetrable))
                     {
+                        _velocity *= _info.PenetrationForce - penetrable.Resistance;
                         startPos = penetrableHitInfo.point + currentMovement.normalized * HIT_OFFSET;
                         currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
                     }
@@ -89,7 +91,21 @@ namespace ExoplanetStudios.ExtractionShooter
                         break;
                 }
                 else
-                    Hit = false;
+                    break;
+            }
+            // Backwards hitscan for bullet holes
+            startPos = transform.position;
+            currentMovement = movement *= -1;
+            while (true)
+            {
+                if (Physics.Raycast(startPos, currentMovement, out RaycastHit penetrableHitInfo, currentMovement.magnitude, ProjectileHitLayer.Penetrable)
+                    && PenetrationHit(penetrableHitInfo, false, out Penetrable penetrable))
+                {
+                    startPos = penetrableHitInfo.point + currentMovement.normalized * HIT_OFFSET;
+                    currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
+                }
+                else
+                    break;
             }
 
             // Lifetime
@@ -119,16 +135,20 @@ namespace ExoplanetStudios.ExtractionShooter
                 Destroy(gameObject);
                 return true;
             }
-            bool PenetrationHit(RaycastHit penetrableHitInfo)
+            bool PenetrationHit(RaycastHit penetrableHitInfo, bool frontHit, out Penetrable penetrable)
             {
-                Instantiate(_info.HitMarker, penetrableHitInfo.point, Quaternion.identity, penetrableHitInfo.transform).Initialize(penetrableHitInfo.normal, _velocity);
-                if (penetrableHitInfo.transform.TryGetComponent(out Penetrable penetrable) && penetrable.Resistance < _info.PenetrationForce)
+                if (penetrableHitInfo.transform.TryGetComponent(out penetrable) && penetrable.Resistance < _info.PenetrationForce)
                 {
-                    penetrable.Penetrate();
-                    _velocity *= _info.PenetrationForce - penetrable.Resistance;
+                    Instantiate(frontHit ? _info.PenetrateMarker : _info.ExitMarker, penetrableHitInfo.point, Quaternion.identity, penetrableHitInfo.transform).Initialize(penetrableHitInfo.normal, _velocity);
+                    if (frontHit)
+                        penetrable.Penetrate();
                     return true;
                 }
-                Destroy(gameObject);
+                if (frontHit)
+                {
+                    Instantiate(_info.HitMarker, penetrableHitInfo.point, Quaternion.identity, penetrableHitInfo.transform).Initialize(penetrableHitInfo.normal, _velocity);
+                    Destroy(gameObject);
+                }
                 return false;
             }
         }

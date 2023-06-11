@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Automatic
   m_EditorClassIdentifier: 
   OwnerId: 0
-  projectileInfo: {fileID: 11400000, guid: 65082254b75985948a4b6dd8cc8ddc52, type: 2}
+  projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}
   Cooldown: 0.1
