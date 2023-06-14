@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -11,10 +12,11 @@ namespace ExoplanetStudios.ExtractionShooter
         private float _maxDistanceSqr;
         private ulong _ownerId;
         private const float HIT_OFFSET = 0.001f;
+        private GameObject _displayObject;
         private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId)
         {
             // Graphics
-            Instantiate(info.Prefab, transform.position, Quaternion.identity, transform);
+            _displayObject = Instantiate(info.Prefab, transform.position, Quaternion.identity);
             // Physics
             _velocity = direction.normalized * info.MuzzleVelocity;
 
@@ -34,79 +36,11 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 oldVelocity = _velocity;
             Vector3 movement = _velocity * Time.fixedDeltaTime;
             transform.position += movement;
-            transform.rotation = Quaternion.FromToRotation(Vector3.up, _velocity);
-            
-            Vector3 startPos = _lastPosition;
-            Vector3 currentMovement = movement;
-            // Main hitscan
-            while (true)
-            {
-                bool ray = Physics.Raycast(startPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, ProjectileHitLayer.CanHit);
+            _displayObject.transform.position = transform.position;
+            _displayObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, _velocity);
 
-                bool penetration = Physics.Raycast(startPos, currentMovement, out RaycastHit penetrableHitInfo, currentMovement.magnitude, ProjectileHitLayer.Penetrable);
-
-                if (ray && penetration)
-                {
-                    if (hitInfo.distance < penetrableHitInfo.distance)
-                    {
-                        if (MainHit(hitInfo))
-                            break;
-                        else
-                        {
-                            startPos = hitInfo.point + currentMovement.normalized * HIT_OFFSET;
-                            currentMovement *= 1 - (hitInfo.distance / currentMovement.magnitude);
-                        }
-                    }
-                    else
-                    {
-                        if (PenetrationHit(penetrableHitInfo, true, out Penetrable penetrable))
-                        {
-                            _velocity *= _info.PenetrationForce - penetrable.Resistance;
-                            startPos = penetrableHitInfo.point + currentMovement.normalized * HIT_OFFSET;
-                            currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
-                        }
-                        else
-                            break;
-                    }
-                }
-                else if (ray)
-                {
-                    if (MainHit(hitInfo))
-                        break;
-                    else
-                    {
-                        startPos = hitInfo.point + currentMovement.normalized * HIT_OFFSET;
-                        currentMovement *= 1 - (hitInfo.distance / currentMovement.magnitude);
-                    }
-                }
-                else if (penetration)
-                {
-                    if (PenetrationHit(penetrableHitInfo, true, out Penetrable penetrable))
-                    {
-                        _velocity *= _info.PenetrationForce - penetrable.Resistance;
-                        startPos = penetrableHitInfo.point + currentMovement.normalized * HIT_OFFSET;
-                        currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
-                    }
-                    else
-                        break;
-                }
-                else
-                    break;
-            }
-            // Backwards hitscan for bullet holes
-            startPos = transform.position;
-            currentMovement = movement *= -1;
-            while (true)
-            {
-                if (Physics.Raycast(startPos, currentMovement, out RaycastHit penetrableHitInfo, currentMovement.magnitude, ProjectileHitLayer.Penetrable)
-                    && PenetrationHit(penetrableHitInfo, false, out Penetrable penetrable))
-                {
-                    startPos = penetrableHitInfo.point + currentMovement.normalized * HIT_OFFSET;
-                    currentMovement *= 1 - (penetrableHitInfo.distance / currentMovement.magnitude);
-                }
-                else
-                    break;
-            }
+            Hitscan(movement, _lastPosition, out float penetrationResistances);
+            _velocity *= penetrationResistances;
 
             // Lifetime
             if ((transform.position - _spawnPosition).sqrMagnitude > _maxDistanceSqr)
@@ -120,9 +54,47 @@ namespace ExoplanetStudios.ExtractionShooter
                 Destroy(gameObject);
 
             _lastPosition = transform.position;
-            
-            bool MainHit(RaycastHit hitInfo)
+        }
+        private void Hitscan(Vector3 movement, Vector3 startPos, out float penetrationResistances)
+        {
+            penetrationResistances = 1;
+            Vector3 currentStartPos = startPos;
+            Vector3 currentMovement = movement;
+            // Main hitscan
+            while (true)
             {
+                if (Physics.Raycast(currentStartPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, ProjectileHitLayer.CanHit))
+                {
+                    if (Hit(hitInfo, currentMovement.normalized, out float penetrationResistance))
+                        break;
+                    else
+                    {
+                        penetrationResistances *= penetrationResistance;
+                        currentStartPos = hitInfo.point + currentMovement.normalized * HIT_OFFSET;
+                        currentMovement *= 1 - (hitInfo.distance / currentMovement.magnitude);
+                    }
+                }
+                else
+                    break;
+            }
+            // Backwards hitscan for bullet holes
+            currentStartPos = startPos + movement;
+            currentMovement = movement *= -1;
+            while (true)
+            {
+                if (Physics.Raycast(currentStartPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, ProjectileHitLayer.Penetrable)
+                    && BackwardsHit(hitInfo, currentMovement.normalized))
+                {
+                    currentStartPos = hitInfo.point + currentMovement.normalized * HIT_OFFSET;
+                    currentMovement *= 1 - (hitInfo.distance / currentMovement.magnitude);
+                }
+                else
+                    break;
+            }
+
+            bool Hit(RaycastHit hitInfo, Vector3 direction, out float penetrationResistance)
+            {
+                penetrationResistance = 1;
                 if (hitInfo.transform.TryGetComponent(out IDamagable damagable))
                 {
                     if (!damagable.CanHit(_ownerId))
@@ -130,26 +102,28 @@ namespace ExoplanetStudios.ExtractionShooter
                     
                     damagable.OnHit(_info.Damage, hitInfo.point, _ownerId);
                 }
-                else
-                    Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, _velocity);
-                Destroy(gameObject);
-                return true;
-            }
-            bool PenetrationHit(RaycastHit penetrableHitInfo, bool frontHit, out Penetrable penetrable)
-            {
-                if (penetrableHitInfo.transform.TryGetComponent(out penetrable) && penetrable.Resistance < _info.PenetrationForce)
+                else if (hitInfo.transform.TryGetComponent(out Penetrable penetrable) && penetrable.Resistance < _info.PenetrationForce)
                 {
-                    Instantiate(frontHit ? _info.PenetrateMarker : _info.ExitMarker, penetrableHitInfo.point, Quaternion.identity, penetrableHitInfo.transform).Initialize(penetrableHitInfo.normal, _velocity);
-                    if (frontHit)
-                        penetrable.Penetrate();
-                    return true;
+                    Instantiate(_info.PenetrateMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, direction);
+                    penetrable.Penetrate();
+                    penetrationResistance = 1 - (_info.PenetrationForce - penetrable.Resistance);
+                    return false;
                 }
-                if (frontHit)
+                else
                 {
-                    Instantiate(_info.HitMarker, penetrableHitInfo.point, Quaternion.identity, penetrableHitInfo.transform).Initialize(penetrableHitInfo.normal, _velocity);
+                    Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, _velocity);
                     Destroy(gameObject);
                 }
-                return false;
+                return true;
+            }
+            bool BackwardsHit(RaycastHit hitInfo, Vector3 direction)
+            {
+                if (hitInfo.transform.TryGetComponent(out Penetrable penetrable))
+                {
+                    Instantiate(_info.ExitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, direction);
+                    return true;
+                }
+                return false;  
             }
         }
     }

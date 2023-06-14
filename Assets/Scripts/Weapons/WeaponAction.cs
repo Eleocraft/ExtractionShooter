@@ -12,10 +12,9 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private Transform CameraSocket;
         [SerializeField] private Weapon MainWeapon;
         private Weapon _weapon;
-        private Dictionary<int, PerformedAction> _receivedActions = new Dictionary<int, PerformedAction>(); // Serveronly
+        private Dictionary<int, ActionType> _receivedActions; // Serveronly
         private FirstPersonController _firstPersonController; // Serveronly
         private float _cameraYOffset; // Serveronly
-        private Vector3 LocalDirection => CameraSocket.rotation * Vector3.forward;
         private void Start()
         {
             _weapon = Instantiate(MainWeapon);
@@ -23,6 +22,9 @@ namespace ExoplanetStudios.ExtractionShooter
             _firstPersonController = GetComponent<FirstPersonController>();
             _cameraYOffset = CameraSocket.localPosition.y;
             NetworkManager.NetworkTickSystem.Tick += Tick;
+            if (IsServer)
+                _receivedActions = new Dictionary<int, ActionType>();
+
             if (!IsOwner)
                 return;
 
@@ -49,41 +51,42 @@ namespace ExoplanetStudios.ExtractionShooter
         private void StartMainAction(InputAction.CallbackContext ctx)
         {
             if (!IsServer)
-                PerformAction(ActionType.StartMainAction, LocalDirection, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StartMainAction, LocalDirection, NetworkManager.LocalTime.Tick);
+                PerformAction(ActionType.StartMainAction, NetworkManager.LocalTime.Tick);
+            ActionServerRpc(ActionType.StartMainAction, NetworkManager.LocalTime.Tick);
         }
 
         private void StopMainAction(InputAction.CallbackContext ctx)
         {
             if (!IsServer)
-                PerformAction(ActionType.StopMainAction, LocalDirection, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StopMainAction, LocalDirection, NetworkManager.LocalTime.Tick);
+                PerformAction(ActionType.StopMainAction, NetworkManager.LocalTime.Tick);
+            ActionServerRpc(ActionType.StopMainAction, NetworkManager.LocalTime.Tick);
         }
         private void StartSecondaryAction(InputAction.CallbackContext ctx)
         {
             if (!IsServer)
-                PerformAction(ActionType.StartSecondaryAction, LocalDirection, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StartSecondaryAction, LocalDirection, NetworkManager.LocalTime.Tick);
+                PerformAction(ActionType.StartSecondaryAction, NetworkManager.LocalTime.Tick);
+            ActionServerRpc(ActionType.StartSecondaryAction, NetworkManager.LocalTime.Tick);
         }
         private void StopSecondaryAction(InputAction.CallbackContext ctx)
         {
             if (!IsServer)
-                PerformAction(ActionType.StopSecondaryAction, LocalDirection, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StopSecondaryAction, LocalDirection, NetworkManager.LocalTime.Tick);
+                PerformAction(ActionType.StopSecondaryAction, NetworkManager.LocalTime.Tick);
+            ActionServerRpc(ActionType.StopSecondaryAction, NetworkManager.LocalTime.Tick);
         }
         [ServerRpc]
-        private void ActionServerRpc(ActionType type, Vector3 direction, int tick)
+        private void ActionServerRpc(ActionType type, int tick)
         {
             if (tick <= NetworkManager.LocalTime.Tick)
-                PerformAction(type, direction, tick);
+                PerformAction(type, tick);
             else
-                _receivedActions.Add(tick, new(type, direction));
+                _receivedActions.Add(tick, type);
         }
-        private void PerformAction(ActionType type, Vector3 direction, int tick)
+        private void PerformAction(ActionType type, int tick)
         {
             if(!_firstPersonController.GetState(tick, out NetworkTransformState transformState)) return;
             
             Vector3 position = transformState.Position + Vector3.up * _cameraYOffset;
+            Vector3 direction = Quaternion.AngleAxis(transformState.LookRotation.y, Vector3.up) * (Quaternion.AngleAxis(transformState.LookRotation.x, Vector3.right) * Vector3.up);
             PerformActionAtPos(type, direction, position);
 
             if (IsServer)
@@ -111,9 +114,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (IsServer && _receivedActions.ContainsKey(NetworkManager.LocalTime.Tick))
             {
-                PerformAction(_receivedActions[NetworkManager.LocalTime.Tick].Type, 
-                    _receivedActions[NetworkManager.LocalTime.Tick].Direction, NetworkManager.LocalTime.Tick);
-
+                PerformAction(_receivedActions[NetworkManager.LocalTime.Tick], NetworkManager.LocalTime.Tick);
                 _receivedActions.Remove(NetworkManager.LocalTime.Tick);
             }
         }
@@ -127,16 +128,6 @@ namespace ExoplanetStudios.ExtractionShooter
         private void Update()
         {
             _weapon.UpdateWeapon(CameraSocket.position, CameraSocket.forward);
-        }
-        private class PerformedAction
-        {
-            public ActionType Type;
-            public Vector3 Direction;
-            public PerformedAction(ActionType type, Vector3 direction)
-            {
-                Type = type;
-                Direction = direction;
-            }
         }
     }
 }
