@@ -9,6 +9,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public Vector3 Position;
         public Vector2 LookRotation;
         public Vector3 Velocity;
+        public bool Predicted;
 
         public NetworkTransformState() {}
         public NetworkTransformState(int tick)
@@ -31,6 +32,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 reader.ReadValueSafe(out Position);
                 reader.ReadValueSafe(out LookRotation);
                 reader.ReadValueSafe(out Velocity);
+                reader.ReadValueSafe(out Predicted);
             }
             else
             {
@@ -39,6 +41,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(Position);
                 writer.WriteValueSafe(LookRotation);
                 writer.WriteValueSafe(Velocity);
+                writer.WriteValueSafe(Predicted);
             }
         }
     }

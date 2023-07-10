@@ -212,5 +212,26 @@ namespace ExoplanetStudios
             yield return new WaitForSeconds(Time.fixedDeltaTime);
             callback?.Invoke();
         }
+        private const float HIT_OFFSET = 0.001f;
+        public static List<RaycastHit> RaycastAll(Vector3 position, Vector3 direction, float distance, LayerMask layerMask)
+        {
+            Vector3 rayStartPos = position;
+            Vector3 rayDir = direction.normalized;
+            float rayDist = distance;
+
+            List<RaycastHit> hits = new();
+
+            while (true)
+            {
+                if (Physics.Raycast(rayStartPos, rayDir, out RaycastHit hitInfo, rayDist, layerMask))
+                {
+                    rayStartPos = hitInfo.point + rayDir * HIT_OFFSET;
+                    rayDist *= 1 - ((hitInfo.distance + HIT_OFFSET) / rayDist);
+                    hits.Add(hitInfo);
+                }
+                else
+                    return hits;
+            }
+        }
     }
 }

@@ -85,30 +85,33 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if(!_firstPersonController.GetState(tick, out NetworkTransformState transformState)) return;
             
-            Vector3 position = transformState.Position + Vector3.up * _cameraYOffset;
-            Vector3 direction = Quaternion.AngleAxis(transformState.LookRotation.y, Vector3.up) * (Quaternion.AngleAxis(transformState.LookRotation.x, Vector3.right) * Vector3.up);
+            Vector3 position = GetShootPosition(transformState.Position);
+            Vector3 direction = GetShootDirection(transformState.LookRotation);
             PerformActionAtPos(type, direction, position);
 
             if (IsServer)
                 ActionClientRpc(type, position, direction);
         }
+        private Vector3 GetShootPosition(Vector3 playerPosition) => playerPosition + Vector3.up * _cameraYOffset;
+        private Vector3 GetShootDirection(Vector2 lookRotation) => Quaternion.Euler(lookRotation.x, lookRotation.y, 0) * Vector3.forward;
         private void PerformActionAtPos(ActionType type, Vector3 direction, Vector3 position)
         {
             switch (type)
             {
                 case ActionType.StartMainAction:
-                    _weapon.StartMainAction(position, direction);
+                    _weapon.StartMainAction();
                     break;
                 case ActionType.StopMainAction:
                     _weapon.StopMainAction();
                     break;
                 case ActionType.StartSecondaryAction:
-                    _weapon.StartSecondaryAction(position, direction);
+                    _weapon.StartSecondaryAction();
                     break;
                 case ActionType.StopSecondaryAction:
                     _weapon.StopSecondaryAction();
                     break;
             }
+            _weapon.UpdateWeapon(position, direction);
         }
         private void Tick()
         {
@@ -117,6 +120,8 @@ namespace ExoplanetStudios.ExtractionShooter
                 PerformAction(_receivedActions[NetworkManager.LocalTime.Tick], NetworkManager.LocalTime.Tick);
                 _receivedActions.Remove(NetworkManager.LocalTime.Tick);
             }
+            if(_firstPersonController.GetState(NetworkManager.LocalTime.Tick, out NetworkTransformState transformState))
+                _weapon.UpdateWeapon(GetShootPosition(transformState.Position), GetShootDirection(transformState.LookRotation));
         }
         [ClientRpc]
         private void ActionClientRpc(ActionType type, Vector3 position, Vector3 direction)
@@ -124,10 +129,6 @@ namespace ExoplanetStudios.ExtractionShooter
             if (IsOwner) return;
 
             PerformActionAtPos(type, direction, position);
-        }
-        private void Update()
-        {
-            _weapon.UpdateWeapon(CameraSocket.position, CameraSocket.forward);
         }
     }
 }

@@ -11,7 +11,6 @@ namespace ExoplanetStudios.ExtractionShooter
         private ProjectileInfo _info;
         private float _maxDistanceSqr;
         private ulong _ownerId;
-        private const float HIT_OFFSET = 0.001f;
         private GameObject _displayObject;
         private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId)
         {
@@ -58,39 +57,21 @@ namespace ExoplanetStudios.ExtractionShooter
         private void Hitscan(Vector3 movement, Vector3 startPos, out float penetrationResistances)
         {
             penetrationResistances = 1;
-            Vector3 currentStartPos = startPos;
-            Vector3 currentMovement = movement;
             // Main hitscan
-            while (true)
+            List<RaycastHit> hits = Utility.RaycastAll(startPos, movement, movement.magnitude, ProjectileHitLayer.CanHit);
+            foreach (RaycastHit hit in hits)
             {
-                if (Physics.Raycast(currentStartPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, ProjectileHitLayer.CanHit))
-                {
-                    if (Hit(hitInfo, currentMovement.normalized, out float penetrationResistance))
-                        break;
-                    else
-                    {
-                        penetrationResistances *= penetrationResistance;
-                        currentStartPos = hitInfo.point + currentMovement.normalized * HIT_OFFSET;
-                        currentMovement *= 1 - (hitInfo.distance / currentMovement.magnitude);
-                    }
-                }
-                else
+                if (Hit(hit, movement.normalized, out float penetrationResistance))
                     break;
+                else
+                    penetrationResistances *= penetrationResistance;
             }
             // Backwards hitscan for bullet holes
-            currentStartPos = startPos + movement;
-            currentMovement = movement *= -1;
-            while (true)
-            {
-                if (Physics.Raycast(currentStartPos, currentMovement, out RaycastHit hitInfo, currentMovement.magnitude, ProjectileHitLayer.Penetrable)
-                    && BackwardsHit(hitInfo, currentMovement.normalized))
-                {
-                    currentStartPos = hitInfo.point + currentMovement.normalized * HIT_OFFSET;
-                    currentMovement *= 1 - (hitInfo.distance / currentMovement.magnitude);
-                }
-                else
-                    break;
-            }
+            Vector3 backwardsStartPos = startPos + movement;
+            Vector3 backwardsMovement = movement *= -1;
+            List<RaycastHit> backwardsHits = Utility.RaycastAll(backwardsStartPos, backwardsMovement, backwardsMovement.magnitude, ProjectileHitLayer.Penetrable);
+            foreach (RaycastHit hit in backwardsHits)
+                BackwardsHit(hit, backwardsMovement.normalized);
 
             bool Hit(RaycastHit hitInfo, Vector3 direction, out float penetrationResistance)
             {

@@ -69,7 +69,8 @@ namespace ExoplanetStudios.ExtractionShooter
 		private CharacterController _controller;
 
 		// Buffer and Interpolation
-		private List<BufferedState> _bufferedStates;
+		private List<NetworkTransformState> _bufferedTransformStates;
+		private NetworkInputStateList _bufferedInputStates;
 		private Dictionary<int, NetworkInputState> _inputsReceived; // Serveronly
 		private NetworkInputState _lastReceivedInput; // Serveronly
 		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>();
@@ -79,6 +80,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private float _currentTickDeltaTime;
 		private bool _correcting;
 		private const int BUFFER_SIZE = 200;
+		private const int INPUTS_SEND = 30;
 		private const float ERROR_THRESHOLD = 0.03f;
 
 		private void Start()
@@ -108,7 +110,10 @@ namespace ExoplanetStudios.ExtractionShooter
 				_controls.Player.Jump.started += JumpInput;
 			}
 			if (IsServer || IsOwner)
-				_bufferedStates = new List<BufferedState>();
+			{
+				_bufferedTransformStates = new List<NetworkTransformState>();
+				_bufferedInputStates = new(BUFFER_SIZE);
+			}
 		}
 		public override void OnDestroy()
 		{
@@ -159,7 +164,7 @@ namespace ExoplanetStudios.ExtractionShooter
 				if (IsHost)
 					_serverTransformState.Value = _currentTransformState;
 				else
-					OnInputServerRpc(inputState);
+					OnInputServerRpc(_bufferedInputStates);
 				
 				if (_jump)
 					_jump = false;
@@ -173,6 +178,7 @@ namespace ExoplanetStudios.ExtractionShooter
 					StoreBuffer(NetworkManager.LocalTime.Tick - 1, _lastReceivedInput, _currentTransformState);
 
 					_serverTransformState.Value = _currentTransformState;
+					_serverTransformState.Value.Predicted = true;
 				}
 				if (_inputsReceived.ContainsKey(NetworkManager.LocalTime.Tick)) // Applying received input
 				{
@@ -189,49 +195,54 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 		private void StoreBuffer(int tick, NetworkInputState inputState, NetworkTransformState transformState)
 		{
-			_bufferedStates.Add(new(tick, inputState, transformState));
-			if (_bufferedStates.Count >= BUFFER_SIZE)
-				_bufferedStates.RemoveAt(0);
+			_bufferedInputStates.Add(inputState);
+			_bufferedInputStates.RemoveOutdated(tick);
+			_bufferedTransformStates.Add(transformState);
+			if (_bufferedTransformStates.Count >= BUFFER_SIZE)
+				_bufferedTransformStates.RemoveAt(0);
 		}
 		[ServerRpc]
-		private void OnInputServerRpc(NetworkInputState inputState)
+		private void OnInputServerRpc(NetworkInputStateList inputState)
 		{
 			// Input should be executed instantly
-			if (inputState.Tick == NetworkManager.LocalTime.Tick)
+			if (inputState.LastState.Tick == NetworkManager.LocalTime.Tick)
 			{
-				CalculateTransformStates(inputState, NetworkManager.LocalTime.Tick);
+				CalculateTransformStates(inputState.LastState, NetworkManager.LocalTime.Tick);
 				_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
-				StoreBuffer(NetworkManager.LocalTime.Tick, inputState, _currentTransformState);
-				_lastReceivedInput = inputState;
+				StoreBuffer(NetworkManager.LocalTime.Tick, inputState.LastState, _currentTransformState);
+				_lastReceivedInput = inputState.LastState;
 				
 				_serverTransformState.Value = _currentTransformState;
 			}
-			else if (inputState.Tick > NetworkManager.LocalTime.Tick) // Input should be stashed to be executed later
-				_inputsReceived.Add(inputState.Tick, inputState);
+			else if (inputState.LastState.Tick > NetworkManager.LocalTime.Tick && !_inputsReceived.ContainsKey(inputState.LastState.Tick)) // Input should be stashed to be executed later
+				_inputsReceived.Add(inputState.LastState.Tick, inputState.LastState);
 		}
 		private void OnServerStateChanged(NetworkTransformState previouseState, NetworkTransformState receivedState)
 		{
 			if (IsOwner && !IsServer)
 			{
-				if (StateBuffered(receivedState.Tick, out int stateId))
+				if (receivedState.Predicted)
+					return;
+				
+				if (TransfromStateBuffered(receivedState.Tick, out int stateId))
 				{
-					if ((_bufferedStates[stateId].TransformState.Position - receivedState.Position).sqrMagnitude <= ERROR_THRESHOLD)
+					if ((_bufferedTransformStates[stateId].Position - receivedState.Position).sqrMagnitude <= ERROR_THRESHOLD)
 						return;
 
 					// Rewind logic
 					Debug.Log("reconceliation");
 					_currentTransformState = receivedState;
 					transform.position = receivedState.Position;
-					for (int i = stateId + 1; i < _bufferedStates.Count; i++)
+					for (int i = stateId + 1; i < _bufferedTransformStates.Count; i++)
 					{
-						CalculateTransformStates(_bufferedStates[i].InputState, _bufferedStates[i].Tick);
-						_bufferedStates[i].TransformState = _currentTransformState;
+						CalculateTransformStates(_bufferedInputStates[_bufferedTransformStates[i].Tick], _bufferedTransformStates[i].Tick);
+						_bufferedTransformStates[i] = _currentTransformState;
 					}
 					_correcting = true;
 					_lerpEndInterpolationState = GetEndInterpolationState();
 					// Delete outdated data
 					for (int i = stateId - 1; i >= 0; i--)
-						_bufferedStates.RemoveAt(0);
+						_bufferedTransformStates.RemoveAt(0);
 				}
 				else
 				{
@@ -370,15 +381,15 @@ namespace ExoplanetStudios.ExtractionShooter
 				transformState = _currentTransformState;
 				return true;
 			}
-			bool stateBuffered = StateBuffered(tick, out int stateId);
-			transformState = stateBuffered ? _bufferedStates[stateId].TransformState : null;
+			bool stateBuffered = TransfromStateBuffered(tick, out int stateId);
+			transformState = stateBuffered ? _bufferedTransformStates[stateId] : null;
 			return stateBuffered;
 		}
-		private bool StateBuffered(int tick, out int stateId)
+		private bool TransfromStateBuffered(int tick, out int stateId)
 		{
-			for (int i = _bufferedStates.Count - 1; i >= 0; i--)
+			for (int i = _bufferedTransformStates.Count - 1; i >= 0; i--)
 			{
-				if (_bufferedStates[i].Tick == tick)
+				if (_bufferedTransformStates[i].Tick == tick)
 				{
 					stateId = i;
 					return true;
@@ -403,19 +414,6 @@ namespace ExoplanetStudios.ExtractionShooter
 				return new InterpolationState(_currentTransformState);
 			}
 
-		}
-		private class BufferedState
-		{
-			public readonly int Tick;
-			public NetworkTransformState TransformState;
-			public readonly NetworkInputState InputState;
-
-			public BufferedState(int tick, NetworkInputState inputState, NetworkTransformState transformState)
-			{
-				Tick = tick;
-				TransformState = transformState;
-				InputState = inputState;
-			}
 		}
 		private struct InterpolationState
 		{

@@ -11,6 +11,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             transform.localScale = new Vector3(1/transform.lossyScale.x, 1/transform.lossyScale.y, 1/transform.lossyScale.z);
             transform.rotation = Quaternion.FromToRotation(Vector3.up, normal);
+            transform.GetChild(0).localRotation = Quaternion.Euler(-90, Random.Range(0, 360), 0);
         }
         void Start()
         {

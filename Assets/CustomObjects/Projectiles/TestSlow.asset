@@ -19,5 +19,9 @@ MonoBehaviour:
   MaxDistance: 100
   PenetrationForce: 0.805
   Prefab: {fileID: 1300443509257007520, guid: dde4e3477d432684d90158d6e538fb9d, type: 3}
-  HitMarker: {fileID: 7882812698031039389, guid: adb0c5e100999ab44b168c830eae7736,
+  HitMarker: {fileID: 7882812698031039389, guid: 2c512890680e9564b825dfb025b298a3,
+    type: 3}
+  PenetrateMarker: {fileID: 7882812698031039389, guid: adb0c5e100999ab44b168c830eae7736,
+    type: 3}
+  ExitMarker: {fileID: 7882812698031039389, guid: b72bf6366dd5c014f9130da31c202ccd,
     type: 3}

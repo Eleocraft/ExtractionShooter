@@ -2183,8 +2183,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   progressBar: {fileID: 515480885}
   animationBar: {fileID: 418794603}
-  animationSpeed: 200
-  timeToUpdate: 0.1
+  animationSpeed: 2000
+  timeToUpdate: 0.3
 --- !u!114 &962697505
 MonoBehaviour:
   m_ObjectHideFlags: 0
