@@ -45,12 +45,36 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(Jump);
             }
         }
+        public static bool operator==(NetworkInputState s1, NetworkInputState s2)
+        {
+            if (s1 is null)
+                return s2 is null;
+            return s1.Equals(s2);
+        }
+        public static bool operator!=(NetworkInputState s1, NetworkInputState s2)
+        {
+            if (s1 is null)
+                return !(s2 is null);
+            return !s1.Equals(s2);
+        }
+        public override bool Equals(object obj)
+        {
+            NetworkInputState otherState = (NetworkInputState)obj;
+            if (MovementInput == otherState.MovementInput && LookRotation == otherState.LookRotation &&
+                Sprint == otherState.Sprint && Jump == otherState.Jump) return true;
+
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
     public class NetworkInputStateList : INetworkSerializable
     {
-		private int _ticksSaved = 30;
-        public List<NetworkInputState> States = new();
-        public NetworkInputState LastState => States[0];
+		private int _ticksSaved;
+        private List<NetworkInputState> States = new();
+        public NetworkInputState LastState => States.Count > 0 ? States[0] : null;
         public NetworkInputState this[int tick]
         {
             get
@@ -58,11 +82,24 @@ namespace ExoplanetStudios.ExtractionShooter
                 if (LastState.Tick - _ticksSaved > tick) // Tick is to old
                     return null;
                 
-                foreach (NetworkInputState state in States)
-                    if (state.Tick <= tick)
-                        return state;
+                for (int i = States.Count - 1; i >= 0; i++)
+                    if (States[i].Tick <= tick)
+                        return States[i];
 
                 return null;
+            }
+            set
+            {
+                if (LastState.Tick - _ticksSaved > tick) // Tick is to old
+                    return;
+                
+                for (int i = States.Count - 1; i >= 0; i++)
+                {
+                    if (States[i].Tick == tick)
+                        States[i] = value;
+                    else if (States[i].Tick < tick)
+                        States.Insert(i, value);
+                }
             }
         }
         public NetworkInputStateList() { }
@@ -72,13 +109,36 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public void Add(NetworkInputState inputState)
         {
-            States.Insert(0, inputState);
+            if (States.Count > 0 && LastState == inputState)
+                States[0].Tick = inputState.Tick;
+            else
+                States.Insert(0, inputState);
         }
-        public void RemoveOutdated(int tick)
+        public void RemoveOutdated()
         {
+            if (States.Count == 0)
+                return;
+            
+            int startTick = LastState.Tick;
             for (int i = States.Count - 1; i >= 0; i--)
-                if (States[i].Tick < tick - _ticksSaved)
+                if (States[i].Tick < startTick - _ticksSaved)
                     States.RemoveAt(i);
+        }
+        public NetworkInputStateList GetListForTicks(int ticks)
+        {
+            if (States.Count == 0)
+                return null;
+            
+            NetworkInputStateList newList = new(ticks);
+            int startTick = LastState.Tick;
+            for (int i = States.Count - 1; i >= 0; i--)
+            {
+                if (States[i].Tick < startTick - ticks)
+                    break;
+                
+                newList.Add(States[i]);
+            }
+            return newList;
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
