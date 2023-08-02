@@ -45,9 +45,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		[SerializeField] private float TopClamp = 90.0f;
 		[Tooltip("How far in degrees can you move the camera down")]
 		[SerializeField] private float BottomClamp = -90.0f;
-		[Header("Interpolation")]
-		[Tooltip("The maximum amout the player can move horizontally each second. must be higher than the Sprint speed")]
-		[SerializeField] private float MaxHorizontalMovement = 15;
 
 		// player
 		private float _jumpVelocity;
@@ -78,7 +75,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		private InterpolationState _lerpEndInterpolationState;
 		private NetworkTransformState _currentTransformState = new(0);
 		private float _currentTickDeltaTime;
-		private bool _correcting;
 		private const int BUFFER_SIZE = 200;
 		private const int INPUT_TICKS_SEND = 30;
 		private const float ERROR_THRESHOLD = 0.03f;
@@ -155,10 +151,8 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				NetworkInputState inputState = CreateInputState();
 				CalculateTransformStates(inputState, NetworkManager.LocalTime.Tick);
-				if (_correcting)
-					_lerpEndInterpolationState = GetEndInterpolationState();
-				else
-					_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
+
+				_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
 				StoreBuffer(inputState, _currentTransformState);
 				
 				if (IsHost)
@@ -202,20 +196,20 @@ namespace ExoplanetStudios.ExtractionShooter
 			_bufferedTransformStates.RemoveOutdated();
 		}
 		[ServerRpc]
-		private void OnInputServerRpc(NetworkInputStateList inputState)
+		private void OnInputServerRpc(NetworkInputStateList inputStates)
 		{
 			// Input should be executed instantly
-			if (inputState.LastState.Tick == NetworkManager.LocalTime.Tick)
+			if (inputStates.LastState.Tick == NetworkManager.LocalTime.Tick)
 			{
-				CalculateTransformStates(inputState.LastState, NetworkManager.LocalTime.Tick);
+				CalculateTransformStates(inputStates.LastState, NetworkManager.LocalTime.Tick);
 				_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
-				StoreBuffer(inputState.LastState, _currentTransformState);
-				_lastReceivedInput = inputState.LastState;
+				StoreBuffer(inputStates.LastState, _currentTransformState);
+				_lastReceivedInput = inputStates.LastState;
 				
 				_serverTransformState.Value = _currentTransformState;
 			}
-			else if (inputState.LastState.Tick > NetworkManager.LocalTime.Tick && !_inputsReceived.ContainsKey(inputState.LastState.Tick)) // Input should be stashed to be executed later
-				_inputsReceived.Add(inputState.LastState.Tick, inputState.LastState);
+			else if (inputStates.LastState.Tick > NetworkManager.LocalTime.Tick && !_inputsReceived.ContainsKey(inputStates.LastState.Tick)) // Input should be stashed to be executed later
+				_inputsReceived.Add(inputStates.LastState.Tick, inputStates.LastState);
 		}
 		private void OnServerStateChanged(NetworkTransformState previouseState, NetworkTransformState receivedState)
 		{
@@ -239,8 +233,7 @@ namespace ExoplanetStudios.ExtractionShooter
 						CalculateTransformStates(_bufferedInputStates[tick], tick);
 						_bufferedTransformStates[tick] = _currentTransformState;
 					}
-					_correcting = true;
-					_lerpEndInterpolationState = GetEndInterpolationState();
+					_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
 				}
 				else
 				{
@@ -381,23 +374,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			}
 			transformState = _bufferedTransformStates[tick];
 			return transformState != null;
-		}
-		private InterpolationState GetEndInterpolationState()
-		{
-			Vector3 movement = _currentTransformState.Position - _lerpStartInterpolationState.Position;
-			Vector3 horizontalMovement = movement.XZ();
-			if (horizontalMovement.magnitude > MaxHorizontalMovement * NetworkManager.LocalTime.FixedDeltaTime)
-			{
-				Debug.Log("bigError");
-				Vector2 newMovement = horizontalMovement.normalized * MaxHorizontalMovement * NetworkManager.LocalTime.FixedDeltaTime;
-				return new InterpolationState(_lerpStartInterpolationState.Position + newMovement.AddHeight(movement.y), _currentTransformState.LookRotation);
-			}
-			else
-			{
-				_correcting = false;
-				return new InterpolationState(_currentTransformState);
-			}
-
 		}
 		private struct InterpolationState
 		{

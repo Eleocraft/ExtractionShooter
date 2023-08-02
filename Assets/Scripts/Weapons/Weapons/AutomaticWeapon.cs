@@ -10,14 +10,8 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float Cooldown;
         private float _cooldown;
         private bool _shoot;
-        public override void StartMainAction()
-        {
-            _shoot = true;
-        }
-        public override void StopMainAction()
-        {
-            _shoot = false;
-        }
+        public override void StartMainAction() => _shoot = true;
+        public override void StopMainAction() => _shoot = false;
         public override void UpdateWeapon(Vector3 position, Vector3 direction)
         {
             if (_cooldown > 0)

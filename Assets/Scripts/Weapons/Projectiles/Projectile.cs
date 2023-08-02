@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
@@ -24,16 +25,22 @@ namespace ExoplanetStudios.ExtractionShooter
             _maxDistanceSqr = info.MaxDistance * info.MaxDistance;
             _ownerId = ownerId;
             _info = info;
+
+            NetworkManager.Singleton.NetworkTickSystem.Tick += Tick;
+        }
+        private void OnDestroy()
+        {
+            NetworkManager.Singleton.NetworkTickSystem.Tick -= Tick;
         }
         public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId)
         {
             GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Projectile], position, Quaternion.identity);
             projectileObj.GetComponent<Projectile>().Initialize(info, position, direction, ownerId);
         }
-        private void FixedUpdate()
+        private void Tick()
         {
             Vector3 oldVelocity = _velocity;
-            Vector3 movement = _velocity * Time.fixedDeltaTime;
+            Vector3 movement = _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             transform.position += movement;
             _displayObject.transform.position = transform.position;
             _displayObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, _velocity);
@@ -45,8 +52,8 @@ namespace ExoplanetStudios.ExtractionShooter
             if ((transform.position - _spawnPosition).sqrMagnitude > _maxDistanceSqr)
                 Destroy(gameObject);
             // Physics
-            _velocity -= _info.Drag * _velocity * Time.fixedDeltaTime; // Drag
-            _velocity += Vector3.down * _info.Dropoff * Time.fixedDeltaTime; // Gravity
+            _velocity -= _info.Drag * _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Drag
+            _velocity += Vector3.down * _info.Dropoff * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Gravity
             // Check for reversed velocity
             if (_velocity.x / Mathf.Abs(_velocity.x) != oldVelocity.x / Mathf.Abs(oldVelocity.x) ||
                 _velocity.z / Mathf.Abs(_velocity.z) != oldVelocity.z / Mathf.Abs(oldVelocity.z))

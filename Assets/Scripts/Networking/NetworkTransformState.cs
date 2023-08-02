@@ -60,8 +60,13 @@ namespace ExoplanetStudios.ExtractionShooter
         public override bool Equals(object obj)
         {
             NetworkTransformState otherState = (NetworkTransformState)obj;
+
+            if (otherState is null)
+                return false;
+
             if (Position == otherState.Position && LookRotation == otherState.LookRotation &&
-                Velocity == otherState.Velocity && Predicted == otherState.Predicted) return true;
+                Velocity == otherState.Velocity && Predicted == otherState.Predicted)
+                return true;
 
             return false;
         }
@@ -79,21 +84,22 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             get
             {
-                if (LastState.Tick - _ticksSaved > tick) // Tick is to old
+                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
                     return null;
                 
-                for (int i = States.Count - 1; i >= 0; i++)
+                for (int i = States.Count - 1; i >= 0; i--)
                     if (States[i].Tick <= tick)
                         return States[i];
 
+                Debug.Log(States.Count);
                 return null;
             }
             set
             {
-                if (LastState.Tick - _ticksSaved > tick) // Tick is to old
+                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
                     return;
                 
-                for (int i = States.Count - 1; i >= 0; i++)
+                for (int i = States.Count - 1; i >= 0; i--)
                 {
                     if (States[i].Tick == tick)
                         States[i] = value;

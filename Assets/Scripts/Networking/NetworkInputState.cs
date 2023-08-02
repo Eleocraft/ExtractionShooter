@@ -60,6 +60,10 @@ namespace ExoplanetStudios.ExtractionShooter
         public override bool Equals(object obj)
         {
             NetworkInputState otherState = (NetworkInputState)obj;
+            
+            if (otherState is null)
+                return false;
+            
             if (MovementInput == otherState.MovementInput && LookRotation == otherState.LookRotation &&
                 Sprint == otherState.Sprint && Jump == otherState.Jump) return true;
 
@@ -79,10 +83,10 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             get
             {
-                if (LastState.Tick - _ticksSaved > tick) // Tick is to old
+                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
                     return null;
                 
-                for (int i = States.Count - 1; i >= 0; i++)
+                for (int i = States.Count - 1; i >= 0; i--)
                     if (States[i].Tick <= tick)
                         return States[i];
 
@@ -90,10 +94,10 @@ namespace ExoplanetStudios.ExtractionShooter
             }
             set
             {
-                if (LastState.Tick - _ticksSaved > tick) // Tick is to old
+                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
                     return;
                 
-                for (int i = States.Count - 1; i >= 0; i++)
+                for (int i = States.Count - 1; i >= 0; i--)
                 {
                     if (States[i].Tick == tick)
                         States[i] = value;
@@ -109,6 +113,9 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public void Add(NetworkInputState inputState)
         {
+            if (inputState.Tick <= LastState.Tick)
+                return;
+            
             if (States.Count > 0 && LastState == inputState)
                 States[0].Tick = inputState.Tick;
             else
@@ -127,7 +134,10 @@ namespace ExoplanetStudios.ExtractionShooter
         public NetworkInputStateList GetListForTicks(int ticks)
         {
             if (States.Count == 0)
+            {
+                Debug.Log("test");
                 return null;
+            }
             
             NetworkInputStateList newList = new(ticks);
             int startTick = LastState.Tick;
@@ -138,6 +148,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 
                 newList.Add(States[i]);
             }
+            Debug.Log("in" + newList.States.Count);
             return newList;
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
