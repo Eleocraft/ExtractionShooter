@@ -85,13 +85,12 @@ namespace ExoplanetStudios.ExtractionShooter
             get
             {
                 if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
-                    return null;
+                    return new(tick);
                 
                 for (int i = 0; i < States.Count; i++)
                     if (States[i].Tick <= tick)
                         return States[i];
 
-                Debug.Log("other problem");
                 return new(tick);
             }
             set
@@ -135,14 +134,14 @@ namespace ExoplanetStudios.ExtractionShooter
                 return;
             
             int startTick = LastState.Tick;
-            bool OldState = false;
+            bool hasFirstState = false;
             for (int i = 0; i < States.Count; i++)
             {
                 if (States[i].Tick > startTick - _ticksSaved)
                     continue;
 
-                if (!OldState)
-                    OldState = true;
+                if (!hasFirstState)
+                    hasFirstState = true;
                 else
                 {
                     States.RemoveAt(i);

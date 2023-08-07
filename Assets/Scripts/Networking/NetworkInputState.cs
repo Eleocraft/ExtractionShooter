@@ -8,7 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         public int Tick;
         public Vector2 MovementInput;
-        public Vector2 LookRotation;
+        public Vector2 LookDelta;
         public bool Sprint;
         public bool Jump;
         public NetworkInputState() {}
@@ -20,7 +20,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             Tick = tick;
             MovementInput = movementInput;
-            LookRotation = lookRotation;
+            LookDelta = lookRotation;
             Sprint = sprint;
             Jump = jump;
         }
@@ -31,7 +31,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 FastBufferReader reader = serializer.GetFastBufferReader();
                 reader.ReadValueSafe(out Tick);
                 reader.ReadValueSafe(out MovementInput);
-                reader.ReadValueSafe(out LookRotation);
+                reader.ReadValueSafe(out LookDelta);
                 reader.ReadValueSafe(out Sprint);
                 reader.ReadValueSafe(out Jump);
             }
@@ -40,7 +40,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 FastBufferWriter writer = serializer.GetFastBufferWriter();
                 writer.WriteValueSafe(Tick);
                 writer.WriteValueSafe(MovementInput);
-                writer.WriteValueSafe(LookRotation);
+                writer.WriteValueSafe(LookDelta);
                 writer.WriteValueSafe(Sprint);
                 writer.WriteValueSafe(Jump);
             }
@@ -64,7 +64,7 @@ namespace ExoplanetStudios.ExtractionShooter
             if (otherState is null)
                 return false;
             
-            if (MovementInput == otherState.MovementInput && LookRotation == otherState.LookRotation &&
+            if (MovementInput == otherState.MovementInput && LookDelta == otherState.LookDelta &&
                 Sprint == otherState.Sprint && Jump == otherState.Jump) return true;
 
             return false;
@@ -84,7 +84,7 @@ namespace ExoplanetStudios.ExtractionShooter
             get
             {
                 if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
-                    return null;
+                    return new(tick);
                 
                 for (int i = 0; i < States.Count; i++)
                     if (States[i].Tick <= tick)
@@ -133,14 +133,14 @@ namespace ExoplanetStudios.ExtractionShooter
                 return;
             
             int startTick = LastState.Tick;
-            bool OldState = false;
+            bool hasFirstState = false;
             for (int i = 0; i < States.Count; i++)
             {
                 if (States[i].Tick > startTick - _ticksSaved)
                     continue;
 
-                if (!OldState)
-                    OldState = true;
+                if (!hasFirstState)
+                    hasFirstState = true;
                 else
                 {
                     States.RemoveAt(i);

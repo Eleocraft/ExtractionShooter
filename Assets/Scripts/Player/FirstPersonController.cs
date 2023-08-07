@@ -49,7 +49,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		// player
 		private float _jumpVelocity;
 		private bool _jump; // Owner only
-		private Vector2 _lookRotation;
+		private Vector2 _lookDelta; // Owner only
 		private const float TERMINAL_VELOCITY = 100.0f;
 		private const string CAMERA_POS_NAME = "CameraPos";
 		private const string PLAYER_CAM_TAG = "PlayerCam";
@@ -77,12 +77,13 @@ namespace ExoplanetStudios.ExtractionShooter
 		private float _currentTickDeltaTime;
 		private const int BUFFER_SIZE = 200;
 		private const int INPUT_TICKS_SEND = 30;
-		private const float ERROR_THRESHOLD = 0.03f;
+		private const float MOVEMENT_ERROR_THRESHOLD = 0.03f;
+		private const float ROTATION_ERROR_THRESHOLD = 0.02f;
 
 		private void Start()
 		{
-			_lerpStartInterpolationState = new InterpolationState(Playermodel.position, _lookRotation);
-			_lerpEndInterpolationState = new InterpolationState(Playermodel.position, _lookRotation);
+			_lerpStartInterpolationState = new InterpolationState(Playermodel.position, Vector2.zero);
+			_lerpEndInterpolationState = new InterpolationState(Playermodel.position, Vector2.zero);
 			// the square root of H * -2 * G = how much velocity needed to reach desired height
 			_jumpVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 			_controller = GetComponent<CharacterController>();
@@ -95,7 +96,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// reset Network Variables
 			if (IsServer)
 			{
-				_serverTransformState.Value = CreateTransformState();
+				_serverTransformState.Value = new NetworkTransformState(NetworkManager.LocalTime.Tick, Playermodel.position, Vector2.zero, Vector3.zero);
 				_inputsReceived = new Dictionary<int, NetworkInputState>();
 				_lastReceivedInput = new NetworkInputState(NetworkManager.LocalTime.Tick);
 			}
@@ -136,14 +137,18 @@ namespace ExoplanetStudios.ExtractionShooter
 			_currentTickDeltaTime += Time.deltaTime;
 			float relativeDeltaTime = _currentTickDeltaTime / NetworkManager.LocalTime.FixedDeltaTime;
 
-			Vector3 position = Vector3.LerpUnclamped(_lerpStartInterpolationState.Position, _lerpEndInterpolationState.Position, relativeDeltaTime);
+			Vector3 position = Vector3.Lerp(_lerpStartInterpolationState.Position, _lerpEndInterpolationState.Position, relativeDeltaTime);
 
 			// the owner should always have the most accurate lookrotation possible
+			Vector2 lookRotation;
 			if (IsOwner)
-				CalculateRotation();
+			{
+				ReadRotationDelta();
+				lookRotation = _lerpStartInterpolationState.LookRotation + _lookDelta;
+			}
 			else
-				_lookRotation = Utility.Vector2RotateLerpUnclamped(_lerpStartInterpolationState.LookRotation, _lerpEndInterpolationState.LookRotation, relativeDeltaTime);
-			Transform(position, _lookRotation);
+				lookRotation = Utility.Vector2RotateLerp(_lerpStartInterpolationState.LookRotation, _lerpEndInterpolationState.LookRotation, relativeDeltaTime);
+			Transform(position, lookRotation);
 		}
 		private void Tick()
 		{
@@ -151,8 +156,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				NetworkInputState inputState = CreateInputState();
 				CalculateTransformStates(inputState, NetworkManager.LocalTime.Tick);
-
-				_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
 				StoreBuffer(inputState, _currentTransformState);
 				
 				if (IsHost)
@@ -162,13 +165,14 @@ namespace ExoplanetStudios.ExtractionShooter
 				
 				if (_jump)
 					_jump = false;
+
+				_lookDelta = Vector2.zero;
 			}
 			else if (IsServer)
 			{
 				if (_serverTransformState.Value.Tick < NetworkManager.LocalTime.Tick - 1) // missed a tick
 				{
 					CalculateTransformStates(_lastReceivedInput, NetworkManager.LocalTime.Tick - 1);
-					_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
 					StoreBuffer(_lastReceivedInput, _currentTransformState);
 
 					_serverTransformState.Value = _currentTransformState;
@@ -177,7 +181,6 @@ namespace ExoplanetStudios.ExtractionShooter
 				if (_inputsReceived.ContainsKey(NetworkManager.LocalTime.Tick)) // Applying received input
 				{
 					CalculateTransformStates(_inputsReceived[NetworkManager.LocalTime.Tick], NetworkManager.LocalTime.Tick);
-					_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
 					StoreBuffer(_inputsReceived[NetworkManager.LocalTime.Tick], _currentTransformState);
 
 					_lastReceivedInput = _inputsReceived[NetworkManager.LocalTime.Tick];
@@ -202,7 +205,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (inputStates.LastState.Tick == NetworkManager.LocalTime.Tick)
 			{
 				CalculateTransformStates(inputStates.LastState, NetworkManager.LocalTime.Tick);
-				_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
 				StoreBuffer(inputStates.LastState, _currentTransformState);
 				_lastReceivedInput = inputStates.LastState;
 				
@@ -221,7 +223,8 @@ namespace ExoplanetStudios.ExtractionShooter
 				NetworkTransformState transformState = _bufferedTransformStates[receivedState.Tick];
 				if (transformState != null)
 				{
-					if ((transformState.Position - receivedState.Position).sqrMagnitude <= ERROR_THRESHOLD)
+					if ((transformState.Position - receivedState.Position).sqrMagnitude <= MOVEMENT_ERROR_THRESHOLD
+						&& (transformState.LookRotation - receivedState.LookRotation).sqrMagnitude <= ROTATION_ERROR_THRESHOLD)
 						return;
 
 					// Rewind logic
@@ -233,7 +236,6 @@ namespace ExoplanetStudios.ExtractionShooter
 						CalculateTransformStates(_bufferedInputStates[tick], tick);
 						_bufferedTransformStates[tick] = _currentTransformState;
 					}
-					_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
 				}
 				else
 				{
@@ -244,7 +246,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			else if (!IsServer)
 			{
 				_currentTickDeltaTime = 0;
-				_lerpStartInterpolationState = new InterpolationState(Playermodel.position, _lookRotation);
+				_lerpStartInterpolationState = new InterpolationState(Playermodel.position, _currentTransformState.LookRotation);
 				_lerpEndInterpolationState = new InterpolationState(receivedState.Position, receivedState.LookRotation);
 				_currentTransformState = receivedState;
 			}
@@ -252,44 +254,46 @@ namespace ExoplanetStudios.ExtractionShooter
 		private NetworkInputState CreateInputState()
 		{
 			return new NetworkInputState(NetworkManager.NetworkTickSystem.LocalTime.Tick,
-				_controls.Player.Move.ReadValue<Vector2>(), _lookRotation,
+				_controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
 				_controls.Player.Sprint.ReadValue<float>().AsBool(), _jump);
 		}
-		private NetworkTransformState CreateTransformState() =>
-			new NetworkTransformState(NetworkManager.LocalTime.Tick, Playermodel.position, _lookRotation, _currentTransformState.Velocity);
 
 		private void CalculateTransformStates(NetworkInputState inputState, int tick)
 		{
 			_currentTickDeltaTime = 0;
-			_lerpStartInterpolationState = new InterpolationState(Playermodel.position, _lookRotation);
+			_lerpStartInterpolationState = new InterpolationState(Playermodel.position, _currentTransformState.LookRotation + inputState.LookDelta);
 
-			Vector3 velocity = CalculateVelocity(inputState);
+			// lookRotation
+			Vector2 lookRotation = _currentTransformState.LookRotation + inputState.LookDelta;
+
+			// clamp our pitch rotation
+			lookRotation.x = Mathf.Clamp(lookRotation.x, BottomClamp, TopClamp);
+			lookRotation.y = lookRotation.y.ClampToAngle();
+
+			// movement
+			Vector3 velocity = CalculateVelocity(inputState, lookRotation);
 			Vector3 movement = velocity * NetworkManager.LocalTime.FixedDeltaTime;
 			_controller.Move(movement);
-			_currentTransformState = new NetworkTransformState(tick, transform.position, inputState.LookRotation, velocity);
-		}
 
+			_currentTransformState = new NetworkTransformState(tick, transform.position, lookRotation, velocity);
+			_lerpEndInterpolationState = new InterpolationState(_currentTransformState);
+		}
 		private bool GroundedCheck()
 		{
 			// set sphere position, with offset
 			Vector3 spherePosition = _currentTransformState.Position + Vector3.down * GroundedOffset;
 			return Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 		}
-		private void CalculateRotation()
+		private void ReadRotationDelta()
 		{
 			Vector2 lookInput = _controls.Mouse.Look.ReadValue<Vector2>();
 
 			// Camera rotation
-			_lookRotation.x += lookInput.y * RotationSpeed;
-			float _rotationVelocity = lookInput.x * RotationSpeed;
-
-			// clamp our pitch rotation
-			_lookRotation.x = Mathf.Clamp(_lookRotation.x, BottomClamp, TopClamp);
-
-			_lookRotation.y += _rotationVelocity;
-			_lookRotation.y = _lookRotation.y.ClampToAngle();
+			_lookDelta.x += lookInput.y * RotationSpeed;
+			_lookDelta.y += lookInput.x * RotationSpeed;
 		}
-		private Vector3 CalculateVelocity(NetworkInputState inputState)
+		private Vector2 GetLocalLookRotation() => _currentTransformState.LookRotation + _lookDelta;
+		private Vector3 CalculateVelocity(NetworkInputState inputState, Vector2 lookRotation)
 		{
 			bool grounded = GroundedCheck();
 			float verticalVelocity = CalculateGravity(inputState.Jump, grounded);
@@ -312,7 +316,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			else
 				speed = targetSpeed;
 
-			Vector3 input = inputState.MovementInput.Rotate(inputState.LookRotation.y).AddHeight(0).normalized * speed;
+			Vector3 input = inputState.MovementInput.Rotate(lookRotation.y).AddHeight(0).normalized * speed;
 
 			return input + Vector3.up * verticalVelocity;
 		}
