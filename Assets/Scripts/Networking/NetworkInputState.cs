@@ -86,23 +86,29 @@ namespace ExoplanetStudios.ExtractionShooter
                 if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
                     return null;
                 
-                for (int i = States.Count - 1; i >= 0; i--)
+                for (int i = 0; i < States.Count; i++)
                     if (States[i].Tick <= tick)
                         return States[i];
 
-                return null;
+                return new(tick);
             }
             set
             {
                 if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
                     return;
                 
-                for (int i = States.Count - 1; i >= 0; i--)
+                for (int i = 0; i < States.Count; i++)
                 {
                     if (States[i].Tick == tick)
+                    {
                         States[i] = value;
+                        break;
+                    }
                     else if (States[i].Tick < tick)
+                    {
                         States.Insert(i, value);
+                        break;
+                    }
                 }
             }
         }
@@ -113,42 +119,49 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public void Add(NetworkInputState inputState)
         {
-            if (inputState.Tick <= LastState.Tick)
+            if (inputState.Tick <= LastState?.Tick)
                 return;
             
-            if (States.Count > 0 && LastState == inputState)
-                States[0].Tick = inputState.Tick;
+            if (LastState is not null && LastState == inputState)
+                LastState.Tick = inputState.Tick;
             else
                 States.Insert(0, inputState);
         }
         public void RemoveOutdated()
         {
-            if (States.Count == 0)
+            if (LastState is null)
                 return;
             
             int startTick = LastState.Tick;
-            for (int i = States.Count - 1; i >= 0; i--)
-                if (States[i].Tick < startTick - _ticksSaved)
+            bool OldState = false;
+            for (int i = 0; i < States.Count; i++)
+            {
+                if (States[i].Tick > startTick - _ticksSaved)
+                    continue;
+
+                if (!OldState)
+                    OldState = true;
+                else
+                {
                     States.RemoveAt(i);
+                    i--;
+                }
+            }
         }
         public NetworkInputStateList GetListForTicks(int ticks)
         {
-            if (States.Count == 0)
-            {
-                Debug.Log("test");
+            if (LastState is null)
                 return null;
-            }
             
             NetworkInputStateList newList = new(ticks);
             int startTick = LastState.Tick;
-            for (int i = States.Count - 1; i >= 0; i--)
+            for (int i = 0; i < States.Count; i++)
             {
                 if (States[i].Tick < startTick - ticks)
                     break;
                 
-                newList.Add(States[i]);
+                newList.States.Add(States[i]);
             }
-            Debug.Log("in" + newList.States.Count);
             return newList;
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
