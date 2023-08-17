@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TestSlow
   m_EditorClassIdentifier: 
   MuzzleVelocity: 50
+  MinVelocity: 5
   Drag: 0.3
   Dropoff: 15
   Damage: 75

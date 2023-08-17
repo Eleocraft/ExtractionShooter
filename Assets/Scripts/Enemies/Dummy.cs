@@ -8,6 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float MaxLife;
         [SerializeField] private GameObject BreakParticles;
         [SerializeField] private GameObject HitParticles;
+
         private NetworkVariable<float> _life = new NetworkVariable<float>();
         private void Start()
         {
@@ -18,16 +19,15 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             base.OnDestroy();
         }
-        public void OnHit(float damage, Vector3 point, ulong ownerId)
+        public void OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ulong ownerId, ref Vector3 velocity)
         {
             Instantiate(HitParticles, point, Quaternion.identity);
             if (!IsServer) return;
             
-            _life.Value -= damage;
+            _life.Value -= info.Damage;
             if (_life.Value < 0)
                 GetComponent<NetworkObject>().Despawn();
         }
-        public bool CanHit(ulong ownerId) => true;
         public override void OnNetworkDespawn()
         {
             Instantiate(BreakParticles, transform.position, Quaternion.identity);

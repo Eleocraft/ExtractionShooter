@@ -13,6 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private float _maxDistanceSqr;
         private ulong _ownerId;
         private GameObject _displayObject;
+        private float _sqrMinVelocity;
         private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId)
         {
             // Graphics
@@ -25,6 +26,8 @@ namespace ExoplanetStudios.ExtractionShooter
             _maxDistanceSqr = info.MaxDistance * info.MaxDistance;
             _ownerId = ownerId;
             _info = info;
+
+            _sqrMinVelocity = _info.MinVelocity * _info.MinVelocity;
 
             NetworkManager.Singleton.NetworkTickSystem.Tick += Tick;
         }
@@ -39,80 +42,54 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void Tick()
         {
-            Vector3 oldVelocity = _velocity;
             Vector3 movement = _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             transform.position += movement;
+
             _displayObject.transform.position = transform.position;
             _displayObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, _velocity);
 
-            Hitscan(movement, _lastPosition, out float penetrationResistances);
-            _velocity *= penetrationResistances;
+            Hitscan(movement, _lastPosition, ref _velocity);
 
             // Lifetime
             if ((transform.position - _spawnPosition).sqrMagnitude > _maxDistanceSqr)
                 Destroy(gameObject);
+            
             // Physics
-            _velocity -= _info.Drag * _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Drag
+            _velocity -= _velocity * _info.Drag * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Drag
             _velocity += Vector3.down * _info.Dropoff * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Gravity
-            // Check for reversed velocity
-            if (_velocity.x / Mathf.Abs(_velocity.x) != oldVelocity.x / Mathf.Abs(oldVelocity.x) ||
-                _velocity.z / Mathf.Abs(_velocity.z) != oldVelocity.z / Mathf.Abs(oldVelocity.z))
+
+            // Check for min velocity
+            if (_velocity.sqrMagnitude <= _sqrMinVelocity)
                 Destroy(gameObject);
 
             _lastPosition = transform.position;
         }
-        private void Hitscan(Vector3 movement, Vector3 startPos, out float penetrationResistances)
+        private void Hitscan(Vector3 movement, Vector3 startPos, ref Vector3 velocity)
         {
-            penetrationResistances = 1;
+            Vector3 oldVelocity = velocity;
+            Vector3 backwardsStartPos = startPos + movement;
             // Main hitscan
             List<RaycastHit> hits = Utility.RaycastAll(startPos, movement, movement.magnitude, ProjectileHitLayer.CanHit);
             foreach (RaycastHit hit in hits)
             {
-                if (Hit(hit, movement.normalized, out float penetrationResistance))
+                if (hit.transform.TryGetComponent(out IDamagable damagable))
+                    damagable.OnHit(_info, hit.point, hit.normal, _ownerId, ref velocity);
+
+                if (VelocityReversed(oldVelocity, velocity))
+                {
+                    backwardsStartPos = hit.point; 
                     break;
-                else
-                    penetrationResistances *= penetrationResistance;
+                }
             }
             // Backwards hitscan for bullet holes
-            Vector3 backwardsStartPos = startPos + movement;
             Vector3 backwardsMovement = movement *= -1;
-            List<RaycastHit> backwardsHits = Utility.RaycastAll(backwardsStartPos, backwardsMovement, backwardsMovement.magnitude, ProjectileHitLayer.Penetrable);
+            List<RaycastHit> backwardsHits = Utility.RaycastAll(backwardsStartPos, backwardsMovement, backwardsMovement.magnitude, ProjectileHitLayer.CanHit);
             foreach (RaycastHit hit in backwardsHits)
-                BackwardsHit(hit, backwardsMovement.normalized);
-
-            bool Hit(RaycastHit hitInfo, Vector3 direction, out float penetrationResistance)
-            {
-                penetrationResistance = 1;
-                if (hitInfo.transform.TryGetComponent(out IDamagable damagable))
-                {
-                    if (!damagable.CanHit(_ownerId))
-                        return false;
-                    
-                    damagable.OnHit(_info.Damage, hitInfo.point, _ownerId);
-                }
-                else if (hitInfo.transform.TryGetComponent(out Penetrable penetrable) && penetrable.Resistance < _info.PenetrationForce)
-                {
-                    Instantiate(_info.PenetrateMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, direction);
-                    penetrable.Penetrate();
-                    penetrationResistance = 1 - (_info.PenetrationForce - penetrable.Resistance);
-                    return false;
-                }
-                else
-                {
-                    Instantiate(_info.HitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, _velocity);
-                    Destroy(gameObject);
-                }
-                return true;
-            }
-            bool BackwardsHit(RaycastHit hitInfo, Vector3 direction)
-            {
-                if (hitInfo.transform.TryGetComponent(out Penetrable penetrable))
-                {
-                    Instantiate(_info.ExitMarker, hitInfo.point, Quaternion.identity, hitInfo.transform).Initialize(hitInfo.normal, direction);
-                    return true;
-                }
-                return false;  
-            }
+                if (hit.transform.TryGetComponent(out IDamagable damagable))
+                    damagable.OnExit(_info, hit.point, hit.normal, velocity);  
         }
+        private bool VelocityReversed(Vector3 oldVelocity, Vector3 newVelocity) => newVelocity == Vector3.zero ||
+                newVelocity.x / Mathf.Abs(newVelocity.x) != oldVelocity.x / Mathf.Abs(oldVelocity.x) ||
+                newVelocity.z / Mathf.Abs(newVelocity.z) != oldVelocity.z / Mathf.Abs(oldVelocity.z);
     }
 }

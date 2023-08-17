@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9033407122523672933}
   - component: {fileID: 685580746538082367}
   - component: {fileID: 324396079305293496}
-  - component: {fileID: 68127527315159737}
+  - component: {fileID: 6808866247711375397}
   m_Layer: 9
   m_Name: Wall3
   m_TagString: Untagged
@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8181494828794827355}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 14.46, y: 1.09, z: -10.69}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &9033407122523672933
 MeshFilter:
@@ -107,7 +107,7 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -326155976204738199, guid: fc8a0e9b775e6f64c826a09c75a4890e, type: 3}
---- !u!114 &68127527315159737
+--- !u!114 &6808866247711375397
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -116,7 +116,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8181494828794827355}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49ff63900fb754a42aa94fbb0989bacf, type: 3}
+  m_Script: {fileID: 11500000, guid: a9574f2ff3a56f0478d460757295aa60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Resistance: 0.4
+  BuildingResistance: 1

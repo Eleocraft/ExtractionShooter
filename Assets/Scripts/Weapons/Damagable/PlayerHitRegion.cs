@@ -4,17 +4,16 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class HitRegion : MonoBehaviour, IDamagable
     {
-        [SerializeField] private PlayerLife ParentDamagable;
+        [SerializeField] private PlayerLife Player;
         [SerializeField] private float Multiplier;
         [SerializeField] private GameObject HitParticle;
-        public void OnHit(float damage, Vector3 point, ulong ownerId)
+        public void OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ulong ownerId, ref Vector3 velocity)
         {
-            if (ownerId == ParentDamagable.OwnerClientId)
+            if (ownerId == Player.OwnerClientId)
                 return;
 
             Instantiate(HitParticle, point, Quaternion.identity);
-            ParentDamagable.OnHit(damage * Multiplier, point, ownerId);
+            Player.OnHit(info.Damage * Multiplier);
         }
-        public bool CanHit(ulong ownerId) => ParentDamagable.CanHit(ownerId);
     }
 }

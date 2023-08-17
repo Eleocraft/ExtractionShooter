@@ -67,7 +67,7 @@ Material:
     - _FadeDist: 1500
     - _FadeScale: 0.002
     - _FadeSpeed: 2
-    - _MainColorDiff: 5
+    - _MainColorDiff: 13.91
     - _NoisePower: 2.1
     - _NoiseScale: 0.015
     - _Offset: 47.68
@@ -104,7 +104,7 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - _DarkColor: {r: 0.2173371, g: 0.40457803, b: 0.5188679, a: 0.99607843}
+    - _DarkColor: {r: 0.49918118, g: 0.5324194, b: 0.5377358, a: 0.99607843}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _LightColor: {r: 0.7018868, g: 0.93808424, b: 1, a: 1}

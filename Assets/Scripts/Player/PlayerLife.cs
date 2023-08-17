@@ -3,7 +3,7 @@ using Unity.Netcode;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class PlayerLife : NetworkBehaviour, IDamagable
+    public class PlayerLife : NetworkBehaviour
     {
         [SerializeField] private float MaxLife;
         [SerializeField] private GameObject BreakParticles;
@@ -23,7 +23,7 @@ namespace ExoplanetStudios.ExtractionShooter
             base.OnDestroy();
             _life.OnValueChanged -= OnLifeChanged;
         }
-        public void OnHit(float damage, Vector3 point, ulong ownerId)
+        public void OnHit(float damage)
         {
             if (IsServer)
             {
@@ -35,10 +35,6 @@ namespace ExoplanetStudios.ExtractionShooter
                     _firstPersonController.SetPosition(SpawnPoints.GetSpawnPoint());
                 }
             }
-        }
-        public bool CanHit(ulong ownerId)
-        {
-            return ownerId != OwnerClientId;
         }
         [ClientRpc]
         private void PlayerDeadClientRpc(Vector3 position)

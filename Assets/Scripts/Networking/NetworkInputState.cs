@@ -4,9 +4,8 @@ using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class NetworkInputState : INetworkSerializable
+    public class NetworkInputState : NetworkState, INetworkSerializable
     {
-        public int Tick;
         public Vector2 MovementInput;
         public Vector2 LookDelta;
         public bool Sprint;
@@ -74,79 +73,12 @@ namespace ExoplanetStudios.ExtractionShooter
             return base.GetHashCode();
         }
     }
-    public class NetworkInputStateList : INetworkSerializable
+    public class NetworkInputStateList : NetworkStateList<NetworkInputState>, INetworkSerializable
     {
-		private int _ticksSaved;
-        private List<NetworkInputState> States = new();
-        public NetworkInputState LastState => States.Count > 0 ? States[0] : null;
-        public NetworkInputState this[int tick]
-        {
-            get
-            {
-                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
-                    return new(tick);
-                
-                for (int i = 0; i < States.Count; i++)
-                    if (States[i].Tick <= tick)
-                        return States[i];
-
-                return new(tick);
-            }
-            set
-            {
-                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
-                    return;
-                
-                for (int i = 0; i < States.Count; i++)
-                {
-                    if (States[i].Tick == tick)
-                    {
-                        States[i] = value;
-                        break;
-                    }
-                    else if (States[i].Tick < tick)
-                    {
-                        States.Insert(i, value);
-                        break;
-                    }
-                }
-            }
-        }
         public NetworkInputStateList() { }
         public NetworkInputStateList(int ticksSaved)
         {
             _ticksSaved = ticksSaved;
-        }
-        public void Add(NetworkInputState inputState)
-        {
-            if (inputState.Tick <= LastState?.Tick)
-                return;
-            
-            if (LastState is not null && LastState == inputState)
-                LastState.Tick = inputState.Tick;
-            else
-                States.Insert(0, inputState);
-        }
-        public void RemoveOutdated()
-        {
-            if (LastState is null)
-                return;
-            
-            int startTick = LastState.Tick;
-            bool hasFirstState = false;
-            for (int i = 0; i < States.Count; i++)
-            {
-                if (States[i].Tick > startTick - _ticksSaved)
-                    continue;
-
-                if (!hasFirstState)
-                    hasFirstState = true;
-                else
-                {
-                    States.RemoveAt(i);
-                    i--;
-                }
-            }
         }
         public NetworkInputStateList GetListForTicks(int ticks)
         {

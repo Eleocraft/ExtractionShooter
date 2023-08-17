@@ -4,9 +4,8 @@ using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class NetworkTransformState : INetworkSerializable
+    public class NetworkTransformState : NetworkState, INetworkSerializable
     {
-        public int Tick;
         public Vector3 Position;
         public Vector2 LookRotation;
         public Vector3 Velocity;
@@ -75,79 +74,12 @@ namespace ExoplanetStudios.ExtractionShooter
             return base.GetHashCode();
         }
     }
-    public class NetworkTransformStateList : INetworkSerializable
+    public class NetworkTransformStateList : NetworkStateList<NetworkTransformState>, INetworkSerializable
     {
-		private int _ticksSaved;
-        private List<NetworkTransformState> States = new();
-        public NetworkTransformState LastState => States.Count > 0 ? States[0] : null;
-        public NetworkTransformState this[int tick]
-        {
-            get
-            {
-                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
-                    return new(tick);
-                
-                for (int i = 0; i < States.Count; i++)
-                    if (States[i].Tick <= tick)
-                        return States[i];
-
-                return new(tick);
-            }
-            set
-            {
-                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
-                    return;
-                
-                for (int i = 0; i < States.Count; i++)
-                {
-                    if (States[i].Tick == tick)
-                    {
-                        States[i] = value;
-                        break;
-                    }
-                    else if (States[i].Tick < tick)
-                    {
-                        States.Insert(i, value);
-                        break;
-                    }
-                }
-            }
-        }
-        public NetworkTransformStateList() { }
+		public NetworkTransformStateList() { }
         public NetworkTransformStateList(int ticksSaved)
         {
             _ticksSaved = ticksSaved;
-        }
-        public void Add(NetworkTransformState inputState)
-        {
-            if (inputState.Tick <= LastState?.Tick)
-                return;
-            
-            if (LastState is not null && LastState == inputState)
-                LastState.Tick = inputState.Tick;
-            else
-                States.Insert(0, inputState);
-        }
-        public void RemoveOutdated()
-        {
-            if (LastState is null)
-                return;
-            
-            int startTick = LastState.Tick;
-            bool hasFirstState = false;
-            for (int i = 0; i < States.Count; i++)
-            {
-                if (States[i].Tick > startTick - _ticksSaved)
-                    continue;
-
-                if (!hasFirstState)
-                    hasFirstState = true;
-                else
-                {
-                    States.RemoveAt(i);
-                    i--;
-                }
-            }
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
