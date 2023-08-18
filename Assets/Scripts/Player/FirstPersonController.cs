@@ -71,11 +71,10 @@ namespace ExoplanetStudios.ExtractionShooter
 		private NetworkTransformStateList _bufferedTransformStates;
 		private NetworkInputStateList _bufferedInputStates;
 		
-		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>();
 		private NetworkTransformState _currentTransformState = new(0); // The current transform state
 
 		private NetworkInputState _lastSaveInput; // Serveronly
-		private NetworkTransformState _lastSaveTransform; // Serveronly
+		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>(); // also lastSaveTransform
 
 		// Interpolation
 		private PlayerInterpolation _interpolation;
@@ -103,7 +102,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				_serverTransformState.Value = new NetworkTransformState(NetworkManager.LocalTime.Tick, transform.position, Vector2.zero, Vector3.zero);
 				_lastSaveInput = new NetworkInputState(NetworkManager.LocalTime.Tick);
-				_lastSaveTransform = new NetworkTransformState(NetworkManager.LocalTime.Tick);
 			}
 			if (IsOwner)
 			{
@@ -143,7 +141,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (IsOwner)
 			{
 				NetworkInputState inputState = CreateInputState();
-				CalculateTransformStates(inputState, NetworkManager.LocalTime.Tick);
+				ExecuteInput(inputState, NetworkManager.LocalTime.Tick);
 				StoreBuffer(inputState, _currentTransformState);
 				
 				if (IsHost)
@@ -160,7 +158,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				if (_serverTransformState.Value.Tick < NetworkManager.LocalTime.Tick - 1) // missed a tick
 				{
-					CalculateTransformStates(_lastSaveInput, NetworkManager.LocalTime.Tick - 1);
+					ExecuteInput(_lastSaveInput, NetworkManager.LocalTime.Tick - 1);
 					StoreBuffer(_lastSaveInput, _currentTransformState);
 
 					_serverTransformState.Value = _currentTransformState;
@@ -170,42 +168,48 @@ namespace ExoplanetStudios.ExtractionShooter
 				}
 
 				// If _bufferedInputStates contains current tick
+				if (_bufferedInputStates.Contains(NetworkManager.LocalTime.Tick))
+				{
+					NetworkInputState input = _bufferedInputStates[NetworkManager.LocalTime.Tick];
+					// execute current tick
+					ExecuteInput(input, NetworkManager.LocalTime.Tick);
 
-				// execute current tick
+					// update _serverTransformState, _bufferedTransformStates and _lastSaveInput
+					_serverTransformState.Value = _currentTransformState;
 
-				// update _serverTransformState, _bufferedTransformStates and _lastSaveInput/_lastSaveTransform
+					_lastSaveInput = input;
+					_bufferedTransformStates.Add(_currentTransformState);
+				}
 			}
 		}
-		private void Update()
+		[ServerRpc]
+		private void OnInputServerRpc(NetworkInputStateList inputStates)
 		{
-			if (IsOwner)
+			// add all input states after _lastSaveInput to _bufferedInputStates
+			_bufferedInputStates.Insert(inputStates, _lastSaveInput.Tick);
+
+			// execute all input states between _lastSaveInput.Tick and current tick/last received tick (reconceliation)
+			_currentTransformState = _serverTransformState.Value;
+			transform.position = _serverTransformState.Value.Position;
+			int lastTickToExecute = Mathf.Min(NetworkManager.LocalTime.Tick, _bufferedInputStates.LastState.Tick);
+			for (int tick = _lastSaveInput.Tick + 1; tick <= lastTickToExecute; tick++)
 			{
-				// if this is the owner the lookrotation should be calculated locally
-				ReadRotationDelta();
-				Vector2 lookRotation = GetLocalLookRotation();
-
-				// Update camera target pitch
-				CameraSocket.localRotation = Quaternion.Euler(lookRotation.x, 0.0f, 0.0f);
-
-				// rotate the player left and right
-				transform.rotation = Quaternion.Euler(0, lookRotation.y, 0);
+				ExecuteInput(_bufferedInputStates[tick], tick);
+				// update _bufferedTransformStates
+				_bufferedTransformStates[tick] = _currentTransformState;
 			}
+
+			// update _serverTransformState and _lastSaveInput
+			_serverTransformState.Value = _currentTransformState;
+
+			_lastSaveInput = _bufferedInputStates[lastTickToExecute];
 		}
 		private void StoreBuffer(NetworkInputState inputState, NetworkTransformState transformState)
 		{
 			_bufferedInputStates.Add(inputState);
 			_bufferedTransformStates.Add(transformState);
 		}
-		[ServerRpc]
-		private void OnInputServerRpc(NetworkInputStateList inputStates)
-		{
-			// add all input states after _lastSaveInput to _bufferedInputStates
-
-			// execute all input states between _lastReceivedInput.Tick and current tick (reconceliation)
-
-			// update _serverTransformState, _bufferedTransformStates and _lastSaveInput/_lastSaveTransform
-		}
-		
+		// Clients
 		private void OnServerStateChanged(NetworkTransformState previouseState, NetworkTransformState receivedState)
 		{
 			if (IsOwner && !IsServer)
@@ -238,7 +242,7 @@ namespace ExoplanetStudios.ExtractionShooter
 				transform.position = lastSaveState.Position;
 				for (int tick = lastSaveState.Tick + 1; tick <= networkInputStateList.LastState.Tick; tick++)
 				{
-					CalculateTransformStates(networkInputStateList[tick], tick);
+					ExecuteInput(networkInputStateList[tick], tick);
 					_bufferedTransformStates[tick] = _currentTransformState;
 				}
 			}
@@ -249,7 +253,7 @@ namespace ExoplanetStudios.ExtractionShooter
 				_controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
 				_controls.Player.Sprint.ReadValue<float>().AsBool(), _jump);
 		}
-		private void CalculateTransformStates(NetworkInputState inputState, int tick)
+		private void ExecuteInput(NetworkInputState inputState, int tick)
 		{
 			// lookRotation
 			Vector2 lookRotation = _currentTransformState.LookRotation + inputState.LookDelta;
@@ -282,6 +286,21 @@ namespace ExoplanetStudios.ExtractionShooter
 			// set sphere position, with offset
 			Vector3 spherePosition = _currentTransformState.Position + Vector3.up * HeadblockOffset;
 			return Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+		}
+		private void Update()
+		{
+			if (IsOwner)
+			{
+				// if this is the owner the lookrotation should be calculated locally
+				ReadRotationDelta();
+				Vector2 lookRotation = GetLocalLookRotation();
+
+				// Update camera target pitch
+				CameraSocket.localRotation = Quaternion.Euler(lookRotation.x, 0.0f, 0.0f);
+
+				// rotate the player left and right
+				transform.rotation = Quaternion.Euler(0, lookRotation.y, 0);
+			}
 		}
 		private void ReadRotationDelta()
 		{

@@ -37,7 +37,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			_currentTickDeltaTime += Time.deltaTime;
 			float relativeDeltaTime = _currentTickDeltaTime / NetworkManager.Singleton.LocalTime.FixedDeltaTime;
 
-			Playermodel.position = Vector3.LerpUnclamped(_lerpStartInterpolationState.Position, _lerpEndInterpolationState.Position, relativeDeltaTime);
+			//Playermodel.position = Vector3.LerpUnclamped(_lerpStartInterpolationState.Position, _lerpEndInterpolationState.Position, relativeDeltaTime);
 
 			// the owner should always have the most accurate lookrotation possible
 			if (!_isOwner)

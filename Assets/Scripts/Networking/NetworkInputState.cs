@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Netcode;
-using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -44,18 +43,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(Jump);
             }
         }
-        public static bool operator==(NetworkInputState s1, NetworkInputState s2)
-        {
-            if (s1 is null)
-                return s2 is null;
-            return s1.Equals(s2);
-        }
-        public static bool operator!=(NetworkInputState s1, NetworkInputState s2)
-        {
-            if (s1 is null)
-                return !(s2 is null);
-            return !s1.Equals(s2);
-        }
         public override bool Equals(object obj)
         {
             NetworkInputState otherState = (NetworkInputState)obj;
@@ -70,7 +57,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (int)MovementInput.x + (int)MovementInput.y + (int)LookDelta.x + (int)LookDelta.y;
         }
     }
     public class NetworkInputStateList : NetworkStateList<NetworkInputState>, INetworkSerializable
@@ -84,6 +71,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (LastState is null)
                 return null;
+            Debug.Log(States.Count);
             
             NetworkInputStateList newList = new(ticks);
             int startTick = LastState.Tick;
@@ -94,6 +82,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 
                 newList.States.Add(States[i]);
             }
+            Debug.Log(newList.States.Count);
             return newList;
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

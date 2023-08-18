@@ -71,7 +71,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (int)Position.x + (int)Position.y + (int)LookRotation.x + (int)LookRotation.y;
         }
     }
     public class NetworkTransformStateList : NetworkStateList<NetworkTransformState>, INetworkSerializable
