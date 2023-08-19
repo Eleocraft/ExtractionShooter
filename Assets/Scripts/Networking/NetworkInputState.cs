@@ -14,6 +14,15 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             Tick = tick;
         }
+        public NetworkInputState(NetworkInputState oldState, int tick)
+        {
+            MovementInput = oldState.MovementInput;
+            LookDelta = oldState.LookDelta;
+            Sprint = oldState.Sprint;
+            Jump = oldState.Jump;
+            
+            Tick = tick;
+        }
         public NetworkInputState(int tick, Vector2 movementInput, Vector2 lookRotation, bool sprint, bool jump)
         {
             Tick = tick;
@@ -71,7 +80,6 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (LastState is null)
                 return null;
-            Debug.Log(States.Count);
             
             NetworkInputStateList newList = new(ticks);
             int startTick = LastState.Tick;
@@ -82,7 +90,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 
                 newList.States.Add(States[i]);
             }
-            Debug.Log(newList.States.Count);
             return newList;
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

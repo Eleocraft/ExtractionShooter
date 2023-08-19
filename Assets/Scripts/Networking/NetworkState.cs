@@ -27,6 +27,7 @@ namespace ExoplanetStudios.ExtractionShooter
         protected int _ticksSaved;
         protected List<T> States = new();
         public T LastState => States.Count > 0 ? States[0] : null;
+        public T OldestState => States.Count > 0 ? States[States.Count-1] : null;
         public T this[int tick]
         {
             get
@@ -37,14 +38,11 @@ namespace ExoplanetStudios.ExtractionShooter
                 for (int i = 0; i < States.Count; i++)
                     if (States[i].Tick <= tick)
                         return States[i];
-
+                
                 return null;
             }
             set
             {
-                if (value is null)
-                    Debug.Log("skljfdklsjlö");
-                
                 if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
                     return;
                 
@@ -70,7 +68,7 @@ namespace ExoplanetStudios.ExtractionShooter
             if (newState.Tick <= LastState?.Tick)
                 return;
 
-            if (LastState is not null && LastState == newState)
+            if (LastState is not null && LastState == newState && States.Count > 1)
                 LastState.Tick = newState.Tick;
             else
                 States.Insert(0, newState);            
@@ -86,27 +84,29 @@ namespace ExoplanetStudios.ExtractionShooter
                 return;
             if (statesIndex < 0) // states are empty
             {
-                States.InsertRange(0, newNetworkStateList.States);
+                while (newStatesIndex >= 0)
+                { // just insert all relevant new entries (tick > insertAfterTick)
+                    if (newNetworkStateList.States[newStatesIndex].Tick > insertAfterTick)
+                        States.Insert(0, newNetworkStateList.States[newStatesIndex]);
+                    newStatesIndex--;
+                }
                 return;
             }
 
             while (true)
             {
-                Debug.Log(newStatesIndex + "  " + statesIndex);
-                Debug.Log(newNetworkStateList.States[newStatesIndex] == null);
-                Debug.Log(States[statesIndex] == null);
-                if (newNetworkStateList.States[newStatesIndex].Tick < insertAfterTick)
+                if (newNetworkStateList.States[newStatesIndex].Tick <= insertAfterTick)
                     newStatesIndex--; // only do something if tick is new enough
                 else if (newNetworkStateList.States[newStatesIndex].Tick < States[statesIndex].Tick)
                 { // If state is newer than newState: insert newState, then skip
-                    States.Insert(statesIndex + 1, newNetworkStateList[newStatesIndex]);
+                    States.Insert(statesIndex + 1, newNetworkStateList.States[newStatesIndex]);
                     newStatesIndex--;
                 }
                 else if (newNetworkStateList.States[newStatesIndex].Tick > States[statesIndex].Tick)
                     statesIndex--; // If state is older than newState: skip
                 else
                 { // If both states have the same tick: new overwrites old, then both skip
-                    States[statesIndex] = newNetworkStateList[newStatesIndex];
+                    States[statesIndex] = newNetworkStateList.States[newStatesIndex];
                     statesIndex--;
                     newStatesIndex--;
                 }
@@ -128,7 +128,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (LastState is null)
                 return;
-            
+
             int startTick = LastState.Tick;
             bool hasFirstState = false;
             for (int i = 0; i < States.Count; i++)
@@ -145,6 +145,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
             }
         }
-        public bool Contains(int tick) => LastState?.Tick >= tick && tick >= LastState.Tick + _ticksSaved;
+        public bool Contains(int tick) => LastState?.Tick >= tick && tick >= Mathf.Max(LastState.Tick + _ticksSaved, States[States.Count-1].Tick);
     }
 }
