@@ -30,6 +30,7 @@ namespace ExoplanetStudios.ExtractionShooter
             // actual shooting
             else if (_shoot)
             {
+                // UnityEngine.random can't be used
                 Vector3 rotationVector = Vector3.Cross(direction, Random.insideUnitSphere.normalized).normalized;
                 Projectile.SpawnProjectile(projectileInfo, position, Quaternion.AngleAxis(_relativeSpray * MaxSpray * Random.value, rotationVector) * direction, OwnerId);
                 _cooldown += Cooldown;

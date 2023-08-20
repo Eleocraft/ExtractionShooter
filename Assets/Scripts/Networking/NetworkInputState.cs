@@ -31,6 +31,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Sprint = sprint;
             Jump = jump;
         }
+        public override NetworkState GetStateWithTick(int tick) => new NetworkInputState(this, tick);
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)
@@ -78,18 +79,13 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public NetworkInputStateList GetListForTicks(int ticks)
         {
-            if (LastState is null)
-                return null;
-            
             NetworkInputStateList newList = new(ticks);
-            int startTick = LastState.Tick;
-            for (int i = 0; i < States.Count; i++)
-            {
-                if (States[i].Tick < startTick - ticks)
-                    break;
-                
-                newList.States.Add(States[i]);
-            }
+            newList.Insert(this, _lastReceivedTick - ticks);
+
+            if (newList.States.Count <= 0 && States.Count > 0) // make sure there is always at least one tick
+                newList.Add((NetworkInputState)States[0].GetStateWithTick(newList._lastReceivedTick - ticks));
+
+            Debug.Log(newList.States.Count);
             return newList;
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -105,6 +101,7 @@ namespace ExoplanetStudios.ExtractionShooter
                     States.Add(state);
                 }
                 reader.ReadValueSafe(out _ticksSaved);
+                reader.ReadValueSafe(out _lastReceivedTick);
             }
             else
             {
@@ -114,6 +111,7 @@ namespace ExoplanetStudios.ExtractionShooter
                     writer.WriteValueSafe(States[i]);
 
                 writer.WriteValueSafe(_ticksSaved);
+                writer.WriteValueSafe(_lastReceivedTick);
             }
         }
     }

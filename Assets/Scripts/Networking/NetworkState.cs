@@ -7,6 +7,7 @@ namespace ExoplanetStudios.ExtractionShooter
     public abstract class NetworkState
     {
         public int Tick;
+        public abstract NetworkState GetStateWithTick(int tick);
         public static bool operator==(NetworkState s1, NetworkState s2)
         {
             if (s1 is null)
@@ -25,119 +26,80 @@ namespace ExoplanetStudios.ExtractionShooter
     public abstract class NetworkStateList<T> where T : NetworkState
     {
         protected int _ticksSaved;
-        protected List<T> States = new();
-        public T LastState => States.Count > 0 ? States[0] : null;
-        public T OldestState => States.Count > 0 ? States[States.Count-1] : null;
+        protected int _lastReceivedTick;
+        public int LastTick => _lastReceivedTick;
+        public List<T> States = new();
+
         public T this[int tick]
         {
             get
             {
-                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
+                if (_lastReceivedTick - _ticksSaved > tick) // Tick is to old
+                {
+                    Debug.Log(_lastReceivedTick + " tick to old " + tick);
                     return null;
+                }
                 
                 for (int i = 0; i < States.Count; i++)
                     if (States[i].Tick <= tick)
-                        return States[i];
+                        return (T)States[i].GetStateWithTick(tick);
                 
+                Debug.Log("No state found " + States.Count + " " + _lastReceivedTick);
                 return null;
-            }
-            set
-            {
-                if (LastState?.Tick - _ticksSaved > tick) // Tick is to old
-                    return;
-                
-                for (int i = 0; i < States.Count; i++)
-                {
-                    if (States[i].Tick == tick)
-                    {
-                        States[i] = value;
-                        break;
-                    }
-                    else if (States[i].Tick < tick)
-                    {
-                        if (States[i] != value)
-                            States.Insert(i, value);
-                        break;
-                    }
-                }
             }
         }
         
         public void Add(T newState)
         {
-            if (newState.Tick <= LastState?.Tick)
+            if (_lastReceivedTick - _ticksSaved > newState.Tick) // new state is too old
                 return;
 
-            if (LastState is not null && LastState == newState && States.Count > 1)
-                LastState.Tick = newState.Tick;
-            else
-                States.Insert(0, newState);            
-            
-            RemoveOutdated();
+            for (int i = 0; i < States.Count; i++)
+            {
+                if (States[i].Tick <= newState.Tick)
+                {
+                    if (States[i].Tick == newState.Tick)
+                        States[i] = newState;
+                    else if (States[i] != newState)
+                        States.Insert(i, newState);
+                        
+                    if (_lastReceivedTick < newState.Tick)
+                    {
+                        _lastReceivedTick = newState.Tick;
+                        RemoveOutdated();
+                    }
+
+                    return;
+                }
+            }
+            States.Add(newState);
+            if (_lastReceivedTick < newState.Tick)
+            {
+                _lastReceivedTick = newState.Tick;
+                RemoveOutdated();
+            }
         }
         public void Insert(NetworkStateList<T> newNetworkStateList, int insertAfterTick) // insert another NetworkStateList into this networkStateList
         {
-            int newStatesIndex = newNetworkStateList.States.Count - 1;
-            int statesIndex = States.Count - 1;
+            if (_lastReceivedTick < newNetworkStateList._lastReceivedTick)
+                _lastReceivedTick = newNetworkStateList._lastReceivedTick;
+            
+            foreach (T state in newNetworkStateList.States)
+                if (state.Tick > insertAfterTick)
+                    Add(state);
 
-            if (newStatesIndex < 0) // new states are empty
-                return;
-            if (statesIndex < 0) // states are empty
-            {
-                while (newStatesIndex >= 0)
-                { // just insert all relevant new entries (tick > insertAfterTick)
-                    if (newNetworkStateList.States[newStatesIndex].Tick > insertAfterTick)
-                        States.Insert(0, newNetworkStateList.States[newStatesIndex]);
-                    newStatesIndex--;
-                }
-                return;
-            }
-
-            while (true)
-            {
-                if (newNetworkStateList.States[newStatesIndex].Tick <= insertAfterTick)
-                    newStatesIndex--; // only do something if tick is new enough
-                else if (newNetworkStateList.States[newStatesIndex].Tick < States[statesIndex].Tick)
-                { // If state is newer than newState: insert newState, then skip
-                    States.Insert(statesIndex + 1, newNetworkStateList.States[newStatesIndex]);
-                    newStatesIndex--;
-                }
-                else if (newNetworkStateList.States[newStatesIndex].Tick > States[statesIndex].Tick)
-                    statesIndex--; // If state is older than newState: skip
-                else
-                { // If both states have the same tick: new overwrites old, then both skip
-                    States[statesIndex] = newNetworkStateList.States[newStatesIndex];
-                    statesIndex--;
-                    newStatesIndex--;
-                }
-
-                // If all new states have been inserted: break
-                if (newStatesIndex < 0)
-                    return;
-                
-                // all remaining new states are newer than LastState: add all remaining new states to 0, then break
-                if (statesIndex < 0)
-                {
-                    for (int i = newStatesIndex; i >= 0; i--)
-                        States.Insert(0, newNetworkStateList.States[i]);
-                    return;
-                }
-            }
+            RemoveOutdated();
         }
         private void RemoveOutdated()
         {
-            if (LastState is null)
-                return;
-
-            int startTick = LastState.Tick;
-            bool hasFirstState = false;
+            bool hasEndState = false; // make sure there is always info for the oldest ticks
             for (int i = 0; i < States.Count; i++)
             {
-                if (States[i].Tick > startTick - _ticksSaved)
+                if (_lastReceivedTick - _ticksSaved < States[i].Tick)
                     continue;
-
-                if (!hasFirstState)
-                    hasFirstState = true;
+                
+                if (!hasEndState)
+                    hasEndState = true;
                 else
                 {
                     States.RemoveAt(i);
@@ -145,6 +107,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
             }
         }
-        public bool Contains(int tick) => LastState?.Tick >= tick && tick >= Mathf.Max(LastState.Tick + _ticksSaved, States[States.Count-1].Tick);
+        public bool Contains(int tick) => _lastReceivedTick >= tick && tick >= Mathf.Max(_lastReceivedTick + _ticksSaved, States[States.Count-1].Tick);
     }
 }

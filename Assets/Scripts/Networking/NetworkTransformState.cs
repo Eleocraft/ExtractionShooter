@@ -16,6 +16,15 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             Tick = tick;
         }
+        public NetworkTransformState(NetworkTransformState oldState, int tick)
+        {
+            Position = oldState.Position;
+            LookRotation = oldState.LookRotation;
+            Velocity = oldState.Velocity;
+            Predicted = oldState.Predicted;
+            
+            Tick = tick;
+        }
         public NetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, Vector3 veloctiy)
         {
             Tick = tick;
@@ -23,6 +32,7 @@ namespace ExoplanetStudios.ExtractionShooter
             LookRotation = lookRotation;
             Velocity = veloctiy;
         }
+        public override NetworkState GetStateWithTick(int tick) => new NetworkTransformState(this, tick);
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)
@@ -94,6 +104,7 @@ namespace ExoplanetStudios.ExtractionShooter
                     States.Add(state);
                 }
                 reader.ReadValueSafe(out _ticksSaved);
+                reader.ReadValueSafe(out _lastReceivedTick);
             }
             else
             {
@@ -103,6 +114,7 @@ namespace ExoplanetStudios.ExtractionShooter
                     writer.WriteValueSafe(States[i]);
 
                 writer.WriteValueSafe(_ticksSaved);
+                writer.WriteValueSafe(_lastReceivedTick);
             }
         }
     }

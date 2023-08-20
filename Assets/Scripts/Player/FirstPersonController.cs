@@ -67,8 +67,8 @@ namespace ExoplanetStudios.ExtractionShooter
 		private CharacterController _controller;
 
 		// Buffer
-		private NetworkTransformStateList _bufferedTransformStates;
-		private NetworkInputStateList _bufferedInputStates;
+		private NetworkTransformStateList _bufferedTransformStates; // Owner and Server
+		private NetworkInputStateList _bufferedInputStates; // Owner and Server
 		
 		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>();
 		private NetworkTransformState _currentTransformState = new(0); // The current transform state
@@ -85,7 +85,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private const float MOVEMENT_ERROR_THRESHOLD = 0.03f;
 		private const float ROTATION_ERROR_THRESHOLD = 0.02f;
 
-		private void Start()
+		public override void OnNetworkSpawn()
 		{
 			// the square root of H * -2 * G = how much velocity needed to reach desired height
 			_jumpVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
@@ -136,13 +136,16 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (!IsServer) return;
 
 			transform.position = position;
+			_currentTransformState = CreateTransformState();
+			_serverTransformState.Value = _currentTransformState;
+			_lastSaveTransform = _currentTransformState;
 		}
 		private void Tick()
 		{
 			if (IsOwner)
 			{
 				NetworkInputState inputState = CreateInputState();
-				ExecuteInput(inputState, NetworkManager.LocalTime.Tick);
+				ExecuteInput(inputState);
 				StoreBuffer(inputState, _currentTransformState);
 				
 				if (IsHost)
@@ -159,8 +162,10 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				if (_currentTransformState.Tick < NetworkManager.LocalTime.Tick - 1) // missed a tick
 				{
-					ExecuteInput(_lastSaveInput, NetworkManager.LocalTime.Tick - 1);
-					StoreBuffer(new NetworkInputState(_lastSaveInput, NetworkManager.LocalTime.Tick - 1), _currentTransformState);
+					Debug.Log(NetworkManager.LocalTime.Tick - 1 + "   (3");
+					NetworkInputState inputState = new NetworkInputState(_lastSaveInput, NetworkManager.LocalTime.Tick - 1);
+					ExecuteInput(inputState);
+					StoreBuffer(inputState, _currentTransformState);
 
 					_serverTransformState.Value = _currentTransformState;
 					
@@ -171,9 +176,10 @@ namespace ExoplanetStudios.ExtractionShooter
 				// If _bufferedInputStates contains current tick
 				if (_bufferedInputStates.Contains(NetworkManager.LocalTime.Tick))
 				{
+					Debug.Log(NetworkManager.LocalTime.Tick + "   (2");
 					NetworkInputState input = _bufferedInputStates[NetworkManager.LocalTime.Tick];
 					// execute current tick
-					ExecuteInput(input, NetworkManager.LocalTime.Tick);
+					ExecuteInput(input);
 
 					// update _serverTransformState, _bufferedTransformStates and _lastSaveInput/_lastSaveTransform
 					_serverTransformState.Value = _currentTransformState;
@@ -187,24 +193,30 @@ namespace ExoplanetStudios.ExtractionShooter
 		[ServerRpc]
 		private void OnInputServerRpc(NetworkInputStateList inputStates)
 		{
+			Debug.Log("  Received  " + inputStates.States.Count);
+
+			if (inputStates.LastTick <= _lastSaveInput.Tick)
+				return; // Received states to old
+
 			// add all input states after _lastSaveInput to _bufferedInputStates
 			_bufferedInputStates.Insert(inputStates, _lastSaveInput.Tick);
 
 			// execute all input states between _lastSaveInput.Tick and current tick/last received tick (reconceliation)
 			_currentTransformState = _lastSaveTransform;
 			transform.position = _lastSaveTransform.Position;
-			int lastTickToExecute = Mathf.Min(NetworkManager.LocalTime.Tick, _bufferedInputStates.LastState.Tick);
+			int lastTickToExecute = Mathf.Min(NetworkManager.LocalTime.Tick, _bufferedInputStates.LastTick);
 			for (int tick = _lastSaveInput.Tick + 1; tick <= lastTickToExecute; tick++)
 			{
-				ExecuteInput(_bufferedInputStates[tick], tick);
+				Debug.Log(tick + "   (1");
+				ExecuteInput(_bufferedInputStates[tick]);
 				// update _bufferedTransformStates
-				_bufferedTransformStates[tick] = _currentTransformState;
+				_bufferedTransformStates.Add(_currentTransformState);
 			}
 
 			// update _serverTransformState and _lastSaveInput/_lastSaveTransform
 			_serverTransformState.Value = _currentTransformState;
 
-			_lastSaveInput = _bufferedInputStates[lastTickToExecute];
+			_lastSaveInput = _bufferedInputStates[inputStates.LastTick];
 			_lastSaveTransform = _currentTransformState;
 		}
 		private void StoreBuffer(NetworkInputState inputState, NetworkTransformState transformState)
@@ -218,17 +230,28 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (IsOwner && !IsServer)
 			{
 				if (receivedState.Predicted)
+				{
+					Debug.Log("predicted");
 					return;
+				}
 				
 				NetworkTransformState transformState = _bufferedTransformStates[receivedState.Tick];
 				if (transformState != null)
 				{
-					if ((transformState.Position - receivedState.Position).sqrMagnitude <= MOVEMENT_ERROR_THRESHOLD
-						&& (transformState.LookRotation - receivedState.LookRotation).sqrMagnitude <= ROTATION_ERROR_THRESHOLD)
+					if ((transformState.Position - receivedState.Position).sqrMagnitude <= MOVEMENT_ERROR_THRESHOLD)
+						/*&& (transformState.LookRotation - receivedState.LookRotation).sqrMagnitude <= ROTATION_ERROR_THRESHOLD)*/
 						return;
 
 					Debug.Log("reconceliation");
-					Reconceliation(_bufferedInputStates, receivedState); // perform reconceliation
+					// perform reconceliation
+					_currentTransformState = receivedState;
+					transform.position = receivedState.Position;
+					for (int tick = receivedState.Tick + 1; tick <= _bufferedInputStates.LastTick; tick++)
+					{
+						Debug.Log("reconceliation tick: " + tick + "   " + _bufferedInputStates[tick].MovementInput);
+						ExecuteInput(_bufferedInputStates[tick]);
+						_bufferedTransformStates.Add(_currentTransformState);
+					}
 				}
 				else
 					Debug.Log("state received from server to old");
@@ -236,27 +259,22 @@ namespace ExoplanetStudios.ExtractionShooter
 			else if (!IsServer)
 			{
 				_currentTransformState = receivedState;
+				transform.position = _currentTransformState.Position;
 				_interpolation.SetInterpolationStates(previouseState.LookRotation, _currentTransformState);
-			}
-
-			void Reconceliation(NetworkInputStateList networkInputStateList, NetworkTransformState lastSaveState)
-			{
-				_currentTransformState = lastSaveState;
-				transform.position = lastSaveState.Position;
-				for (int tick = lastSaveState.Tick + 1; tick <= networkInputStateList.LastState.Tick; tick++)
-				{
-					ExecuteInput(networkInputStateList[tick], tick);
-					_bufferedTransformStates[tick] = _currentTransformState;
-				}
 			}
 		}
 		private NetworkInputState CreateInputState()
 		{
-			return new NetworkInputState(NetworkManager.NetworkTickSystem.LocalTime.Tick,
+			return new NetworkInputState(NetworkManager.LocalTime.Tick,
 				_controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
 				_controls.Player.Sprint.ReadValue<float>().AsBool(), _jump);
 		}
-		private void ExecuteInput(NetworkInputState inputState, int tick)
+		private NetworkTransformState CreateTransformState()
+		{
+			return new NetworkTransformState(NetworkManager.LocalTime.Tick,
+				transform.position, Vector3.forward, Vector3.zero);
+		}
+		private void ExecuteInput(NetworkInputState inputState)
 		{
 			// lookRotation
 			Vector2 lookRotation = _currentTransformState.LookRotation + inputState.LookDelta;
@@ -273,7 +291,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			Vector3 movement = velocity * NetworkManager.LocalTime.FixedDeltaTime;
 			_controller.Move(movement);
 
-			_currentTransformState = new NetworkTransformState(tick, transform.position, lookRotation, velocity);
+			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity);
 
 			// End interpolation state
 			_interpolation.SetEndInterpolationState(_currentTransformState);
