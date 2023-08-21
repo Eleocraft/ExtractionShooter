@@ -85,7 +85,6 @@ namespace ExoplanetStudios.ExtractionShooter
             if (newList.States.Count <= 0 && States.Count > 0) // make sure there is always at least one tick
                 newList.Add((NetworkInputState)States[0].GetStateWithTick(newList._lastReceivedTick - ticks));
 
-            Debug.Log(newList.States.Count);
             return newList;
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

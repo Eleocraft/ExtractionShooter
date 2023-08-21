@@ -193,8 +193,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		[ServerRpc]
 		private void OnInputServerRpc(NetworkInputStateList inputStates)
 		{
-			Debug.Log("  Received  " + inputStates.States.Count);
-
 			if (inputStates.LastTick <= _lastSaveInput.Tick)
 				return; // Received states to old
 
@@ -230,25 +228,21 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (IsOwner && !IsServer)
 			{
 				if (receivedState.Predicted)
-				{
-					Debug.Log("predicted");
 					return;
-				}
 				
 				NetworkTransformState transformState = _bufferedTransformStates[receivedState.Tick];
 				if (transformState != null)
 				{
-					if ((transformState.Position - receivedState.Position).sqrMagnitude <= MOVEMENT_ERROR_THRESHOLD)
-						/*&& (transformState.LookRotation - receivedState.LookRotation).sqrMagnitude <= ROTATION_ERROR_THRESHOLD)*/
+					if ((transformState.Position - receivedState.Position).sqrMagnitude <= MOVEMENT_ERROR_THRESHOLD
+						&& (transformState.LookRotation - receivedState.LookRotation).sqrMagnitude <= ROTATION_ERROR_THRESHOLD)
 						return;
 
-					Debug.Log("reconceliation");
+					Debug.Log("reconceliation tick: " + receivedState.Tick);
 					// perform reconceliation
 					_currentTransformState = receivedState;
 					transform.position = receivedState.Position;
 					for (int tick = receivedState.Tick + 1; tick <= _bufferedInputStates.LastTick; tick++)
 					{
-						Debug.Log("reconceliation tick: " + tick + "   " + _bufferedInputStates[tick].MovementInput);
 						ExecuteInput(_bufferedInputStates[tick]);
 						_bufferedTransformStates.Add(_currentTransformState);
 					}
@@ -276,6 +270,9 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 		private void ExecuteInput(NetworkInputState inputState)
 		{
+			if (inputState == null)
+				return;
+			
 			// lookRotation
 			Vector2 lookRotation = _currentTransformState.LookRotation + inputState.LookDelta;
 

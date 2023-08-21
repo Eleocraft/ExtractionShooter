@@ -16,4 +16,6 @@ MonoBehaviour:
   projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}
   Cooldown: 0.1
   MaxSpray: 3
-  MaxSprayReachTime: 1
+  MaxSprayReachTime: 2
+  SprayResetTime: 0.5
+  SpraySeed: 14332

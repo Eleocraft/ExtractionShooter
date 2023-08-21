@@ -35,16 +35,12 @@ namespace ExoplanetStudios.ExtractionShooter
             get
             {
                 if (_lastReceivedTick - _ticksSaved > tick) // Tick is to old
-                {
-                    Debug.Log(_lastReceivedTick + " tick to old " + tick);
                     return null;
-                }
                 
                 for (int i = 0; i < States.Count; i++)
                     if (States[i].Tick <= tick)
                         return (T)States[i].GetStateWithTick(tick);
                 
-                Debug.Log("No state found " + States.Count + " " + _lastReceivedTick);
                 return null;
             }
         }
@@ -107,6 +103,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
             }
         }
-        public bool Contains(int tick) => _lastReceivedTick >= tick && tick >= Mathf.Max(_lastReceivedTick + _ticksSaved, States[States.Count-1].Tick);
+        public bool Contains(int tick) => _lastReceivedTick >= tick && tick >= Mathf.Max(_lastReceivedTick - _ticksSaved, States[States.Count-1].Tick);
     }
 }
