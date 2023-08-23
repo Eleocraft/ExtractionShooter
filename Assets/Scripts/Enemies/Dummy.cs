@@ -19,12 +19,12 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             base.OnDestroy();
         }
-        public void OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ulong ownerId, ref Vector3 velocity)
+        public void OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ref Vector3 velocity)
         {
             Instantiate(HitParticles, point, Quaternion.identity);
             if (!IsServer) return;
             
-            _life.Value -= info.Damage;
+            _life.Value -= info.DefaultDamage;
             if (_life.Value < 0)
                 GetComponent<NetworkObject>().Despawn();
         }

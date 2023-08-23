@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c07420cc09fb4c409ba3c4fcdd04df7, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
+  DefaultDamage: 20
+  HeadshotDamage: 80
   MuzzleVelocity: 300
-  MinVelocity: 20
   Drag: 1
   Dropoff: 9.81
-  Damage: 30
-  MaxDistance: 200
   PenetrationForce: 0.1
+  MaxDistance: 200
+  MinVelocity: 20
   Prefab: {fileID: 1300443509257007520, guid: dde4e3477d432684d90158d6e538fb9d, type: 3}
   HitMarker: {fileID: 7882812698031039389, guid: 2c512890680e9564b825dfb025b298a3,
     type: 3}

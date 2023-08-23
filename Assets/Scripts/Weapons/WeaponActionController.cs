@@ -18,15 +18,18 @@ namespace ExoplanetStudios.ExtractionShooter
 
         private bool _mainActionStopped;
         private bool _secondaryActionStopped;
-        private void Start()
+        
+        private int _weaponTickDiff;
+        public override void OnNetworkSpawn()
         {
             _weapon = Instantiate(MainWeapon);
             _weapon.OwnerId = OwnerClientId;
             _firstPersonController = GetComponent<FirstPersonController>();
-            _cameraYOffset = CameraSocket.localPosition.y;
-            NetworkManager.NetworkTickSystem.Tick += Tick;
+            _cameraYOffset = CameraSocket.localPosition.y - 0.01f;
             if (IsServer)
                 _receivedActions = new Dictionary<int, ActionType>();
+            
+            _firstPersonController.TransformStateChanged += TransformStateChanged;
 
             if (!IsOwner)
                 return;
@@ -40,8 +43,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             base.OnDestroy();
 
-            if (NetworkManager?.NetworkTickSystem != null)
-                NetworkManager.NetworkTickSystem.Tick -= Tick;
+            _firstPersonController.TransformStateChanged -= TransformStateChanged;
 
             if (!IsOwner)
                 return;
@@ -55,30 +57,32 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (!IsServer)
                 CalculateAction(ActionType.StartMainAction, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StartMainAction, NetworkManager.LocalTime.Tick);
+            ActionServerRpc(ActionType.StartMainAction, NetworkManager.LocalTime.Tick, NetworkManager.ServerTime.Tick);
         }
 
         private void StopMainAction(InputAction.CallbackContext ctx)
         {
             if (!IsServer)
                 CalculateAction(ActionType.StopMainAction, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StopMainAction, NetworkManager.LocalTime.Tick);
+            ActionServerRpc(ActionType.StopMainAction, NetworkManager.LocalTime.Tick, NetworkManager.ServerTime.Tick);
         }
         private void StartSecondaryAction(InputAction.CallbackContext ctx)
         {
             if (!IsServer)
                 CalculateAction(ActionType.StartSecondaryAction, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StartSecondaryAction, NetworkManager.LocalTime.Tick);
+            ActionServerRpc(ActionType.StartSecondaryAction, NetworkManager.LocalTime.Tick, NetworkManager.ServerTime.Tick);
         }
         private void StopSecondaryAction(InputAction.CallbackContext ctx)
         {
             if (!IsServer)
                 CalculateAction(ActionType.StopSecondaryAction, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StopSecondaryAction, NetworkManager.LocalTime.Tick);
+            ActionServerRpc(ActionType.StopSecondaryAction, NetworkManager.LocalTime.Tick, NetworkManager.ServerTime.Tick);
         }
         [ServerRpc]
-        private void ActionServerRpc(ActionType type, int tick)
+        private void ActionServerRpc(ActionType type, int tick, int serverTick)
         {
+            _weaponTickDiff = NetworkManager.ServerTime.Tick - serverTick;
+
             if (tick <= NetworkManager.LocalTime.Tick)
                 CalculateAction(type, tick);
             else
@@ -115,15 +119,15 @@ namespace ExoplanetStudios.ExtractionShooter
                     break;
             }
         }
-        private void Tick()
-        {       
+        private void TransformStateChanged(NetworkTransformState transformState)
+        {
             if (IsServer && _receivedActions.ContainsKey(NetworkManager.LocalTime.Tick))
             {
                 CalculateAction(_receivedActions[NetworkManager.LocalTime.Tick], NetworkManager.LocalTime.Tick);
                 _receivedActions.Remove(NetworkManager.LocalTime.Tick);
             }
-            if(_firstPersonController.GetState(NetworkManager.LocalTime.Tick, out NetworkTransformState transformState))
-                _weapon.UpdateWeapon(GetShootPosition(transformState.Position), GetShootDirection(transformState.LookRotation));
+            // Update weapon
+            _weapon.UpdateWeapon(GetShootPosition(transformState.Position), GetShootDirection(transformState.LookRotation), transformState.Velocity.XZ().magnitude, _weaponTickDiff);
 
             // actions are only stopped after one weapon update
             if (_mainActionStopped)

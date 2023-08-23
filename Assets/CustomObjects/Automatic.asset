@@ -19,3 +19,4 @@ MonoBehaviour:
   MaxSprayReachTime: 2
   SprayResetTime: 0.5
   SpraySeed: 14332
+  MovementError: 5

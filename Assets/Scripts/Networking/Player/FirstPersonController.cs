@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Unity.Netcode;
+using System;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -49,6 +50,10 @@ namespace ExoplanetStudios.ExtractionShooter
 
 		[Header("Inputs")]
 		[SerializeField] private GlobalInputs GI;
+		[Header("Test")]
+		[SerializeField] private bool Walk;
+
+		public Action<NetworkTransformState> TransformStateChanged;
 
 		// player
 		private float _jumpVelocity;
@@ -162,7 +167,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				if (_currentTransformState.Tick < NetworkManager.LocalTime.Tick - 1) // missed a tick
 				{
-					Debug.Log(NetworkManager.LocalTime.Tick - 1 + "   (3");
 					NetworkInputState inputState = new NetworkInputState(_lastSaveInput, NetworkManager.LocalTime.Tick - 1);
 					ExecuteInput(inputState);
 					StoreBuffer(inputState, _currentTransformState);
@@ -176,7 +180,6 @@ namespace ExoplanetStudios.ExtractionShooter
 				// If _bufferedInputStates contains current tick
 				if (_bufferedInputStates.Contains(NetworkManager.LocalTime.Tick))
 				{
-					Debug.Log(NetworkManager.LocalTime.Tick + "   (2");
 					NetworkInputState input = _bufferedInputStates[NetworkManager.LocalTime.Tick];
 					// execute current tick
 					ExecuteInput(input);
@@ -189,6 +192,7 @@ namespace ExoplanetStudios.ExtractionShooter
 					_bufferedTransformStates.Add(_currentTransformState);
 				}
 			}
+			TransformStateChanged?.Invoke(_currentTransformState);
 		}
 		[ServerRpc]
 		private void OnInputServerRpc(NetworkInputStateList inputStates)
@@ -205,7 +209,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			int lastTickToExecute = Mathf.Min(NetworkManager.LocalTime.Tick, _bufferedInputStates.LastTick);
 			for (int tick = _lastSaveInput.Tick + 1; tick <= lastTickToExecute; tick++)
 			{
-				Debug.Log(tick + "   (1");
 				ExecuteInput(_bufferedInputStates[tick]);
 				// update _bufferedTransformStates
 				_bufferedTransformStates.Add(_currentTransformState);
@@ -260,7 +263,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private NetworkInputState CreateInputState()
 		{
 			return new NetworkInputState(NetworkManager.LocalTime.Tick,
-				_controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
+				Walk ? Vector2.up : _controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
 				_controls.Player.Sprint.ReadValue<float>().AsBool(), _jump);
 		}
 		private NetworkTransformState CreateTransformState()

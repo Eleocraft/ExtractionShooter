@@ -14,7 +14,9 @@ namespace ExoplanetStudios.ExtractionShooter
         private ulong _ownerId;
         private GameObject _displayObject;
         private float _sqrMinVelocity;
-        private void Initialize(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId)
+
+        private int _tickDiff;
+        private void Initialize(ProjectileInfo info, int tickDiff, Vector3 direction, ulong ownerId)
         {
             // Graphics
             _displayObject = Instantiate(info.Prefab, transform.position, Quaternion.identity);
@@ -30,15 +32,16 @@ namespace ExoplanetStudios.ExtractionShooter
             _sqrMinVelocity = _info.MinVelocity * _info.MinVelocity;
 
             NetworkManager.Singleton.NetworkTickSystem.Tick += Tick;
+            _tickDiff = tickDiff;
         }
         private void OnDestroy()
         {
             NetworkManager.Singleton.NetworkTickSystem.Tick -= Tick;
         }
-        public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId)
+        public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
         {
             GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Projectile], position, Quaternion.identity);
-            projectileObj.GetComponent<Projectile>().Initialize(info, position, direction, ownerId);
+            projectileObj.GetComponent<Projectile>().Initialize(info, tickDiff, direction, ownerId);
         }
         private void Tick()
         {
@@ -69,11 +72,11 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 oldVelocity = velocity;
             Vector3 backwardsStartPos = startPos + movement;
             // Main hitscan
-            List<RaycastHit> hits = Utility.RaycastAll(startPos, movement, movement.magnitude, ProjectileHitLayer.CanHit);
+            List<RaycastHit> hits = Utility.RaycastAll(startPos, movement, movement.magnitude, ProjectileHitLayer.CanHit, true);
             foreach (RaycastHit hit in hits)
             {
                 if (hit.transform.TryGetComponent(out IDamagable damagable))
-                    damagable.OnHit(_info, hit.point, hit.normal, _ownerId, ref velocity);
+                    damagable.OnHit(_info, hit.point, hit.normal, _ownerId, _tickDiff, ref velocity);
 
                 if (VelocityReversed(oldVelocity, velocity))
                 {

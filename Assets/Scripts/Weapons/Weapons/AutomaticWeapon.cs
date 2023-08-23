@@ -12,6 +12,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float MaxSprayReachTime;
         [SerializeField] private float SprayResetTime;
         [SerializeField] private int SpraySeed;
+        [SerializeField] private float MovementError;
 
         private float _cooldown;
         private float _relativeSpray;
@@ -29,7 +30,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _sprayIncreaseSpeed = 1f / MaxSprayReachTime;
             _sprayDecreaseSpeed = 1f / SprayResetTime;
         }
-        public override void UpdateWeapon(Vector3 position, Vector3 direction)
+        public override void UpdateWeapon(Vector3 position, Vector3 direction, float velocity, int tick)
         {
             // Spray Calculations
             if (_shoot)
@@ -46,7 +47,9 @@ namespace ExoplanetStudios.ExtractionShooter
             {
                 Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*720f-360f, 0, (float)_rng.NextDouble()*720f-360f) * Vector3.up;
                 Vector3 rotationVector = Vector3.Cross(direction, randomVector).normalized;
-                Projectile.SpawnProjectile(projectileInfo, position, Quaternion.AngleAxis(_relativeSpray * MaxSpray * (float)_rng.NextDouble(), rotationVector) * direction, OwnerId);
+                float spray = _relativeSpray * MaxSpray;
+                float movementError = MovementError * velocity;
+                Projectile.SpawnProjectile(projectileInfo, position, Quaternion.AngleAxis((spray + movementError) * (float)_rng.NextDouble(), rotationVector) * direction, OwnerId, tick);
                 _cooldown += Cooldown;
             }
         }

@@ -7,6 +7,8 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private float MaxLife;
         [SerializeField] private GameObject BreakParticles;
+        [SerializeField] private GameObject HitParticle;
+        [SerializeField] private GameObject HeadshotParticle;
         private NetworkVariable<float> _life = new NetworkVariable<float>();
         private FirstPersonController _firstPersonController; // Serveronly
         private void Start()
@@ -23,11 +25,20 @@ namespace ExoplanetStudios.ExtractionShooter
             base.OnDestroy();
             _life.OnValueChanged -= OnLifeChanged;
         }
-        public void OnHit(float damage)
+        public void OnHit(ProjectileInfo info, Vector3 point, bool Headshot, ulong ownerId)
         {
+            if (OwnerClientId == ownerId)
+                return;
+
+            // Particle Effects
+            if (Headshot)
+                Instantiate(HeadshotParticle, transform.position, Quaternion.identity);
+            else
+                Instantiate(HitParticle, point + transform.position, Quaternion.identity);
+
             if (IsServer)
-            {
-                _life.Value -= damage;
+            { // Life calculation
+                _life.Value -= Headshot ? info.HeadshotDamage : info.DefaultDamage;
                 if (_life.Value <= 0)
                 {
                     _life.Value = MaxLife;

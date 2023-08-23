@@ -2,18 +2,16 @@ using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class HitRegion : MonoBehaviour, IDamagable
+    public class PlayerHitRegion : MonoBehaviour, IDamagable
     {
-        [SerializeField] private PlayerLife Player;
-        [SerializeField] private float Multiplier;
-        [SerializeField] private GameObject HitParticle;
-        public void OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ulong ownerId, ref Vector3 velocity)
-        {
-            if (ownerId == Player.OwnerClientId)
-                return;
+        [SerializeField] private bool Headshot;
 
-            Instantiate(HitParticle, point, Quaternion.identity);
-            Player.OnHit(info.Damage * Multiplier);
+        private PlayerBulletHitbox _playerBulletHitbox;
+        public void Initialize(PlayerBulletHitbox playerBulletHitbox)
+        {
+            _playerBulletHitbox = playerBulletHitbox;
         }
+        public void OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ulong ownerId, int tickDiff, ref Vector3 velocity) => 
+            _playerBulletHitbox.OnHit(info, point, Headshot, ownerId, tickDiff);
     }
 }
