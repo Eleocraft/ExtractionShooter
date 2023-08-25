@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 
 // This is a wrapper for the System.Collections.Generic.Dictionary,
 // which makes dictionarys with enum values as key serializable
@@ -42,7 +43,6 @@ namespace ExoplanetStudios
             get => dict[index];
             set { dict[index] = value; }
         }
-
         [System.Serializable]
         private class PanelObject
         {

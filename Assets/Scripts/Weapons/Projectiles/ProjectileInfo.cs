@@ -1,13 +1,16 @@
+using System;
 using UnityEngine;
 
+
+public enum DamageType { Default, Headshot }
 namespace ExoplanetStudios.ExtractionShooter
 {
     [CreateAssetMenu(fileName = "New Projectile", menuName = "CustomObjects/Weapons/Projectile")]
     public class ProjectileInfo : ScriptableObject
     {
         [Header("Damage")]
-        public float DefaultDamage;
-        public float HeadshotDamage;
+        public EnumDictionary<DamageType, float> Damages;
+
         [Header("Physics")]
         public float MuzzleVelocity;
         public float Drag;
@@ -21,5 +24,14 @@ namespace ExoplanetStudios.ExtractionShooter
         public HitMarker HitMarker;
         public HitMarker PenetrateMarker;
         public HitMarker ExitMarker;
+
+        private void OnValidate()
+        {
+            Damages.Update();
+        }
+        public float GetDamage(DamageType damageType, float projectileVelocity)
+        {
+            return Damages[damageType] * (projectileVelocity / MuzzleVelocity);
+        }
     }
 }

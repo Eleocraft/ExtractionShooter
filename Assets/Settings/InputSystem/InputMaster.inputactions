@@ -231,7 +231,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "MainAction",
+                    "name": "PrimaryAction",
                     "type": "Button",
                     "id": "e5eacb3f-6e83-4512-9d5d-1a7ca79ee605",
                     "expectedControlType": "Button",
@@ -268,7 +268,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
-                    "action": "MainAction",
+                    "action": "PrimaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

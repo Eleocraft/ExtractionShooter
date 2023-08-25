@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c07420cc09fb4c409ba3c4fcdd04df7, type: 3}
   m_Name: TestSlow
   m_EditorClassIdentifier: 
-  DefaultDamage: 20
-  HeadshotDamage: 80
+  Damages:
+    values:
+    - name: Default
+      key: 0
+      value: 80
+    - name: Headshot
+      key: 1
+      value: 80
   MuzzleVelocity: 50
   Drag: 0.3
   Dropoff: 15

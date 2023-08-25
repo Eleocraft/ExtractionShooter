@@ -24,7 +24,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Instantiate(HitParticles, point, Quaternion.identity);
             if (!IsServer) return;
             
-            _life.Value -= info.DefaultDamage;
+            _life.Value -= info.GetDamage(DamageType.Default, velocity.magnitude);
             if (_life.Value < 0)
                 GetComponent<NetworkObject>().Despawn();
         }

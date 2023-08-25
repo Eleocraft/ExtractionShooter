@@ -10,7 +10,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private Vector3 _lastPosition;
         private Vector3 _velocity;
         private ProjectileInfo _info;
-        private float _maxDistanceSqr;
+        private float _sqrMaxDistance;
         private ulong _ownerId;
         private GameObject _displayObject;
         private float _sqrMinVelocity;
@@ -25,18 +25,21 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _lastPosition = transform.position;
             _spawnPosition = transform.position;
-            _maxDistanceSqr = info.MaxDistance * info.MaxDistance;
+
             _ownerId = ownerId;
             _info = info;
+            _tickDiff = tickDiff;
 
-            _sqrMinVelocity = _info.MinVelocity * _info.MinVelocity;
+            _sqrMaxDistance = info.MaxDistance * info.MaxDistance;
+            _sqrMinVelocity = info.MinVelocity * info.MinVelocity;
 
             NetworkManager.Singleton.NetworkTickSystem.Tick += Tick;
-            _tickDiff = tickDiff;
+            PlayerBulletHitboxManager.AddBullet(_tickDiff);
         }
         private void OnDestroy()
         {
             NetworkManager.Singleton.NetworkTickSystem.Tick -= Tick;
+            PlayerBulletHitboxManager.RemoveBullet(_tickDiff);
         }
         public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
         {
@@ -54,7 +57,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Hitscan(movement, _lastPosition, ref _velocity);
 
             // Lifetime
-            if ((transform.position - _spawnPosition).sqrMagnitude > _maxDistanceSqr)
+            if ((transform.position - _spawnPosition).sqrMagnitude > _sqrMaxDistance)
                 Destroy(gameObject);
             
             // Physics

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using Unity.Netcode;
 using System.Collections.Generic;
 
@@ -7,146 +6,106 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class WeaponActionController : NetworkBehaviour
     {
-        private enum ActionType { StartMainAction, StopMainAction, StartSecondaryAction, StopSecondaryAction, Utility, Reload }
         [SerializeField] private GlobalInputs GI;
-        [SerializeField] private Transform CameraSocket;
         [SerializeField] private Weapon MainWeapon;
-        private Weapon _weapon;
-        private Dictionary<int, ActionType> _receivedActions; // Serveronly
-        private FirstPersonController _firstPersonController; // Serveronly
-        private float _cameraYOffset; // Serveronly
 
-        private bool _mainActionStopped;
-        private bool _secondaryActionStopped;
+        private FirstPersonController _firstPersonController;
+
+        // Owner
+        private InputMaster _controls;
+        private Weapon _weapon;
         
-        private int _weaponTickDiff;
+        // Server
+        private Dictionary<int, NetworkWeaponInputState> _receivedActions; // Serveronly
+        private const float CAMERA_Y_OFFSET = 1.59f; // Temp
+
+        // NetworkWeaponInputStates
+        private NetworkVariable<NetworkWeaponInputState> _serverWeaponInputState = new NetworkVariable<NetworkWeaponInputState>();
+        private NetworkWeaponInputState _currentWeaponInputState = new();
+
         public override void OnNetworkSpawn()
         {
             _weapon = Instantiate(MainWeapon);
             _weapon.OwnerId = OwnerClientId;
             _firstPersonController = GetComponent<FirstPersonController>();
-            _cameraYOffset = CameraSocket.localPosition.y - 0.01f;
+
             if (IsServer)
-                _receivedActions = new Dictionary<int, ActionType>();
-            
+                _receivedActions = new Dictionary<int, NetworkWeaponInputState>();
+            if (IsOwner)
+                _controls = GI.Controls;
+                
             _firstPersonController.TransformStateChanged += TransformStateChanged;
-
-            if (!IsOwner)
-                return;
-
-            GI.Controls.Mouse.MainAction.started += StartMainAction;
-            GI.Controls.Mouse.SecondaryAction.started += StartSecondaryAction;
-            GI.Controls.Mouse.MainAction.canceled += StopMainAction;
-            GI.Controls.Mouse.SecondaryAction.canceled += StopSecondaryAction;
         }
         public override void OnDestroy()
         {
             base.OnDestroy();
 
             _firstPersonController.TransformStateChanged -= TransformStateChanged;
-
-            if (!IsOwner)
-                return;
-
-            GI.Controls.Mouse.MainAction.started -= StartMainAction;
-            GI.Controls.Mouse.SecondaryAction.started -= StartSecondaryAction;
-            GI.Controls.Mouse.MainAction.canceled -= StopMainAction;
-            GI.Controls.Mouse.SecondaryAction.canceled -= StopSecondaryAction;
-        }
-        private void StartMainAction(InputAction.CallbackContext ctx)
-        {
-            if (!IsServer)
-                CalculateAction(ActionType.StartMainAction, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StartMainAction, NetworkManager.LocalTime.Tick, NetworkManager.ServerTime.Tick);
-        }
-
-        private void StopMainAction(InputAction.CallbackContext ctx)
-        {
-            if (!IsServer)
-                CalculateAction(ActionType.StopMainAction, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StopMainAction, NetworkManager.LocalTime.Tick, NetworkManager.ServerTime.Tick);
-        }
-        private void StartSecondaryAction(InputAction.CallbackContext ctx)
-        {
-            if (!IsServer)
-                CalculateAction(ActionType.StartSecondaryAction, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StartSecondaryAction, NetworkManager.LocalTime.Tick, NetworkManager.ServerTime.Tick);
-        }
-        private void StopSecondaryAction(InputAction.CallbackContext ctx)
-        {
-            if (!IsServer)
-                CalculateAction(ActionType.StopSecondaryAction, NetworkManager.LocalTime.Tick);
-            ActionServerRpc(ActionType.StopSecondaryAction, NetworkManager.LocalTime.Tick, NetworkManager.ServerTime.Tick);
-        }
-        [ServerRpc]
-        private void ActionServerRpc(ActionType type, int tick, int serverTick)
-        {
-            _weaponTickDiff = NetworkManager.ServerTime.Tick - serverTick;
-
-            if (tick <= NetworkManager.LocalTime.Tick)
-                CalculateAction(type, tick);
-            else
-                _receivedActions.Add(tick, type);
-        }
-        private void CalculateAction(ActionType type, int tick)
-        {
-            if(!_firstPersonController.GetState(tick, out NetworkTransformState transformState)) return;
-            
-            Vector3 position = GetShootPosition(transformState.Position);
-            Vector3 direction = GetShootDirection(transformState.LookRotation);
-            PerformAction(type, direction, position);
-
-            if (IsServer)
-                ActionClientRpc(type, position, direction);
-        }
-        private Vector3 GetShootPosition(Vector3 playerPosition) => playerPosition + Vector3.up * _cameraYOffset;
-        private Vector3 GetShootDirection(Vector2 lookRotation) => Quaternion.Euler(lookRotation.x, lookRotation.y, 0) * Vector3.forward;
-        private void PerformAction(ActionType type, Vector3 direction, Vector3 position)
-        {
-            switch (type)
-            {
-                case ActionType.StartMainAction:
-                    _weapon.StartMainAction();
-                    break;
-                case ActionType.StopMainAction:
-                    _mainActionStopped = true;
-                    break;
-                case ActionType.StartSecondaryAction:
-                    _weapon.StartSecondaryAction();
-                    break;
-                case ActionType.StopSecondaryAction:
-                    _secondaryActionStopped = true;
-                    break;
-            }
         }
         private void TransformStateChanged(NetworkTransformState transformState)
         {
-            if (IsServer && _receivedActions.ContainsKey(NetworkManager.LocalTime.Tick))
+            if (IsOwner)
             {
-                CalculateAction(_receivedActions[NetworkManager.LocalTime.Tick], NetworkManager.LocalTime.Tick);
+                NetworkWeaponInputState newWeaponInputState = GetNetworkInputState();
+                // Execute Input
+                ExecuteInput(newWeaponInputState);
+                if (IsHost)
+                    _serverWeaponInputState.Value = newWeaponInputState;
+                else
+                    OnInputServerRpc(newWeaponInputState);
+            }
+            else if (IsServer && _receivedActions.ContainsKey(NetworkManager.LocalTime.Tick))
+            {
+                ExecuteInput(_receivedActions[NetworkManager.LocalTime.Tick]);
                 _receivedActions.Remove(NetworkManager.LocalTime.Tick);
+                _serverWeaponInputState.Value = _currentWeaponInputState;
             }
             // Update weapon
-            _weapon.UpdateWeapon(GetShootPosition(transformState.Position), GetShootDirection(transformState.LookRotation), transformState.Velocity.XZ().magnitude, _weaponTickDiff);
-
-            // actions are only stopped after one weapon update
-            if (_mainActionStopped)
-            {
-                _weapon.StopMainAction();
-                _mainActionStopped = false;
-            }
-            if (_secondaryActionStopped)
-            {
-                _weapon.StopSecondaryAction();
-                _secondaryActionStopped = false;
-            }
+            _weapon.UpdateWeapon(_currentWeaponInputState, GetShootPosition(transformState.Position), GetShootDirection(transformState.LookRotation), transformState.Velocity.XZ().magnitude);
         }
-        [ClientRpc]
-        private void ActionClientRpc(ActionType type, Vector3 position, Vector3 direction)
+        [ServerRpc]
+        private void OnInputServerRpc(NetworkWeaponInputState state)
+        {
+            if (state.Tick == NetworkManager.LocalTime.Tick)
+            {
+                ExecuteInput(state);
+                _serverWeaponInputState.Value = _currentWeaponInputState;
+            }
+            else if (state.Tick > NetworkManager.LocalTime.Tick)
+                _receivedActions.Add(state.Tick, state);
+        }
+        private void OnServerStateChanged(NetworkWeaponInputState state)
         {
             if (IsOwner) return;
 
-            PerformAction(type, direction, position);
+            ExecuteInput(state);
         }
+        private NetworkWeaponInputState GetNetworkInputState()
+        {
+            return new NetworkWeaponInputState(_controls.Mouse.PrimaryAction.ReadValue<float>().AsBool(),
+                _controls.Mouse.PrimaryAction.ReadValue<float>().AsBool(), NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
+        }
+        private void ExecuteInput(NetworkWeaponInputState weaponInputState)
+        {
+            if (weaponInputState.PrimaryAction != _currentWeaponInputState.PrimaryAction)
+            {
+                if (weaponInputState.PrimaryAction)
+                    _weapon.StartPrimaryAction();
+                else
+                    _weapon.StopPrimaryAction();
+            }
+
+            if (weaponInputState.SecondaryAction != _currentWeaponInputState.SecondaryAction)
+            {
+                if (weaponInputState.SecondaryAction)
+                    _weapon.StartSecondaryAction();
+                else
+                    _weapon.StopSecondaryAction();
+            }
+
+            _currentWeaponInputState = weaponInputState;
+        }
+        private Vector3 GetShootPosition(Vector3 playerPosition) => playerPosition + Vector3.up * CAMERA_Y_OFFSET;
+        private Vector3 GetShootDirection(Vector2 lookRotation) => Quaternion.Euler(lookRotation.x, lookRotation.y, 0) * Vector3.forward;
     }
 }
