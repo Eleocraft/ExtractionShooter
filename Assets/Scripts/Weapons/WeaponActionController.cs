@@ -8,6 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private GlobalInputs GI;
         [SerializeField] private Weapon MainWeapon;
+        [SerializeField] private Transform WeaponTransform;
 
         private FirstPersonController _firstPersonController;
 
@@ -17,7 +18,6 @@ namespace ExoplanetStudios.ExtractionShooter
         
         // Server
         private Dictionary<int, NetworkWeaponInputState> _receivedActions; // Serveronly
-        private const float CAMERA_Y_OFFSET = 1.59f; // Temp
 
         // NetworkWeaponInputStates
         private NetworkVariable<NetworkWeaponInputState> _serverWeaponInputState = new NetworkVariable<NetworkWeaponInputState>();
@@ -35,12 +35,14 @@ namespace ExoplanetStudios.ExtractionShooter
                 _controls = GI.Controls;
                 
             _firstPersonController.TransformStateChanged += TransformStateChanged;
+            _serverWeaponInputState.OnValueChanged += OnServerStateChanged;
         }
         public override void OnDestroy()
         {
             base.OnDestroy();
 
             _firstPersonController.TransformStateChanged -= TransformStateChanged;
+            _serverWeaponInputState.OnValueChanged -= OnServerStateChanged;
         }
         private void TransformStateChanged(NetworkTransformState transformState)
         {
@@ -61,7 +63,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
             // Update weapon
-            _weapon.UpdateWeapon(_currentWeaponInputState, GetShootPosition(transformState.Position), GetShootDirection(transformState.LookRotation), transformState.Velocity.XZ().magnitude);
+            _weapon.UpdateWeapon(_currentWeaponInputState, WeaponTransform.position, GetShootDirection(transformState.LookRotation), transformState.Velocity.XZ().magnitude);
         }
         [ServerRpc]
         private void OnInputServerRpc(NetworkWeaponInputState state)
@@ -71,12 +73,12 @@ namespace ExoplanetStudios.ExtractionShooter
                 ExecuteInput(state);
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
-            else if (state.Tick > NetworkManager.LocalTime.Tick)
+            else if (state.Tick > NetworkManager.LocalTime.Tick && !_receivedActions.ContainsKey(state.Tick))
                 _receivedActions.Add(state.Tick, state);
         }
-        private void OnServerStateChanged(NetworkWeaponInputState state)
+        private void OnServerStateChanged(NetworkWeaponInputState oldState, NetworkWeaponInputState state)
         {
-            if (IsOwner) return;
+            if (IsServer || IsOwner) return;
 
             ExecuteInput(state);
         }
@@ -105,7 +107,6 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _currentWeaponInputState = weaponInputState;
         }
-        private Vector3 GetShootPosition(Vector3 playerPosition) => playerPosition + Vector3.up * CAMERA_Y_OFFSET;
         private Vector3 GetShootDirection(Vector2 lookRotation) => Quaternion.Euler(lookRotation.x, lookRotation.y, 0) * Vector3.forward;
     }
 }

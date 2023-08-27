@@ -16,7 +16,8 @@ namespace ExoplanetStudios.ExtractionShooter
 		[Tooltip("Rotation speed of the character")]
 		[SerializeField] private float RotationSpeed = 1.0f;
 		[Tooltip("Acceleration and deceleration")]
-		[SerializeField] private float GroundSpeedChangeRate = 8.0f;
+		[SerializeField] private float GroundAccelerationRate = 8.0f;
+		[SerializeField] private float GroundDecelerationRate = 8.0f;
 		[SerializeField] private float AirSpeedChangeRate = 3.0f;
 
 		[Space(10)]
@@ -65,6 +66,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
 		private const float SPEED_OFFSET = 0.05f;
+		
 
 		private InputMaster _controls; // Owneronly
 		private CharacterController _controller;
@@ -342,14 +344,20 @@ namespace ExoplanetStudios.ExtractionShooter
 
 			// accelerate or decelerate to target speed
 			if ((horizontalVelocity - targetHorizontalVelocity).sqrMagnitude > SPEED_OFFSET)
-			{
-				float speedChangeRate = grounded ? GroundSpeedChangeRate : AirSpeedChangeRate;
-				horizontalVelocity = Vector2.Lerp(horizontalVelocity, targetHorizontalVelocity, NetworkManager.LocalTime.FixedDeltaTime * speedChangeRate);
-			}
+				horizontalVelocity = Vector2.Lerp(horizontalVelocity, targetHorizontalVelocity, NetworkManager.LocalTime.FixedDeltaTime * CalculateAcceleration(grounded, horizontalVelocity, targetHorizontalVelocity));
 			else
 				horizontalVelocity = targetHorizontalVelocity;
 
 			return horizontalVelocity.AddHeight(verticalVelocity);
+
+
+			float CalculateAcceleration(bool grounded, Vector2 horizontalVelocity, Vector2 targetHorizontalVelocity)
+			{
+				if (!grounded)
+					return AirSpeedChangeRate;
+				
+				return (horizontalVelocity.sqrMagnitude < targetHorizontalVelocity.sqrMagnitude) ? GroundAccelerationRate : GroundDecelerationRate;
+			}
 		}
 
 		private float CalculateGravity(bool jump, bool grounded)
