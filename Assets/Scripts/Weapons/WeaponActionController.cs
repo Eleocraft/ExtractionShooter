@@ -9,10 +9,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private GlobalInputs GI;
         [SerializeField] private Weapon MainWeapon;
         [SerializeField] private Transform WeaponTransform;
-        [SerializeField] private float MinLockonRange;
-        [SerializeField] private float MaxLockonRange;
 
-        private const float CAMERA_Y_POSITION = 1.6f;
         private Vector3 _weaponPos;
         private FirstPersonController _firstPersonController;
 
@@ -70,7 +67,7 @@ namespace ExoplanetStudios.ExtractionShooter
             }
             // Update weapon
             Vector3 weaponPosition = transformState.Position + (Quaternion.Euler(transformState.LookRotation.x, transformState.LookRotation.y, 0) * _weaponPos);
-            _weapon.UpdateWeapon(_currentWeaponInputState, weaponPosition, GetShootDirection(weaponPosition, transformState.Position, transformState.LookRotation), transformState.Velocity.XZ().magnitude);
+            _weapon.UpdateWeapon(_currentWeaponInputState, transformState, weaponPosition, transformState.Velocity.XZ().magnitude);
         }
         [ServerRpc]
         private void OnInputServerRpc(NetworkWeaponInputState state)
@@ -113,14 +110,6 @@ namespace ExoplanetStudios.ExtractionShooter
             }
 
             _currentWeaponInputState = weaponInputState;
-        }
-        private Vector3 GetShootDirection(Vector3 weaponPosition, Vector3 playerPosition, Vector2 lookRotation)
-        {
-            Vector3 lookDirection = Quaternion.Euler(lookRotation.x, lookRotation.y, 0) * Vector3.forward;
-            if (Physics.Raycast(Vector3.up * CAMERA_Y_POSITION + playerPosition, lookDirection, out RaycastHit hitInfo, MaxLockonRange) && hitInfo.distance > MinLockonRange)
-                return (hitInfo.point - weaponPosition).normalized;
-            
-            return lookDirection;
         }
     }
 }
