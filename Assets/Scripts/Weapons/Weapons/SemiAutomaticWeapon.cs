@@ -14,13 +14,13 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _shoot = true;
         }
-        public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, Vector3 position, Vector3 direction, float velocity)
+        public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, Vector3 weaponPos, float velocity)
         {
             if (_cooldown > 0)
                 _cooldown -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             else if (_shoot)
             {
-                Projectile.SpawnProjectile(projectileInfo, position, direction, OwnerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(projectileInfo, weaponPos, GetShootDirection(weaponPos, playerState), OwnerId, weaponInputState.TickDiff);
                 _cooldown = Cooldown;
                 _shoot = false;
             }

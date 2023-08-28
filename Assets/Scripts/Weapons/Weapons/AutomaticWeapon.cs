@@ -27,7 +27,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _sprayIncreaseSpeed = 1f / MaxSprayReachTime;
             _sprayDecreaseSpeed = 1f / SprayResetTime;
         }
-        public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, Vector3 position, Vector3 direction, float velocity)
+        public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, Vector3 weaponPos, float velocity)
         {
             // Spray Calculations
             if (weaponInputState.PrimaryAction)
@@ -42,11 +42,12 @@ namespace ExoplanetStudios.ExtractionShooter
             // actual shooting
             else if (weaponInputState.PrimaryAction)
             {
-                Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*720f-360f, 0, (float)_rng.NextDouble()*720f-360f) * Vector3.up;
-                Vector3 rotationVector = Vector3.Cross(direction, randomVector).normalized;
+                Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*360f-180f, 0, (float)_rng.NextDouble()*360f-180f) * Vector3.up;
+                Vector3 shootDirection = GetShootDirection(weaponPos, playerState);
+                Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
                 float spray = _relativeSpray * MaxSpray;
                 float movementError = velocity * MovementError;
-                Projectile.SpawnProjectile(projectileInfo, position, Quaternion.AngleAxis((spray + movementError) * (float)_rng.NextDouble(), rotationVector) * direction, OwnerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(projectileInfo, weaponPos, Quaternion.AngleAxis((spray + movementError) * (float)_rng.NextDouble(), rotationVector) * shootDirection, OwnerId, weaponInputState.TickDiff);
                 _cooldown += Cooldown;
             }
         }
