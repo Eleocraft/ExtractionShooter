@@ -20,7 +20,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public float MaxDistance;
         public float MinVelocity;
         [Header("Graphics")]
-        public GameObject Prefab;
+        public ProjectileGraphic Prefab;
         public HitMarker HitMarker;
         public HitMarker PenetrateMarker;
         public HitMarker ExitMarker;

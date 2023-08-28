@@ -12,7 +12,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private ProjectileInfo _info;
         private float _sqrMaxDistance;
         private ulong _ownerId;
-        private GameObject _displayObject;
+        private ProjectileGraphic _displayObject;
         private float _sqrMinVelocity;
 
         private int _tickDiff;
@@ -40,6 +40,8 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             NetworkManager.Singleton.NetworkTickSystem.Tick -= Tick;
             PlayerBulletHitboxManager.RemoveBullet(_tickDiff);
+
+            _displayObject.EndProjectile();
         }
         public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
         {
@@ -51,8 +53,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 movement = _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             transform.position += movement;
 
-            _displayObject.transform.position = transform.position;
-            _displayObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, _velocity);
+            _displayObject.SetPositionAndDirection(transform.position, _velocity);
 
             Hitscan(movement, _lastPosition, ref _velocity);
 

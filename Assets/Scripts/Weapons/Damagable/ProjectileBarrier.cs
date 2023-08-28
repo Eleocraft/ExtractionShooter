@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class BulletBarrier : MonoBehaviour, IDamagable
+    public class ProjectileBarrier : MonoBehaviour, IDamagable
     {
         public void OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ref Vector3 velocity)
         {

@@ -129,8 +129,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Playermodel: {fileID: 3637600293124795170, guid: 35200bd5f0019b44ca8fa7e8d605a211,
     type: 3}
-  MoveSpeed: 4
-  SprintSpeed: 8
+  MoveSpeed: 3
+  SprintSpeed: 6
   RotationSpeed: 0.3
   GroundAccelerationRate: 10
   GroundDecelerationRate: 20
@@ -164,6 +164,8 @@ MonoBehaviour:
   GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
   MainWeapon: {fileID: 11400000, guid: f8bd593bd5742d446867d9d78522d065, type: 2}
   WeaponTransform: {fileID: 7801753223300285075}
+  MinLockonRange: 3
+  MaxLockonRange: 80
 --- !u!114 &3974214662581333730
 MonoBehaviour:
   m_ObjectHideFlags: 0
