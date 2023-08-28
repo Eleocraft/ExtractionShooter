@@ -14,6 +14,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _shoot = true;
         }
+        public override void Initialize(bool IsOwner) { }
         public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, Vector3 weaponPos, float velocity)
         {
             if (_cooldown > 0)

@@ -13,7 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private bool _isOwner;
 
         private const string CAMERA_POS_NAME = "CameraPos";
-		private const string PLAYER_CAM_TAG = "PlayerCam";
+		public const string PLAYER_CAM_TAG = "PlayerCam";
         public void SetOwner()
         {
             _isOwner = true;

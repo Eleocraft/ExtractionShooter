@@ -28,6 +28,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _weapon = Instantiate(MainWeapon);
             _weapon.OwnerId = OwnerClientId;
+            _weapon.Initialize(IsOwner);
             _firstPersonController = GetComponent<FirstPersonController>();
 
             _weaponPos = WeaponTransform.position - transform.position;
@@ -66,7 +67,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
             // Update weapon
-            Vector3 weaponPosition = transformState.Position + (Quaternion.Euler(transformState.LookRotation.x, transformState.LookRotation.y, 0) * _weaponPos);
+            Vector3 weaponPosition = transformState.Position + (Quaternion.Euler(0, transformState.LookRotation.y, 0) * _weaponPos);
             _weapon.UpdateWeapon(_currentWeaponInputState, transformState, weaponPosition, transformState.Velocity.XZ().magnitude);
         }
         [ServerRpc]
@@ -89,7 +90,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private NetworkWeaponInputState GetNetworkInputState()
         {
             return new NetworkWeaponInputState(_controls.Mouse.PrimaryAction.ReadValue<float>().AsBool(),
-                _controls.Mouse.PrimaryAction.ReadValue<float>().AsBool(), NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
+                _controls.Mouse.SecondaryAction.ReadValue<float>().AsBool(), NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
         }
         private void ExecuteInput(NetworkWeaponInputState weaponInputState)
         {

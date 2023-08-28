@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Automatic
   m_EditorClassIdentifier: 
   OwnerId: 0
+  MinLockonRange: 2
+  MaxLockonRange: 80
   projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}
   Cooldown: 0.1
   MaxSpray: 2
@@ -20,3 +22,4 @@ MonoBehaviour:
   SprayResetTime: 0.5
   SpraySeed: 14332
   MovementError: 2
+  ADSFOV: 50
