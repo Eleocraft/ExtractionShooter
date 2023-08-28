@@ -8,7 +8,12 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private GlobalInputs GI;
         [SerializeField] private Weapon MainWeapon;
+        [SerializeField] private Transform WeaponTransform;
+        [SerializeField] private float MinLockonRange;
+        [SerializeField] private float MaxLockonRange;
 
+        private const float CAMERA_Y_POSITION = 1.6f;
+        private Vector3 _weaponPos;
         private FirstPersonController _firstPersonController;
 
         // Owner
@@ -17,7 +22,6 @@ namespace ExoplanetStudios.ExtractionShooter
         
         // Server
         private Dictionary<int, NetworkWeaponInputState> _receivedActions; // Serveronly
-        private const float CAMERA_Y_OFFSET = 1.59f; // Temp
 
         // NetworkWeaponInputStates
         private NetworkVariable<NetworkWeaponInputState> _serverWeaponInputState = new NetworkVariable<NetworkWeaponInputState>();
@@ -29,18 +33,22 @@ namespace ExoplanetStudios.ExtractionShooter
             _weapon.OwnerId = OwnerClientId;
             _firstPersonController = GetComponent<FirstPersonController>();
 
+            _weaponPos = WeaponTransform.position - transform.position;
+
             if (IsServer)
                 _receivedActions = new Dictionary<int, NetworkWeaponInputState>();
             if (IsOwner)
                 _controls = GI.Controls;
                 
             _firstPersonController.TransformStateChanged += TransformStateChanged;
+            _serverWeaponInputState.OnValueChanged += OnServerStateChanged;
         }
         public override void OnDestroy()
         {
             base.OnDestroy();
 
             _firstPersonController.TransformStateChanged -= TransformStateChanged;
+            _serverWeaponInputState.OnValueChanged -= OnServerStateChanged;
         }
         private void TransformStateChanged(NetworkTransformState transformState)
         {
@@ -61,7 +69,8 @@ namespace ExoplanetStudios.ExtractionShooter
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
             // Update weapon
-            _weapon.UpdateWeapon(_currentWeaponInputState, GetShootPosition(transformState.Position), GetShootDirection(transformState.LookRotation), transformState.Velocity.XZ().magnitude);
+            Vector3 weaponPosition = transformState.Position + (Quaternion.Euler(transformState.LookRotation.x, transformState.LookRotation.y, 0) * _weaponPos);
+            _weapon.UpdateWeapon(_currentWeaponInputState, weaponPosition, GetShootDirection(weaponPosition, transformState.Position, transformState.LookRotation), transformState.Velocity.XZ().magnitude);
         }
         [ServerRpc]
         private void OnInputServerRpc(NetworkWeaponInputState state)
@@ -71,12 +80,12 @@ namespace ExoplanetStudios.ExtractionShooter
                 ExecuteInput(state);
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
-            else if (state.Tick > NetworkManager.LocalTime.Tick)
+            else if (state.Tick > NetworkManager.LocalTime.Tick && !_receivedActions.ContainsKey(state.Tick))
                 _receivedActions.Add(state.Tick, state);
         }
-        private void OnServerStateChanged(NetworkWeaponInputState state)
+        private void OnServerStateChanged(NetworkWeaponInputState oldState, NetworkWeaponInputState state)
         {
-            if (IsOwner) return;
+            if (IsServer || IsOwner) return;
 
             ExecuteInput(state);
         }
@@ -105,7 +114,13 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _currentWeaponInputState = weaponInputState;
         }
-        private Vector3 GetShootPosition(Vector3 playerPosition) => playerPosition + Vector3.up * CAMERA_Y_OFFSET;
-        private Vector3 GetShootDirection(Vector2 lookRotation) => Quaternion.Euler(lookRotation.x, lookRotation.y, 0) * Vector3.forward;
+        private Vector3 GetShootDirection(Vector3 weaponPosition, Vector3 playerPosition, Vector2 lookRotation)
+        {
+            Vector3 lookDirection = Quaternion.Euler(lookRotation.x, lookRotation.y, 0) * Vector3.forward;
+            if (Physics.Raycast(Vector3.up * CAMERA_Y_POSITION + playerPosition, lookDirection, out RaycastHit hitInfo, MaxLockonRange) && hitInfo.distance > MinLockonRange)
+                return (hitInfo.point - weaponPosition).normalized;
+            
+            return lookDirection;
+        }
     }
 }

@@ -1151,6 +1151,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dumdums
       objectReference: {fileID: 0}
+    - target: {fileID: 3453497160093288170, guid: c45cb1aae5dba364da5de4e1f16cd388,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7391258311189254995, guid: c45cb1aae5dba364da5de4e1f16cd388,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1303,6 +1308,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Dumdums (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3453497160093288170, guid: c45cb1aae5dba364da5de4e1f16cd388,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7391258311189254995, guid: c45cb1aae5dba364da5de4e1f16cd388,
         type: 3}
@@ -1949,7 +1959,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bcf5b9234d9ec704f9231ddc7483fe0d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2d91ce04de665f64ba9b66241d261e10, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2124,6 +2134,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Dumdums (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3453497160093288170, guid: c45cb1aae5dba364da5de4e1f16cd388,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7391258311189254995, guid: c45cb1aae5dba364da5de4e1f16cd388,
         type: 3}
@@ -3970,7 +3985,7 @@ PrefabInstance:
     - target: {fileID: 887657531600989122, guid: d627ace6b9ad9644a8b5264dae41f59a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.83333457
+      value: 0.53
       objectReference: {fileID: 0}
     - target: {fileID: 887657531600989122, guid: d627ace6b9ad9644a8b5264dae41f59a,
         type: 3}

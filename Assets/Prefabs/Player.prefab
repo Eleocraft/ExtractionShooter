@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2369675754234580445
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7801753223300285075}
+  m_Layer: 7
+  m_Name: WeaponPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7801753223300285075
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2369675754234580445}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.2, y: 1.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 540658265090185713}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5565047739996945905
 GameObject:
   m_ObjectHideFlags: 0
@@ -34,7 +65,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7801753223300285075}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &949028256853859375
@@ -97,10 +129,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Playermodel: {fileID: 3637600293124795170, guid: 35200bd5f0019b44ca8fa7e8d605a211,
     type: 3}
-  MoveSpeed: 4
-  SprintSpeed: 8
+  MoveSpeed: 3
+  SprintSpeed: 6
   RotationSpeed: 0.3
-  GroundSpeedChangeRate: 10
+  GroundAccelerationRate: 10
+  GroundDecelerationRate: 20
   AirSpeedChangeRate: 5
   JumpHeight: 1.71
   Gravity: -30
@@ -130,6 +163,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
   MainWeapon: {fileID: 11400000, guid: f8bd593bd5742d446867d9d78522d065, type: 2}
+  WeaponTransform: {fileID: 7801753223300285075}
+  MinLockonRange: 3
+  MaxLockonRange: 80
 --- !u!114 &3974214662581333730
 MonoBehaviour:
   m_ObjectHideFlags: 0
