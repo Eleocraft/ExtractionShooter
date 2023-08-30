@@ -19,11 +19,11 @@ MonoBehaviour:
   ADSFOV: 50
   firstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
   secondShotInfo: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
-  Cooldown: 0.3
-  TimeUntilSecondShot: 0.1
+  Cooldown: 1
+  TimeUntilSecondShot: 0.13
   firstShotSpray:
-    startValue: 0.5
-    endValue: 3
+    startValue: 0.26
+    endValue: 2.76
     sliderMin: 0
     sliderMax: 5
   firstShotSprayADS:
@@ -32,13 +32,13 @@ MonoBehaviour:
     sliderMin: 0
     sliderMax: 5
   secondShotSpray:
-    startValue: 7.0499997
-    endValue: 11.28
+    startValue: 5.49
+    endValue: 9.719999
     sliderMin: 5
     sliderMax: 15
   ShotsUntilMaxSpray: 4
-  SprayResetTime: 3
+  SprayResetTime: 2.5
   SpraySeed: 123214
-  MovementError: 3
+  MovementError: 1.5
   firstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
   secondShotAudio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
