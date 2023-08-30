@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c07420cc09fb4c409ba3c4fcdd04df7, type: 3}
+  m_Name: WheellockFirstShot
+  m_EditorClassIdentifier: 
+  Damages:
+    values:
+    - name: Default
+      key: 0
+      value: 20
+    - name: Headshot
+      key: 1
+      value: 50
+  MuzzleVelocity: 200
+  Drag: 0.6
+  Dropoff: 9.81
+  PenetrationForce: 0.017
+  MaxDistance: 200
+  MinVelocity: 20
+  Prefab: {fileID: -406850179386133358, guid: dde4e3477d432684d90158d6e538fb9d, type: 3}
+  HitMarker: {fileID: 7882812698031039389, guid: 2c512890680e9564b825dfb025b298a3,
+    type: 3}
+  PenetrateMarker: {fileID: 7882812698031039389, guid: adb0c5e100999ab44b168c830eae7736,
+    type: 3}
+  ExitMarker: {fileID: 7882812698031039389, guid: b72bf6366dd5c014f9130da31c202ccd,
+    type: 3}

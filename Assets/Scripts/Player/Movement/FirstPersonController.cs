@@ -82,7 +82,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private NetworkTransformState _lastSaveTransform; // Serveronly
 
 		// Interpolation
-		private PlayerInterpolation _interpolation;
+		[HideInInspector] public PlayerInterpolation PlayerModel;
 
 		// Constants
 		private const int BUFFER_SIZE = 200;
@@ -90,10 +90,13 @@ namespace ExoplanetStudios.ExtractionShooter
 		private const float MOVEMENT_ERROR_THRESHOLD = 0.03f;
 		private const float ROTATION_ERROR_THRESHOLD = 0.02f;
 
-		public override void OnNetworkSpawn()
+		private void Awake()
 		{
 			// Instantiate the playermodel
-			_interpolation = Instantiate(Playermodel);
+			PlayerModel = Instantiate(Playermodel);
+		}
+		public override void OnNetworkSpawn()
+		{
 			// the square root of H * -2 * G = how much velocity needed to reach desired height
 			_jumpVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 			_controller = GetComponent<CharacterController>();
@@ -112,7 +115,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			}
 			if (IsOwner)
 			{
-				_interpolation.SetOwner();
+				PlayerModel.SetOwner();
 				_controls = GI.Controls;
 				_controls.Player.Jump.started += JumpInput;
 			}
@@ -257,7 +260,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				_currentTransformState = receivedState;
 				transform.position = _currentTransformState.Position;
-				_interpolation.SetInterpolationStates(previouseState.LookRotation, _currentTransformState);
+				PlayerModel.SetInterpolationStates(previouseState.LookRotation, _currentTransformState);
 			}
 		}
 		private NetworkInputState CreateInputState()
@@ -280,7 +283,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			Vector2 lookRotation = _currentTransformState.LookRotation + inputState.LookDelta;
 
 			// Start interpolation state
-			_interpolation.SetStartInterpolationState(lookRotation);
+			PlayerModel.SetStartInterpolationState(lookRotation);
 
 			// rotation
 			lookRotation.x = Mathf.Clamp(lookRotation.x, BottomClamp, TopClamp);
@@ -295,7 +298,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity);
 
 			// End interpolation state
-			_interpolation.SetEndInterpolationState(_currentTransformState);
+			PlayerModel.SetEndInterpolationState(_currentTransformState);
 		}
 		private bool GroundedCheck()
 		{
@@ -316,7 +319,7 @@ namespace ExoplanetStudios.ExtractionShooter
 				// if this is the owner the lookrotation should be calculated locally
 				ReadRotationDelta();
 				Vector2 lookRotation = GetLocalLookRotation();
-				_interpolation.Rotate(lookRotation);
+				PlayerModel.Rotate(lookRotation);
 			}
 		}
 		private void ReadRotationDelta()

@@ -4,11 +4,26 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public abstract class Weapon : ScriptableObject
     {
-        [HideInInspector] public ulong OwnerId;
+        protected ulong _ownerId;
+        [SerializeField] private GameObject WeaponPrefab;
         [SerializeField] private float MinLockonRange;
         [SerializeField] private float MaxLockonRange;
-        public abstract void Initialize(bool IsOwner);
-        public abstract void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, Vector3 weaponPos, float velocity);
+
+        private Vector3 _relativeWeaponPos;
+        protected GameObject _weaponObject;
+
+        public virtual void Initialize(ulong ownerId, bool isOwner, Transform weaponPos)
+        {
+            _relativeWeaponPos = weaponPos.localPosition;
+            _ownerId = ownerId;
+            if (isOwner)
+                _weaponObject = Instantiate(WeaponPrefab, weaponPos);
+        }
+        private void OnDestroy()
+        {
+            Destroy(_weaponObject);
+        }
+        public abstract void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
         public virtual void StartPrimaryAction() { }
         public virtual void StopPrimaryAction() { }
         public virtual void StartSecondaryAction() { }
@@ -16,14 +31,18 @@ namespace ExoplanetStudios.ExtractionShooter
         
         private const float CAMERA_Y_POSITION = 1.6f;
         protected Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * CAMERA_Y_POSITION + playerState.Position;
+        protected Vector3 GetWeaponPosition(NetworkTransformState playerState) => GetCameraPosition(playerState) + (Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * _relativeWeaponPos);
         protected Vector3 GetLookDirection(NetworkTransformState playerState) => Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * Vector3.forward;
-        protected Vector3 GetShootDirection(Vector3 weaponPosition, NetworkTransformState playerState)
+        protected Vector3 GetShootDirection(NetworkTransformState playerState)
         {
+            Vector3 cameraPosition = GetCameraPosition(playerState);
+            Vector3 weaponPosition = GetWeaponPosition(playerState);
+
             Vector3 lookDirection = GetLookDirection(playerState);
-            if (Physics.Raycast(GetCameraPosition(playerState), lookDirection, out RaycastHit hitInfo, MaxLockonRange) && hitInfo.distance > MinLockonRange)
+            if (Physics.Raycast(cameraPosition, lookDirection, out RaycastHit hitInfo, MaxLockonRange) && hitInfo.distance > MinLockonRange)
                 return (hitInfo.point - weaponPosition).normalized;
             
-            return lookDirection;
+            return (cameraPosition + lookDirection * MaxLockonRange - weaponPosition).normalized;
         }
     }
 }

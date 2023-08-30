@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CinemachineTarget
   - PlayerCam
+  - GunAudioSource
   layers:
   - Default
   - TransparentFX

@@ -6,6 +6,7 @@ namespace ExoplanetStudios.ExtractionShooter
     public class PlayerInterpolation : MonoBehaviour
     {
         [SerializeField] private Transform CameraSocket;
+        public Transform WeaponTransform;
 
         private InterpolationState _lerpStartInterpolationState;
 		private InterpolationState _lerpEndInterpolationState;

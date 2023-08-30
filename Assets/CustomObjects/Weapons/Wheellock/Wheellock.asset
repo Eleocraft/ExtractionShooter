@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a91481c85a810114daee984fcd2c4de9, type: 3}
+  m_Name: Wheellock
+  m_EditorClassIdentifier: 
+  WeaponPrefab: {fileID: 3726804448589417541, guid: b120790e657f1cb4480e058063a4d548,
+    type: 3}
+  MinLockonRange: 2
+  MaxLockonRange: 80
+  ADSFOV: 50
+  firstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
+  secondShotInfo: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
+  Cooldown: 0.3
+  TimeUntilSecondShot: 0.1
+  firstShotSpray:
+    startValue: 0.5
+    endValue: 3
+    sliderMin: 0
+    sliderMax: 5
+  firstShotSprayADS:
+    startValue: 0
+    endValue: 1
+    sliderMin: 0
+    sliderMax: 5
+  secondShotSpray:
+    startValue: 7.0499997
+    endValue: 11.28
+    sliderMin: 5
+    sliderMax: 15
+  ShotsUntilMaxSpray: 4
+  SprayResetTime: 3
+  SpraySeed: 123214
+  MovementError: 3
+  firstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
+  secondShotAudio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}

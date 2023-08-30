@@ -8,9 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private GlobalInputs GI;
         [SerializeField] private Weapon MainWeapon;
-        [SerializeField] private Transform WeaponTransform;
 
-        private Vector3 _weaponPos;
         private FirstPersonController _firstPersonController;
 
         // Owner
@@ -26,12 +24,9 @@ namespace ExoplanetStudios.ExtractionShooter
 
         public override void OnNetworkSpawn()
         {
-            _weapon = Instantiate(MainWeapon);
-            _weapon.OwnerId = OwnerClientId;
-            _weapon.Initialize(IsOwner);
             _firstPersonController = GetComponent<FirstPersonController>();
-
-            _weaponPos = WeaponTransform.position - transform.position;
+            _weapon = Instantiate(MainWeapon);
+            _weapon.Initialize(OwnerClientId, IsOwner, _firstPersonController.PlayerModel.WeaponTransform);
 
             if (IsServer)
                 _receivedActions = new Dictionary<int, NetworkWeaponInputState>();
@@ -67,8 +62,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
             // Update weapon
-            Vector3 weaponPosition = transformState.Position + (Quaternion.Euler(0, transformState.LookRotation.y, 0) * _weaponPos);
-            _weapon.UpdateWeapon(_currentWeaponInputState, transformState, weaponPosition, transformState.Velocity.XZ().magnitude);
+            _weapon.UpdateWeapon(_currentWeaponInputState, transformState);
         }
         [ServerRpc]
         private void OnInputServerRpc(NetworkWeaponInputState state)

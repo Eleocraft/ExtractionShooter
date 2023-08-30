@@ -9,11 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94beb7537bf7af842a05e90da99e8c0c, type: 3}
-  m_Name: SemiAutomaticWeapon
+  m_Script: {fileID: 11500000, guid: df2975fe62b16814fbd9ece340aec5cd, type: 3}
+  m_Name: Automatic
   m_EditorClassIdentifier: 
-  OwnerId: 0
+  WeaponPrefab: {fileID: 3726804448589417541, guid: b120790e657f1cb4480e058063a4d548,
+    type: 3}
   MinLockonRange: 2
   MaxLockonRange: 80
+  ADSFOV: 50
   projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}
-  Cooldown: 0.15
+  Cooldown: 0.1
+  MaxSpray: 3
+  ADSMaxSpray: 1
+  MaxSprayReachTime: 2
+  SprayResetTime: 0.5
+  SpraySeed: 14332
+  MovementError: 2
