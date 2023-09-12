@@ -26,7 +26,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _firstPersonController = GetComponent<FirstPersonController>();
             _weapon = Instantiate(MainWeapon);
-            _weapon.Initialize(OwnerClientId, IsOwner, _firstPersonController.PlayerModel.WeaponTransform);
+            _weapon.Initialize(OwnerClientId, IsOwner, _firstPersonController.PlayerModel.WeaponTransform, _firstPersonController.PlayerModel.CameraSocket);
 
             if (IsServer)
                 _receivedActions = new Dictionary<int, NetworkWeaponInputState>();

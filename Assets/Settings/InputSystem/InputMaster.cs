@@ -46,7 +46,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Sprint"",
+                    ""name"": ""SlowWalk"",
                     ""type"": ""PassThrough"",
                     ""id"": ""980e881e-182c-404c-8cbf-3d09fdb48fef"",
                     ""expectedControlType"": """",
@@ -209,7 +209,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
-                    ""action"": ""Sprint"",
+                    ""action"": ""SlowWalk"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -447,7 +447,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
-        m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+        m_Player_SlowWalk = m_Player.FindAction("SlowWalk", throwIfNotFound: true);
         m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
         m_Player_Utility = m_Player.FindAction("Utility", throwIfNotFound: true);
         m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
@@ -528,7 +528,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Jump;
-    private readonly InputAction m_Player_Sprint;
+    private readonly InputAction m_Player_SlowWalk;
     private readonly InputAction m_Player_Interaction;
     private readonly InputAction m_Player_Utility;
     private readonly InputAction m_Player_Reload;
@@ -539,7 +539,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public PlayerActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
-        public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+        public InputAction @SlowWalk => m_Wrapper.m_Player_SlowWalk;
         public InputAction @Interaction => m_Wrapper.m_Player_Interaction;
         public InputAction @Utility => m_Wrapper.m_Player_Utility;
         public InputAction @Reload => m_Wrapper.m_Player_Reload;
@@ -559,9 +559,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @Sprint.started += instance.OnSprint;
-            @Sprint.performed += instance.OnSprint;
-            @Sprint.canceled += instance.OnSprint;
+            @SlowWalk.started += instance.OnSlowWalk;
+            @SlowWalk.performed += instance.OnSlowWalk;
+            @SlowWalk.canceled += instance.OnSlowWalk;
             @Interaction.started += instance.OnInteraction;
             @Interaction.performed += instance.OnInteraction;
             @Interaction.canceled += instance.OnInteraction;
@@ -584,9 +584,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @Sprint.started -= instance.OnSprint;
-            @Sprint.performed -= instance.OnSprint;
-            @Sprint.canceled -= instance.OnSprint;
+            @SlowWalk.started -= instance.OnSlowWalk;
+            @SlowWalk.performed -= instance.OnSlowWalk;
+            @SlowWalk.canceled -= instance.OnSlowWalk;
             @Interaction.started -= instance.OnInteraction;
             @Interaction.performed -= instance.OnInteraction;
             @Interaction.canceled -= instance.OnInteraction;
@@ -799,7 +799,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
-        void OnSprint(InputAction.CallbackContext context);
+        void OnSlowWalk(InputAction.CallbackContext context);
         void OnInteraction(InputAction.CallbackContext context);
         void OnUtility(InputAction.CallbackContext context);
         void OnReload(InputAction.CallbackContext context);

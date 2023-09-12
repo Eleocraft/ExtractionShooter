@@ -33,18 +33,18 @@ namespace ExoplanetStudios.ExtractionShooter
         private float _sprayIncreaseByShot;
         private float _secondShotTimer;
 
-        private AudioSource _gunAudioSource;
+        private AudioSource[] _gunAudioSource;
         private bool _shot;
 
-        public override void Initialize(ulong ownerId, bool isOwner, Transform weaponPos)
+        public override void Initialize(ulong ownerId, bool isOwner, Transform weaponTransform, Transform cameraTransform)
         {
-            base.Initialize(ownerId, isOwner, weaponPos);
+            base.Initialize(ownerId, isOwner, weaponTransform, cameraTransform);
 
             if (_rng == null)
                 _rng = new System.Random(SpraySeed);
             _sprayDecreaseSpeed = 1f / SprayResetTime;
             _sprayIncreaseByShot = 1f / ShotsUntilMaxSpray;
-            _gunAudioSource = GameObject.FindGameObjectWithTag("GunAudioSource").GetComponent<AudioSource>();
+            _gunAudioSource = _weaponObject.GetComponentsInChildren<AudioSource>();
         }
         public override void StopPrimaryAction()
         {
@@ -75,14 +75,14 @@ namespace ExoplanetStudios.ExtractionShooter
             void FirstShot()
             {
                 Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*360f-180f, 0, (float)_rng.NextDouble()*360f-180f) * Vector3.up;
-                Vector3 shootDirection = weaponInputState.SecondaryAction ? GetLookDirection(playerState) : GetShootDirection(playerState);
+                Vector3 shootDirection = GetLookDirection(playerState);
                 Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
 
                 float spray = weaponInputState.SecondaryAction ? firstShotSprayADS.Evaluate(_relativeSpray) : firstShotSpray.Evaluate(_relativeSpray);
                 float movementError = playerState.Velocity.XZ().magnitude * MovementError;
 
-                Projectile.SpawnProjectile(firstShotInfo, weaponInputState.SecondaryAction ? GetCameraPosition(playerState) : GetWeaponPosition(playerState), Quaternion.AngleAxis(spray + movementError, rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
-                _gunAudioSource.PlayOneShot(firstShotAudio);
+                Projectile.SpawnProjectile(firstShotInfo, GetCameraPosition(playerState), Quaternion.AngleAxis(spray + movementError, rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
+                _gunAudioSource[0].PlayOneShot(firstShotAudio);
 
                 _secondShotTimer = TimeUntilSecondShot;
                 _shot = true;
@@ -90,14 +90,14 @@ namespace ExoplanetStudios.ExtractionShooter
             void SecondShot()
             {
                 Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*360f-180f, 0, (float)_rng.NextDouble()*360f-180f) * Vector3.up;
-                Vector3 shootDirection = weaponInputState.SecondaryAction ? GetLookDirection(playerState) : GetShootDirection(playerState); 
+                Vector3 shootDirection = GetLookDirection(playerState); 
                 Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
 
                 float spray = secondShotSpray.Evaluate(_relativeSpray);
                 float movementError = playerState.Velocity.XZ().magnitude * MovementError;
 
-                Projectile.SpawnProjectile(secondShotInfo, weaponInputState.SecondaryAction ? GetCameraPosition(playerState) : GetWeaponPosition(playerState), Quaternion.AngleAxis(spray + movementError, rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
-                _gunAudioSource.PlayOneShot(secondShotAudio);
+                Projectile.SpawnProjectile(secondShotInfo, GetCameraPosition(playerState), Quaternion.AngleAxis(spray + movementError, rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
+                _gunAudioSource[1].PlayOneShot(secondShotAudio);
 
                 _cooldown = Cooldown;
                 _relativeSpray += _sprayIncreaseByShot;

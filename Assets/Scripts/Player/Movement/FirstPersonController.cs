@@ -9,16 +9,20 @@ namespace ExoplanetStudios.ExtractionShooter
 	{
 		[Header("Player")]
 		[SerializeField] private PlayerInterpolation Playermodel;
-		[Tooltip("Move speed of the character in m/s")]
-		[SerializeField] private float MoveSpeed = 4.0f;
-		[Tooltip("Sprint speed of the character in m/s")]
-		[SerializeField] private float SprintSpeed = 6.0f;
+		[Tooltip("Slow walk speed of the character in m/s")]
+		[SerializeField] private float WalkSpeed = 4.0f;
+		[Tooltip("Run speed of the character in m/s")]
+		[SerializeField] private float RunSpeed = 6.0f;
+		[Tooltip("Crouch speed of the character in m/s")]
+		[SerializeField] private float CrouchSpeed = 2.0f;
 		[Tooltip("Rotation speed of the character")]
-		[SerializeField] private float RotationSpeed = 1.0f;
+		[SerializeField] private float RotationSensitivity = 1.0f;
 		[Tooltip("Acceleration and deceleration")]
 		[SerializeField] private float GroundAccelerationRate = 8.0f;
 		[SerializeField] private float GroundDecelerationRate = 8.0f;
 		[SerializeField] private float AirSpeedChangeRate = 3.0f;
+		[Header("Crouch")]
+		[SerializeField] private float CrouchEnterSpeed = 10f;
 
 		[Space(10)]
 		[Tooltip("The height the player can jump")]
@@ -109,7 +113,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// reset Network Variables
 			if (IsServer)
 			{
-				_serverTransformState.Value = new NetworkTransformState(NetworkManager.LocalTime.Tick, transform.position, Vector2.zero, Vector3.zero, false);
+				_serverTransformState.Value = new NetworkTransformState(NetworkManager.LocalTime.Tick, transform.position, Vector2.zero, Vector3.zero, 0);
 				_lastSaveInput = new NetworkInputState(NetworkManager.LocalTime.Tick);
 				_lastSaveTransform = new NetworkTransformState(NetworkManager.LocalTime.Tick);
 			}
@@ -267,12 +271,12 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			return new NetworkInputState(NetworkManager.LocalTime.Tick,
 				Walk ? Vector2.up : _controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
-				!_controls.Player.Sprint.ReadValue<float>().AsBool(), _jump, _controls.Player.Crouch.ReadValue<float>().AsBool());
+				_controls.Player.SlowWalk.ReadValue<float>().AsBool(), _jump, _controls.Player.Crouch.ReadValue<float>().AsBool());
 		}
 		private NetworkTransformState CreateTransformState()
 		{
 			return new NetworkTransformState(NetworkManager.LocalTime.Tick,
-				transform.position, Vector3.forward, Vector3.zero, false);
+				transform.position, Vector3.forward, Vector3.zero, 0);
 		}
 		private void ExecuteInput(NetworkInputState inputState)
 		{
@@ -282,7 +286,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// lookRotation
 			Vector2 lookRotation = _currentTransformState.LookRotation + inputState.LookDelta;
 
-			// Start interpolation state
+			// start interpolation state
 			PlayerModel.SetStartInterpolationState(lookRotation);
 
 			// rotation
@@ -290,12 +294,17 @@ namespace ExoplanetStudios.ExtractionShooter
 			lookRotation.y = lookRotation.y.ClampToAngle();
 			transform.rotation = Quaternion.Euler(0, lookRotation.y, 0);
 
+			// crouch
+			float crouchAmount = CalculateCrouch(inputState.Crouch, _currentTransformState.CrouchAmount);
+			PlayerModel.SetCrouchAmount(crouchAmount);
+
 			// movement
-			Vector3 velocity = CalculateVelocity(inputState, lookRotation);
+			Vector3 velocity = CalculateVelocity(inputState, crouchAmount > 0, lookRotation);
 			Vector3 movement = velocity * NetworkManager.LocalTime.FixedDeltaTime;
 			_controller.Move(movement);
-
-			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity, inputState.Crouch);
+			
+			// Set new transform state
+			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity, crouchAmount);
 
 			// End interpolation state
 			PlayerModel.SetEndInterpolationState(_currentTransformState);
@@ -327,17 +336,21 @@ namespace ExoplanetStudios.ExtractionShooter
 			Vector2 lookInput = _controls.Mouse.Look.ReadValue<Vector2>();
 
 			// Camera rotation
-			_lookDelta.x += lookInput.y * RotationSpeed;
-			_lookDelta.y += lookInput.x * RotationSpeed;
+			_lookDelta.x += lookInput.y * RotationSensitivity;
+			_lookDelta.y += lookInput.x * RotationSensitivity;
 		}
 		private Vector2 GetLocalLookRotation() => _currentTransformState.LookRotation + _lookDelta;
-		private Vector3 CalculateVelocity(NetworkInputState inputState, Vector2 lookRotation)
+		private float CalculateCrouch(bool crouchInput, float current)
+		{
+			return Mathf.MoveTowards(current, crouchInput ? 1f : 0f, CrouchEnterSpeed * NetworkManager.LocalTime.FixedDeltaTime);
+		}
+		private Vector3 CalculateVelocity(NetworkInputState inputState, bool crouch, Vector2 lookRotation)
 		{
 			bool grounded = GroundedCheck();
 			float verticalVelocity = CalculateGravity(inputState.Jump, grounded);
 			
-			// set target speed based on move speed, sprint speed and if sprint is pressed
-			float targetSpeed = inputState.Sprint ? SprintSpeed : MoveSpeed;
+			// set target speed based on if slowWalk or crouch is pressed
+			float targetSpeed = crouch ? CrouchSpeed : inputState.SlowWalk ? WalkSpeed : RunSpeed;
 
 			// target speed is 0 if no key is pressed
 			if (inputState.MovementInput == Vector2.zero) targetSpeed = 0.0f;

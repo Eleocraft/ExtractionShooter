@@ -8,7 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public Vector3 Position;
         public Vector2 LookRotation;
         public Vector3 Velocity;
-        public bool Crouch;
+        public float CrouchAmount;
         public bool Predicted;
 
         public NetworkTransformState() {}
@@ -22,17 +22,17 @@ namespace ExoplanetStudios.ExtractionShooter
             LookRotation = oldState.LookRotation;
             Velocity = oldState.Velocity;
             Predicted = oldState.Predicted;
-            Crouch = oldState.Crouch;
+            CrouchAmount = oldState.CrouchAmount;
             
             Tick = tick;
         }
-        public NetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, Vector3 veloctiy, bool crouch)
+        public NetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, Vector3 veloctiy, float crouch)
         {
             Tick = tick;
             Position = position;
             LookRotation = lookRotation;
             Velocity = veloctiy;
-            Crouch = crouch;
+            CrouchAmount = crouch;
         }
         public override NetworkState GetStateWithTick(int tick) => new NetworkTransformState(this, tick);
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -44,7 +44,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 reader.ReadValueSafe(out Position);
                 reader.ReadValueSafe(out LookRotation);
                 reader.ReadValueSafe(out Velocity);
-                reader.ReadValueSafe(out Crouch);
+                reader.ReadValueSafe(out CrouchAmount);
                 reader.ReadValueSafe(out Predicted);
             }
             else
@@ -54,7 +54,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(Position);
                 writer.WriteValueSafe(LookRotation);
                 writer.WriteValueSafe(Velocity);
-                writer.WriteValueSafe(Crouch);
+                writer.WriteValueSafe(CrouchAmount);
                 writer.WriteValueSafe(Predicted);
             }
         }
@@ -78,7 +78,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 return false;
 
             if (Position == otherState.Position && LookRotation == otherState.LookRotation &&
-                Velocity == otherState.Velocity && Crouch == otherState.Crouch && Predicted == otherState.Predicted)
+                Velocity == otherState.Velocity && CrouchAmount == otherState.CrouchAmount && Predicted == otherState.Predicted)
                 return true;
 
             return false;

@@ -8,9 +8,9 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float ADSFOV;
         private CinemachineVirtualCamera _camera;
         private float _defaultFOV;
-        public override void Initialize(ulong ownerId, bool isOwner, Transform weaponPos)
+        public override void Initialize(ulong ownerId, bool isOwner, Transform weaponTransform, Transform cameraTransform)
         {
-            base.Initialize(ownerId, isOwner, weaponPos);
+            base.Initialize(ownerId, isOwner, weaponTransform, cameraTransform);
 
             if (isOwner)
             {

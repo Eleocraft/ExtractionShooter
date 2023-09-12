@@ -5,13 +5,18 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class PlayerInterpolation : MonoBehaviour
     {
-        [SerializeField] private Transform CameraSocket;
+        public Transform CameraSocket;
         public Transform WeaponTransform;
+        [SerializeField] private float CrouchBodyYScale;
+        [SerializeField] private float CrouchCamYPos;
+        [SerializeField] private Transform Body;
 
         private InterpolationState _lerpStartInterpolationState;
 		private InterpolationState _lerpEndInterpolationState;
         private float _currentTickDeltaTime;        
         private bool _isOwner;
+
+        private float _defaultCameraYPos;
 
         private const string CAMERA_POS_NAME = "CameraPos";
 		public const string PLAYER_CAM_TAG = "PlayerCam";
@@ -37,10 +42,16 @@ namespace ExoplanetStudios.ExtractionShooter
             _lerpEndInterpolationState = new (currentTransformState);
             _currentTickDeltaTime = 0;
         }
+        public void SetCrouchAmount(float crouchAmount)
+        {
+            Body.localScale = Body.localScale.WithHeight(Mathf.Lerp(1, CrouchBodyYScale, crouchAmount));
+            CameraSocket.transform.localPosition = CameraSocket.transform.localPosition.WithHeight(Mathf.Lerp(_defaultCameraYPos, CrouchCamYPos, crouchAmount));
+        }
         private void Start()
         {
             _lerpStartInterpolationState = new InterpolationState(transform.position, Vector2.zero);
 			_lerpEndInterpolationState = new InterpolationState(transform.position, Vector2.zero);
+            _defaultCameraYPos = CameraSocket.localPosition.y;
         }
         private void Update()
 		{

@@ -18,7 +18,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _playerLife = GetComponent<PlayerLife>();
             _controller = GetComponent<FirstPersonController>();
-            Instantiate(PlayerBulletHitboxPrefab, transform.position, Quaternion.identity, transform).Initialize(_playerLife, _controller, 0, true);
+            Instantiate(PlayerBulletHitboxPrefab).Initialize(_playerLife, _controller, 0, true);
             
 
             if (IsServer)

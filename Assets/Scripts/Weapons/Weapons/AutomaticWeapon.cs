@@ -22,9 +22,9 @@ namespace ExoplanetStudios.ExtractionShooter
         private float _sprayIncreaseSpeed;
         private float _sprayDecreaseSpeed;
 
-        public override void Initialize(ulong ownerId, bool isOwner, Transform weaponPos)
+        public override void Initialize(ulong ownerId, bool isOwner, Transform weaponTransform, Transform cameraTransform)
         {
-            base.Initialize(ownerId, isOwner, weaponPos);
+            base.Initialize(ownerId, isOwner, weaponTransform, cameraTransform);
 
             if (_rng == null)
                 _rng = new System.Random(SpraySeed);
@@ -47,13 +47,13 @@ namespace ExoplanetStudios.ExtractionShooter
             else if (weaponInputState.PrimaryAction)
             {
                 Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*360f-180f, 0, (float)_rng.NextDouble()*360f-180f) * Vector3.up;
-                Vector3 shootDirection = weaponInputState.SecondaryAction ? GetLookDirection(playerState) : GetShootDirection(playerState);
+                Vector3 shootDirection = GetLookDirection(playerState);
                 Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
 
                 float spray = _relativeSpray * (weaponInputState.SecondaryAction ? ADSMaxSpray : MaxSpray);
                 float movementError = playerState.Velocity.XZ().magnitude * MovementError;
 
-                Projectile.SpawnProjectile(projectileInfo, weaponInputState.SecondaryAction ? GetCameraPosition(playerState) : GetWeaponPosition(playerState), Quaternion.AngleAxis((spray + movementError) * (float)_rng.NextDouble(), rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(projectileInfo, GetCameraPosition(playerState), Quaternion.AngleAxis((spray + movementError) * (float)_rng.NextDouble(), rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
                 _cooldown += Cooldown;
             }
         }
