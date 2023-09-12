@@ -97,8 +97,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Playermodel: {fileID: 3637600293124795170, guid: 35200bd5f0019b44ca8fa7e8d605a211,
     type: 3}
-  MoveSpeed: 3
-  SprintSpeed: 6
+  MoveSpeed: 2.5
+  SprintSpeed: 5
   RotationSpeed: 0.3
   GroundAccelerationRate: 10
   GroundDecelerationRate: 20

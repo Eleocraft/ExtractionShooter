@@ -40,5 +40,5 @@ MonoBehaviour:
   SprayResetTime: 3
   SpraySeed: 123214
   MovementError: 3
-  firstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
-  secondShotAudio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
+  firstShotAudio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
+  secondShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}

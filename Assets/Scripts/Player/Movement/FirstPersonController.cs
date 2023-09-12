@@ -109,7 +109,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// reset Network Variables
 			if (IsServer)
 			{
-				_serverTransformState.Value = new NetworkTransformState(NetworkManager.LocalTime.Tick, transform.position, Vector2.zero, Vector3.zero);
+				_serverTransformState.Value = new NetworkTransformState(NetworkManager.LocalTime.Tick, transform.position, Vector2.zero, Vector3.zero, false);
 				_lastSaveInput = new NetworkInputState(NetworkManager.LocalTime.Tick);
 				_lastSaveTransform = new NetworkTransformState(NetworkManager.LocalTime.Tick);
 			}
@@ -267,12 +267,12 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			return new NetworkInputState(NetworkManager.LocalTime.Tick,
 				Walk ? Vector2.up : _controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
-				_controls.Player.Sprint.ReadValue<float>().AsBool(), _jump);
+				!_controls.Player.Sprint.ReadValue<float>().AsBool(), _jump, _controls.Player.Crouch.ReadValue<float>().AsBool());
 		}
 		private NetworkTransformState CreateTransformState()
 		{
 			return new NetworkTransformState(NetworkManager.LocalTime.Tick,
-				transform.position, Vector3.forward, Vector3.zero);
+				transform.position, Vector3.forward, Vector3.zero, false);
 		}
 		private void ExecuteInput(NetworkInputState inputState)
 		{
@@ -295,7 +295,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			Vector3 movement = velocity * NetworkManager.LocalTime.FixedDeltaTime;
 			_controller.Move(movement);
 
-			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity);
+			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity, inputState.Crouch);
 
 			// End interpolation state
 			PlayerModel.SetEndInterpolationState(_currentTransformState);

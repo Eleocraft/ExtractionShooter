@@ -8,6 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public Vector2 MovementInput;
         public Vector2 LookDelta;
         public bool Sprint;
+        public bool Crouch;
         public bool Jump;
         public NetworkInputState() {}
         public NetworkInputState(int tick)
@@ -20,16 +21,18 @@ namespace ExoplanetStudios.ExtractionShooter
             LookDelta = oldState.LookDelta;
             Sprint = oldState.Sprint;
             Jump = oldState.Jump;
+            Crouch = oldState.Crouch;
             
             Tick = tick;
         }
-        public NetworkInputState(int tick, Vector2 movementInput, Vector2 lookRotation, bool sprint, bool jump)
+        public NetworkInputState(int tick, Vector2 movementInput, Vector2 lookRotation, bool sprint, bool jump, bool crouch)
         {
             Tick = tick;
             MovementInput = movementInput;
             LookDelta = lookRotation;
             Sprint = sprint;
             Jump = jump;
+            Crouch = crouch;
         }
         public override NetworkState GetStateWithTick(int tick) => new NetworkInputState(this, tick);
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -42,6 +45,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 reader.ReadValueSafe(out LookDelta);
                 reader.ReadValueSafe(out Sprint);
                 reader.ReadValueSafe(out Jump);
+                reader.ReadValueSafe(out Crouch);
             }
             else
             {
@@ -51,6 +55,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(LookDelta);
                 writer.WriteValueSafe(Sprint);
                 writer.WriteValueSafe(Jump);
+                writer.WriteValueSafe(Crouch);
             }
         }
         public override bool Equals(object obj)
@@ -61,7 +66,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 return false;
             
             if (MovementInput == otherState.MovementInput && LookDelta == otherState.LookDelta &&
-                Sprint == otherState.Sprint && Jump == otherState.Jump) return true;
+                Sprint == otherState.Sprint && Jump == otherState.Jump && Crouch == otherState.Crouch) return true;
 
             return false;
         }
