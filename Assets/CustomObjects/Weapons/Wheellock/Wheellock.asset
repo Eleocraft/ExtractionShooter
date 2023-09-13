@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WeaponPrefab: {fileID: 3726804448589417541, guid: b120790e657f1cb4480e058063a4d548,
     type: 3}
-  MinLockonRange: 2
-  MaxLockonRange: 80
   ADSFOV: 50
+  TransitTime: 0.2
   firstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
   secondShotInfo: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Cooldown: 0.3

@@ -120,7 +120,7 @@ VisualEffect:
         m_Overridden: 1
       - m_Value:
           serializedVersion: 2
-          key0: {r: 3.9999995, g: 0.9301658, b: 0, a: 1}
+          key0: {r: 3.9999995, g: 0.26801297, b: 0, a: 1}
           key1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
           key2: {r: 0, g: 0, b: 0, a: 0}
           key3: {r: 0, g: 0, b: 0, a: 0}
@@ -152,7 +152,7 @@ VisualEffect:
         m_Overridden: 1
       - m_Value:
           serializedVersion: 2
-          key0: {r: 7.999999, g: 4.210302, b: 0, a: 1}
+          key0: {r: 7.999999, g: 0, b: 0.6184806, a: 1}
           key1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
           key2: {r: 0, g: 0, b: 0, a: 0}
           key3: {r: 0, g: 0, b: 0, a: 0}

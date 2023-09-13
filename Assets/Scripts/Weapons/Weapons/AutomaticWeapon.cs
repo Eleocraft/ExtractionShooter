@@ -33,6 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
+            base.UpdateWeapon(weaponInputState, playerState);
             // Spray Calculations
             if (weaponInputState.PrimaryAction)
                 _relativeSpray += NetworkManager.Singleton.LocalTime.FixedDeltaTime * _sprayIncreaseSpeed;

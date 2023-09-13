@@ -7,7 +7,7 @@ namespace ExoplanetStudios.ExtractionShooter
         protected ulong _ownerId;
         [SerializeField] private GameObject WeaponPrefab;
 
-        private Transform _cameraTransform;
+        protected Transform _cameraTransform;
 
         protected GameObject _weaponObject;
 

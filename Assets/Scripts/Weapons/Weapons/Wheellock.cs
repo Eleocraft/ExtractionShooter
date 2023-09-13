@@ -60,8 +60,8 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
+            base.UpdateWeapon(weaponInputState, playerState);
             // Spray Calculations
-
             if (_secondShotTimer > 0)
             {
                 _secondShotTimer -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
@@ -72,7 +72,7 @@ namespace ExoplanetStudios.ExtractionShooter
             else if (_cooldown > 0)
                 _cooldown -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             // first shot shooting
-            else if (weaponInputState.PrimaryAction && !_shot)
+            else if (weaponInputState.PrimaryAction && !InADSTransit && !_shot)
                 FirstShot();
             else
                 _relativeSpray -= NetworkManager.Singleton.LocalTime.FixedDeltaTime * _sprayDecreaseSpeed;
