@@ -33,10 +33,11 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _controller.TransformStateChanged -= TransformStateChanged;
         }
-        public void OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong ownerId, int tickDiff)
+        public bool OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong ownerId, int tickDiff)
         {
             if (tickDiff == _tickDiff)
-                _playerLife.OnHit(info, point - transform.position, damageType, projectileVelocity, ownerId);
+                return _playerLife.OnHit(info, point - transform.position, damageType, projectileVelocity, ownerId);
+            return false;
         }
         private void TransformStateChanged(NetworkTransformState transformState)
         {

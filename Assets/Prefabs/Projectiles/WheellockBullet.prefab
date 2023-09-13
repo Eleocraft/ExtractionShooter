@@ -9,8 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 198720928863147406}
-  - component: {fileID: 2559106124394590092}
-  - component: {fileID: -406850179386133358}
+  - component: {fileID: 2604837440249994210}
+  - component: {fileID: 6847435988720863931}
+  - component: {fileID: -6467647714678451421}
   m_Layer: 0
   m_Name: WheellockBullet
   m_TagString: Untagged
@@ -28,14 +29,14 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!96 &2559106124394590092
-TrailRenderer:
-  serializedVersion: 3
+--- !u!120 &2604837440249994210
+LineRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -75,17 +76,16 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.2
-  m_PreviewTimeScale: 1
+  m_Positions: []
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.05
+    widthMultiplier: 1
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 0
+        time: 0.027561188
+        value: 0.031053543
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -93,40 +93,40 @@ TrailRenderer:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.099162556
-        value: 0.7113327
-        inSlope: 0
-        outSlope: 0
+        time: 0.8416307
+        value: 0.10737285
+        inSlope: 0.15340714
+        outSlope: 0.15340714
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.82893157
-        value: 0.25986403
-        inSlope: 0
-        outSlope: 0
+        time: 0.95978236
+        value: 0.14091177
+        inSlope: -0.027633194
+        outSlope: -0.027633194
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
         value: 0
-        inSlope: 0
-        outSlope: 0
+        inSlope: -7.179484
+        outSlope: -7.179484
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.18461493
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0.3596777, b: 0, a: 1}
-      key1: {r: 1, g: 0.6702911, b: 0, a: 0.78431374}
-      key2: {r: 1, g: 0.8200104, b: 0, a: 0.39215687}
+      key0: {r: 0.3018868, g: 0.3018868, b: 0.3018868, a: 0.39215687}
+      key1: {r: 0.6698113, g: 0.5894637, b: 0.42589888, a: 0.78431374}
+      key2: {r: 1, g: 0.6091012, b: 0, a: 1}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
@@ -140,9 +140,9 @@ TrailRenderer:
       ctime5: 0
       ctime6: 0
       ctime7: 0
-      atime0: 6554
-      atime1: 19661
-      atime2: 64957
+      atime0: 0
+      atime1: 47224
+      atime2: 58211
       atime3: 0
       atime4: 0
       atime5: 0
@@ -152,19 +152,18 @@ TrailRenderer:
       m_ColorSpace: 0
       m_NumColorKeys: 3
       m_NumAlphaKeys: 3
-    numCornerVertices: 0
-    numCapVertices: 0
+    numCornerVertices: 5
+    numCapVertices: 3
     alignment: 0
     textureMode: 0
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
-  m_MinVertexDistance: 0.1
   m_MaskInteraction: 0
-  m_Autodestruct: 0
-  m_Emitting: 1
+  m_UseWorldSpace: 1
+  m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &-406850179386133358
+--- !u!114 &6847435988720863931
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -173,7 +172,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1300443509257007520}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7e2ac52f2ed76048820210315d8c874, type: 3}
+  m_Script: {fileID: 11500000, guid: c1ef408bc6904314883f833d5fcdb737, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RemainAfterEnd: 2
+  DecayTime: 0.2
+  FadeTime: 0.2
+  SqrCornerDistance: 200
+--- !u!114 &-6467647714678451421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300443509257007520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23779a76f1993fc4b9f3a15e11eb38a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

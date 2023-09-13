@@ -16,7 +16,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private float _sqrMinVelocity;
 
         private int _tickDiff;
-        private void Initialize(ProjectileInfo info, int tickDiff, Vector3 direction, ulong ownerId)
+        private void Initialize(ProjectileInfo info, Vector3 graphicsSource, Vector3 direction, ulong ownerId, int tickDiff)
         {
             // Graphics
             _displayObject = Instantiate(info.Prefab, transform.position, Quaternion.identity);
@@ -33,33 +33,33 @@ namespace ExoplanetStudios.ExtractionShooter
             _sqrMaxDistance = info.MaxDistance * info.MaxDistance;
             _sqrMinVelocity = info.MinVelocity * info.MinVelocity;
 
+            _displayObject.OnInitialisation(graphicsSource, _velocity);
+
             NetworkManager.Singleton.NetworkTickSystem.Tick += Tick;
             PlayerBulletHitboxManager.AddBullet(_tickDiff);
         }
-        private void OnDestroy()
-        {
-            NetworkManager.Singleton.NetworkTickSystem.Tick -= Tick;
-            PlayerBulletHitboxManager.RemoveBullet(_tickDiff);
-
-            _displayObject.EndProjectile();
-        }
-        public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
+        public static void SpawnProjectile(ProjectileInfo info, Vector3 graphicsSource, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
         {
             GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Projectile], position, Quaternion.identity);
-            projectileObj.GetComponent<Projectile>().Initialize(info, tickDiff, direction, ownerId);
+            projectileObj.GetComponent<Projectile>().Initialize(info, graphicsSource, direction, ownerId, tickDiff);
         }
         private void Tick()
         {
             Vector3 movement = _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             transform.position += movement;
 
-            _displayObject.SetPositionAndDirection(transform.position, _velocity);
-
-            Hitscan(movement, _lastPosition, ref _velocity);
+            if (Hitscan(movement, _lastPosition, ref _velocity))
+            {
+                EndProjectile();
+                return;
+            }
 
             // Lifetime
             if ((transform.position - _spawnPosition).sqrMagnitude > _sqrMaxDistance)
-                Destroy(gameObject);
+            {
+                EndProjectile();
+                return;
+            }
             
             // Physics
             _velocity -= _velocity * _info.Drag * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Drag
@@ -67,33 +67,55 @@ namespace ExoplanetStudios.ExtractionShooter
 
             // Check for min velocity
             if (_velocity.sqrMagnitude <= _sqrMinVelocity)
-                Destroy(gameObject);
+            {
+                EndProjectile();
+                return;
+            }
 
             _lastPosition = transform.position;
+            _displayObject.SetPositionAndDirection(transform.position, _velocity);
+
+            void EndProjectile()
+            {
+                _displayObject.EndProjectile();
+                NetworkManager.Singleton.NetworkTickSystem.Tick -= Tick;
+                PlayerBulletHitboxManager.RemoveBullet(_tickDiff);
+                Destroy(gameObject);
+            }
         }
-        private void Hitscan(Vector3 movement, Vector3 startPos, ref Vector3 velocity)
+        private bool Hitscan(Vector3 movement, Vector3 startPos, ref Vector3 velocity)
         {
+            bool destroy = false;
             Vector3 oldVelocity = velocity;
             Vector3 backwardsStartPos = startPos + movement;
+            Vector3 backwardsMovement = movement * -1;
             // Main hitscan
             List<RaycastHit> hits = Utility.RaycastAll(startPos, movement, movement.magnitude, ProjectileHitLayer.CanHit, true);
             foreach (RaycastHit hit in hits)
             {
-                if (hit.transform.TryGetComponent(out IDamagable damagable))
-                    damagable.OnHit(_info, hit.point, hit.normal, _ownerId, _tickDiff, ref velocity);
-
+                if (!hit.transform.TryGetComponent(out IDamagable damagable))
+                    continue;
+                
+                if (damagable.OnHit(_info, hit.point, hit.normal, _ownerId, _tickDiff, ref velocity))
+                    _displayObject.AddHit(hit.point, oldVelocity.normalized);
+                    
                 if (VelocityReversed(oldVelocity, velocity))
                 {
-                    backwardsStartPos = hit.point; 
+                    backwardsStartPos = hit.point;
+                    backwardsMovement *= (hit.point - startPos).magnitude;
+                    destroy = true;
                     break;
                 }
+                else
+                    oldVelocity = velocity;
             }
             // Backwards hitscan for bullet holes
-            Vector3 backwardsMovement = movement *= -1;
             List<RaycastHit> backwardsHits = Utility.RaycastAll(backwardsStartPos, backwardsMovement, backwardsMovement.magnitude, ProjectileHitLayer.CanHit);
             foreach (RaycastHit hit in backwardsHits)
                 if (hit.transform.TryGetComponent(out IDamagable damagable))
-                    damagable.OnExit(_info, hit.point, hit.normal, velocity);  
+                    damagable.OnExit(_info, hit.point, hit.normal, velocity);
+
+            return destroy;
         }
         private bool VelocityReversed(Vector3 oldVelocity, Vector3 newVelocity) => newVelocity == Vector3.zero ||
                 newVelocity.x / Mathf.Abs(newVelocity.x) != oldVelocity.x / Mathf.Abs(oldVelocity.x) ||

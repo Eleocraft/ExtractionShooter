@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class Bullet : ProjectileGraphic
+    public class DefaultProjectileGraphic : ProjectileGraphic
     {
         [SerializeField] private float RemainAfterEnd = 2f;
         public override void SetPositionAndDirection(Vector3 newPosition, Vector3 newDirection)

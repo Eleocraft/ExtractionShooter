@@ -23,10 +23,10 @@ MonoBehaviour:
   MuzzleVelocity: 200
   Drag: 0.6
   Dropoff: 9.81
-  PenetrationForce: 0.017
+  PenetrationForce: 0.04
   MaxDistance: 200
   MinVelocity: 20
-  Prefab: {fileID: -406850179386133358, guid: dde4e3477d432684d90158d6e538fb9d, type: 3}
+  Prefab: {fileID: 6847435988720863931, guid: dde4e3477d432684d90158d6e538fb9d, type: 3}
   HitMarker: {fileID: 7882812698031039389, guid: 2c512890680e9564b825dfb025b298a3,
     type: 3}
   PenetrateMarker: {fileID: 7882812698031039389, guid: adb0c5e100999ab44b168c830eae7736,

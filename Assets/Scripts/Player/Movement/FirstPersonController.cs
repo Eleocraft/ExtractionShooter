@@ -284,14 +284,12 @@ namespace ExoplanetStudios.ExtractionShooter
 				return;
 			
 			// lookRotation
-			Vector2 lookRotation = _currentTransformState.LookRotation + inputState.LookDelta;
+			Vector2 lookRotation = GetLookRotation(inputState.LookDelta);
 
 			// start interpolation state
 			PlayerModel.SetStartInterpolationState(lookRotation);
 
 			// rotation
-			lookRotation.x = Mathf.Clamp(lookRotation.x, BottomClamp, TopClamp);
-			lookRotation.y = lookRotation.y.ClampToAngle();
 			transform.rotation = Quaternion.Euler(0, lookRotation.y, 0);
 
 			// crouch
@@ -327,8 +325,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				// if this is the owner the lookrotation should be calculated locally
 				ReadRotationDelta();
-				Vector2 lookRotation = GetLocalLookRotation();
-				PlayerModel.Rotate(lookRotation);
+				PlayerModel.Rotate(GetLookRotation(_lookDelta));
 			}
 		}
 		private void ReadRotationDelta()
@@ -339,7 +336,13 @@ namespace ExoplanetStudios.ExtractionShooter
 			_lookDelta.x += lookInput.y * RotationSensitivity;
 			_lookDelta.y += lookInput.x * RotationSensitivity;
 		}
-		private Vector2 GetLocalLookRotation() => _currentTransformState.LookRotation + _lookDelta;
+		private Vector2 GetLookRotation(Vector2 lookDelta)
+		{
+			Vector2 lookRotation = _currentTransformState.LookRotation + lookDelta;
+			lookRotation.x = Mathf.Clamp(lookRotation.x, BottomClamp, TopClamp);
+			lookRotation.y = lookRotation.y.ClampToAngle();
+			return lookRotation;
+		}
 		private float CalculateCrouch(bool crouchInput, float current)
 		{
 			return Mathf.MoveTowards(current, crouchInput ? 1f : 0f, CrouchEnterSpeed * NetworkManager.LocalTime.FixedDeltaTime);

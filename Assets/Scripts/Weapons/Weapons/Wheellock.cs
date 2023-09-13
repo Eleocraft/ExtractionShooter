@@ -36,9 +36,17 @@ namespace ExoplanetStudios.ExtractionShooter
         private AudioSource[] _gunAudioSource;
         private bool _shot;
 
+        private Transform _firstShotSource;
+        private Transform _secondShotSource;
+        private const string FIRST_SHOT_SOURCE_NAME = "FirstShotSource";
+        private const string SECOND_SHOT_SOURCE_NAME = "SecondShotSource";
+
         public override void Initialize(ulong ownerId, bool isOwner, Transform weaponTransform, Transform cameraTransform)
         {
             base.Initialize(ownerId, isOwner, weaponTransform, cameraTransform);
+
+            _firstShotSource = _weaponObject.transform.Find(FIRST_SHOT_SOURCE_NAME);
+            _secondShotSource = _weaponObject.transform.Find(SECOND_SHOT_SOURCE_NAME);
 
             if (_rng == null)
                 _rng = new System.Random(SpraySeed);
@@ -81,7 +89,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 float spray = weaponInputState.SecondaryAction ? firstShotSprayADS.Evaluate(_relativeSpray) : firstShotSpray.Evaluate(_relativeSpray);
                 float movementError = playerState.Velocity.XZ().magnitude * MovementError;
 
-                Projectile.SpawnProjectile(firstShotInfo, GetCameraPosition(playerState), Quaternion.AngleAxis(spray + movementError, rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(firstShotInfo, _firstShotSource.position, GetCameraPosition(playerState), Quaternion.AngleAxis(spray + movementError, rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
                 _gunAudioSource[0].PlayOneShot(firstShotAudio);
 
                 _secondShotTimer = TimeUntilSecondShot;
@@ -96,7 +104,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 float spray = secondShotSpray.Evaluate(_relativeSpray);
                 float movementError = playerState.Velocity.XZ().magnitude * MovementError;
 
-                Projectile.SpawnProjectile(secondShotInfo, GetCameraPosition(playerState), Quaternion.AngleAxis(spray + movementError, rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(secondShotInfo, _secondShotSource.position, GetCameraPosition(playerState), Quaternion.AngleAxis(spray + movementError, rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
                 _gunAudioSource[1].PlayOneShot(secondShotAudio);
 
                 _cooldown = Cooldown;

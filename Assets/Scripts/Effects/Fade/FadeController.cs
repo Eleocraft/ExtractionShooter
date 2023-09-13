@@ -26,8 +26,8 @@ namespace ExoplanetStudios
             gameObject.SetActive(true);
             SetOpacity(1);
 
-            this._decayTime = decayTime;
-            this._fadeTime = fadeTime;
+            _decayTime = decayTime;
+            _fadeTime = fadeTime;
             _totalFadeTime = fadeTime;
         }
         public void StartTimer(float decayTime, float fadeTime, Action callback = default)

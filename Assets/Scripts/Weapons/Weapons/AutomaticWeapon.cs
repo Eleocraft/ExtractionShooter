@@ -53,7 +53,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 float spray = _relativeSpray * (weaponInputState.SecondaryAction ? ADSMaxSpray : MaxSpray);
                 float movementError = playerState.Velocity.XZ().magnitude * MovementError;
 
-                Projectile.SpawnProjectile(projectileInfo, GetCameraPosition(playerState), Quaternion.AngleAxis((spray + movementError) * (float)_rng.NextDouble(), rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(projectileInfo, _weaponObject.transform.position, GetCameraPosition(playerState), Quaternion.AngleAxis((spray + movementError) * (float)_rng.NextDouble(), rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
                 _cooldown += Cooldown;
             }
         }

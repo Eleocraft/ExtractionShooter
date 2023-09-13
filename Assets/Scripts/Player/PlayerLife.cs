@@ -26,10 +26,10 @@ namespace ExoplanetStudios.ExtractionShooter
             base.OnDestroy();
             _life.OnValueChanged -= OnLifeChanged;
         }
-        public void OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong ownerId)
+        public bool OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong ownerId)
         {
             if (OwnerClientId == ownerId)
-                return;
+                return false;
 
             // Particle Effects
             if (damageType == DamageType.Headshot)
@@ -48,6 +48,7 @@ namespace ExoplanetStudios.ExtractionShooter
                     _firstPersonController.SetPosition(SpawnPoints.GetSpawnPoint()); // Set new position
                 }
             }
+            return true;
         }
         [ClientRpc]
         private void PlayerDeadClientRpc(Vector3 position)
