@@ -15,7 +15,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [Header("SprayAmountDegrees")]
         [SerializeField] [MinMaxRange(0, 5)] private RangeSlider firstShotSpray;
         [SerializeField] [MinMaxRange(0, 5)] private RangeSlider firstShotSprayADS;
-        [SerializeField] [MinMaxRange(5, 15)] private RangeSlider secondShotSpray;
+        [SerializeField] [MinMaxRange(2, 15)] private RangeSlider secondShotSpray;
 
         [Header("SprayTimers")]
         [SerializeField] private float ShotsUntilMaxSpray;

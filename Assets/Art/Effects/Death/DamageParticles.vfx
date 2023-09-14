@@ -31,7 +31,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d4c867f6b72b714dbb5fd1780afe208, type: 3}
-  m_Name: DeathParticles
+  m_Name: DamageParticles
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 0}
@@ -267,7 +267,7 @@ VisualEffectResource:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DeathParticles
+  m_Name: DamageParticles
   m_Graph: {fileID: 114350483966674976}
   m_Infos:
     m_RendererSettings:
@@ -810,7 +810,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"276d9e395ae18fe40a9b4988549f2349","type":3}}'
+      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"bfc63cbb4576de744bdf1eb412b7081f","type":3}}'
     m_Space: 2147483647
   m_Property:
     name: mainTexture
@@ -3194,7 +3194,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"obj":{"fileID":10300,"guid":"0000000000000000f000000000000000","type":0}}'
+      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"bfc63cbb4576de744bdf1eb412b7081f","type":3}}'
     m_Space: 2147483647
   m_Property:
     name: mainTexture
@@ -9302,7 +9302,7 @@ MonoBehaviour:
   - {fileID: 8926484042661614955}
   m_ExposedName: SparkAmount
   m_Exposed: 1
-  m_Order: 11
+  m_Order: 10
   m_Category: 
   m_Min:
     m_Type:
@@ -9382,7 +9382,7 @@ MonoBehaviour:
   - {fileID: 8926484042661614957}
   m_ExposedName: MainRayAmount
   m_Exposed: 1
-  m_Order: 12
+  m_Order: 11
   m_Category: 
   m_Min:
     m_Type:
@@ -9462,7 +9462,7 @@ MonoBehaviour:
   - {fileID: 8926484042661614959}
   m_ExposedName: BloodAmount
   m_Exposed: 1
-  m_Order: 13
+  m_Order: 12
   m_Category: 
   m_Min:
     m_Type:

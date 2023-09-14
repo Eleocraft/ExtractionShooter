@@ -21,7 +21,7 @@ MonoBehaviour:
   Cooldown: 0.3
   TimeUntilSecondShot: 0.1
   firstShotSpray:
-    startValue: 0.5
+    startValue: 0.25
     endValue: 3
     sliderMin: 0
     sliderMax: 5
@@ -31,9 +31,9 @@ MonoBehaviour:
     sliderMin: 0
     sliderMax: 5
   secondShotSpray:
-    startValue: 7.0499997
-    endValue: 11.28
-    sliderMin: 5
+    startValue: 3
+    endValue: 8
+    sliderMin: 2
     sliderMax: 15
   ShotsUntilMaxSpray: 4
   SprayResetTime: 3

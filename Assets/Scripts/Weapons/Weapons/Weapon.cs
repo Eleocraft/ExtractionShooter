@@ -15,8 +15,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _cameraTransform = cameraTransform;
             _ownerId = ownerId;
-            if (isOwner)
-                _weaponObject = Instantiate(WeaponPrefab, weaponTransform);
+            _weaponObject = Instantiate(WeaponPrefab, weaponTransform);
         }
         private void OnDestroy()
         {

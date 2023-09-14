@@ -27,7 +27,6 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void AddHit(Vector3 hitPosition, Vector3 direction) => AddPosition(hitPosition);
         private void AddPosition(Vector3 position)
         {
-            Debug.DrawRay(position, Vector3.up *3, Color.red, 10);
             _lineRenderer.positionCount++;
             _lineRenderer.SetPosition(_lineRenderer.positionCount-2, position);
             _lineRenderer.SetPosition(_lineRenderer.positionCount-1, position);

@@ -79,7 +79,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (IsServer || IsOwner) return;
 
-            ExecuteInput(state);
+            ExecuteInput((NetworkWeaponInputState)state.GetStateWithTick(state.Tick));
         }
         private NetworkWeaponInputState GetNetworkInputState()
         {

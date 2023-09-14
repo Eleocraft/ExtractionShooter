@@ -7,11 +7,13 @@ namespace ExoplanetStudios.ExtractionShooter
     public class PlayerLife : NetworkBehaviour
     {
         [SerializeField] private float MaxLife;
+        [SerializeField] private float SpawnProtectionTime = 2;
         [SerializeField] private GameObject BreakParticles;
         [SerializeField] private GameObject HitParticle;
         [SerializeField] private GameObject HeadshotParticle;
         private NetworkVariable<float> _life = new NetworkVariable<float>();
         private FirstPersonController _firstPersonController; // Serveronly
+        private float _spawnProtectionTimer; // Serveronly
         private void Start()
         {
             if (IsServer)
@@ -26,6 +28,11 @@ namespace ExoplanetStudios.ExtractionShooter
             base.OnDestroy();
             _life.OnValueChanged -= OnLifeChanged;
         }
+        private void Update()
+        {
+            if (_spawnProtectionTimer > 0)
+                _spawnProtectionTimer -= Time.deltaTime;
+        }
         public bool OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong ownerId)
         {
             if (OwnerClientId == ownerId)
@@ -33,15 +40,17 @@ namespace ExoplanetStudios.ExtractionShooter
 
             // Particle Effects
             if (damageType == DamageType.Headshot)
-                Instantiate(HeadshotParticle, transform.position, Quaternion.identity);
+                Instantiate(HeadshotParticle, point + transform.position, Quaternion.identity);
             else
                 Instantiate(HitParticle, point + transform.position, Quaternion.identity);
 
-            if (IsServer)
+            if (IsServer && _spawnProtectionTimer <= 0)
             { // Life calculation
                 _life.Value -= info.GetDamage(damageType, projectileVelocity);
                 if (_life.Value <= 0)
                 {
+                    _spawnProtectionTimer = SpawnProtectionTime;
+                    Scoreboard.AddKill(ownerId, OwnerClientId);
                     NetworkManager.ConnectedClients[ownerId].PlayerObject.GetComponent<PlayerLife>()._life.Value = MaxLife; // Heal shooting player
                     _life.Value = MaxLife; // heal this player
                     PlayerDeadClientRpc(transform.position); // Send message to all clients

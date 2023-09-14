@@ -52,16 +52,16 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 0.3
+      - m_Value: 2
         m_Name: MainRayThickness
         m_Overridden: 1
       - m_Value: 50
         m_Name: MainRaySize
         m_Overridden: 1
-      - m_Value: 0.1
+      - m_Value: 0.3
         m_Name: SparklesThickness
         m_Overridden: 1
-      - m_Value: 6
+      - m_Value: 10
         m_Name: SparklesSize
         m_Overridden: 1
       - m_Value: 7
@@ -69,6 +69,9 @@ VisualEffect:
         m_Overridden: 1
       - m_Value: 4
         m_Name: BloodVelocity
+        m_Overridden: 1
+      - m_Value: 3
+        m_Name: MainRayDistance
         m_Overridden: 1
     m_Vector2f:
       m_Array: []
