@@ -20,7 +20,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 {
                     float relativeDist = 1f - ((col.transform.position - transform.position).magnitude / Radius);
                     if (relativeDist > 0)
-                        damagable.ExplosionDamage(Damage.Evaluate(relativeDist), ownerId, tickDiff);
+                        damagable.Damage(Damage.Evaluate(relativeDist), ownerId, tickDiff);
                 }
             }
         }

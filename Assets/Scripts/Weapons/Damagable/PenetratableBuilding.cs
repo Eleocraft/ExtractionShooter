@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class PenetratableBuilding : MonoBehaviour, IDamagable
+    public class PenetratableBuilding : MonoBehaviour, IProjectileTarget
     {
         [SerializeField] [Range(0.7f, 1)] private float BuildingResistance;
         public bool OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ref Vector3 velocity)

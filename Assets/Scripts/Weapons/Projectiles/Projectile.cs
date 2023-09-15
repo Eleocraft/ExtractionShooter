@@ -98,7 +98,7 @@ namespace ExoplanetStudios.ExtractionShooter
             List<RaycastHit> hits = Utility.RaycastAll(startPos, movement, movement.magnitude, ProjectileHitLayer.CanHit, true);
             foreach (RaycastHit hit in hits)
             {
-                if (!hit.transform.TryGetComponent(out IDamagable damagable))
+                if (!hit.transform.TryGetComponent(out IProjectileTarget damagable))
                     continue;
                 
                 if (damagable.OnHit(_info, hit.point, hit.normal, _ownerId, _tickDiff, ref velocity))
@@ -117,7 +117,7 @@ namespace ExoplanetStudios.ExtractionShooter
             // Backwards hitscan for bullet holes
             List<RaycastHit> backwardsHits = Utility.RaycastAll(backwardsStartPos, backwardsMovement, backwardsMovement.magnitude, ProjectileHitLayer.CanHit);
             foreach (RaycastHit hit in backwardsHits)
-                if (hit.transform.TryGetComponent(out IDamagable damagable))
+                if (hit.transform.TryGetComponent(out IProjectileTarget damagable))
                     damagable.OnExit(_info, hit.point, hit.normal, velocity);
 
             return destroy;

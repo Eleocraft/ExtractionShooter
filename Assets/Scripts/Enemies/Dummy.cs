@@ -3,7 +3,7 @@ using Unity.Netcode;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class Dummy : NetworkBehaviour, IDamagable
+    public class Dummy : NetworkBehaviour, IProjectileTarget, IDamagable
     {
         [SerializeField] private float MaxLife;
         [SerializeField] private GameObject BreakParticles;
@@ -25,12 +25,17 @@ namespace ExoplanetStudios.ExtractionShooter
                 return false;
             
             Instantiate(HitParticles, point, Quaternion.identity);
-            if (!IsServer) return true;
-            _life.Value -= info.GetDamage(DamageType.Default, velocity.magnitude);
-            if (_life.Value <= 0)
-                GetComponent<NetworkObject>().Despawn();
+
+            if (IsServer)
+                Damage(info.GetDamage(DamageType.Default, velocity.magnitude));
             
             return true;
+        }
+        public void Damage(float damage)
+        {
+            _life.Value -= damage;
+            if (_life.Value <= 0)
+                GetComponent<NetworkObject>().Despawn();
         }
         public override void OnNetworkDespawn()
         {
