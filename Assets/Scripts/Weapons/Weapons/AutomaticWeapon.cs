@@ -8,55 +8,66 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private ProjectileInfo projectileInfo;
         [SerializeField] private float Cooldown;
-        [SerializeField] private float MaxSpray;
-        [SerializeField] private float ADSMaxSpray;
-        [SerializeField] private float MaxSprayReachTime;
+        [SerializeField] [MinMaxRange(0, 5)] private RangeSlider Spray;
+        [SerializeField] [MinMaxRange(0, 5)] private RangeSlider ADSSpray;
+        [SerializeField] private float ShotsUntilMaxSpray;
         [SerializeField] private float SprayResetTime;
-        [SerializeField] private int SpraySeed;
         [SerializeField] private float MovementError;
+        [SerializeField] private int MagazineSize;
+        [SerializeField] private float TimeToReload;
 
         private float _cooldown;
         private float _relativeSpray;
-        private System.Random _rng;
 
-        private float _sprayIncreaseSpeed;
         private float _sprayDecreaseSpeed;
+        private Transform _shotSource;
+        
+        private float _sprayIncreaseByShot;
+        public override int MagSize => MagazineSize;
+        public override float ReloadTime => TimeToReload;
 
-        public override void Initialize(ulong ownerId, bool isOwner, Transform weaponTransform, Transform cameraTransform)
+        public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller)
         {
-            base.Initialize(ownerId, isOwner, weaponTransform, cameraTransform);
+            base.Initialize(ownerId, isOwner, controller);
 
-            if (_rng == null)
-                _rng = new System.Random(SpraySeed);
-            _sprayIncreaseSpeed = 1f / MaxSprayReachTime;
+            _sprayIncreaseByShot = 1f / ShotsUntilMaxSpray;
             _sprayDecreaseSpeed = 1f / SprayResetTime;
+        }
+        public override void Activate()
+        {
+            base.Activate();
+
+            _shotSource = _weaponObject.transform.Find("ShotSource");
+        }
+        public override void Deactivate()
+        {
+            base.Deactivate();
+
+            _relativeSpray = 0;
+            _cooldown = 0;
         }
         public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             base.UpdateWeapon(weaponInputState, playerState);
-            // Spray Calculations
-            if (weaponInputState.PrimaryAction)
-                _relativeSpray += NetworkManager.Singleton.LocalTime.FixedDeltaTime * _sprayIncreaseSpeed;
-            else
-                _relativeSpray -= NetworkManager.Singleton.LocalTime.FixedDeltaTime * _sprayDecreaseSpeed;
 
-            _relativeSpray = Mathf.Clamp01(_relativeSpray);
             // Cooldown
             if (_cooldown > 0)
                 _cooldown -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             // actual shooting
-            else if (weaponInputState.PrimaryAction)
+            else if (weaponInputState.PrimaryAction && !InADSTransit && BulletsLoaded > 0 && !IsReloading)
             {
-                Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*360f-180f, 0, (float)_rng.NextDouble()*360f-180f) * Vector3.up;
-                Vector3 shootDirection = GetLookDirection(playerState);
-                Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
+                float spray = weaponInputState.SecondaryAction ? ADSSpray.Evaluate(_relativeSpray) : Spray.Evaluate(_relativeSpray);
+                Vector3 direction = GetShootDirection(playerState, spray, MovementError);
 
-                float spray = _relativeSpray * (weaponInputState.SecondaryAction ? ADSMaxSpray : MaxSpray);
-                float movementError = playerState.Velocity.XZ().magnitude * MovementError;
-
-                Projectile.SpawnProjectile(projectileInfo, _weaponObject.transform.position, GetCameraPosition(playerState), Quaternion.AngleAxis((spray + movementError) * (float)_rng.NextDouble(), rotationVector) * shootDirection, _ownerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(projectileInfo, _shotSource.position, GetCameraPosition(playerState), direction, _ownerId, weaponInputState.TickDiff);
                 _cooldown += Cooldown;
+                BulletsLoaded--;
+                _relativeSpray += _sprayIncreaseByShot;
             }
+            else
+                _relativeSpray -= NetworkManager.Singleton.LocalTime.FixedDeltaTime * _sprayDecreaseSpeed;
+
+            _relativeSpray = Mathf.Clamp01(_relativeSpray);
         }
     }
 }

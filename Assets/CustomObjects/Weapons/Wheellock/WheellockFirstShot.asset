@@ -16,10 +16,10 @@ MonoBehaviour:
     values:
     - name: Default
       key: 0
-      value: 20
+      value: 40
     - name: Headshot
       key: 1
-      value: 50
+      value: 80
   MuzzleVelocity: 200
   Drag: 0.6
   Dropoff: 9.81

@@ -14,30 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WeaponPrefab: {fileID: 3726804448589417541, guid: b120790e657f1cb4480e058063a4d548,
     type: 3}
+  Seed: 234
   ADSFOV: 50
-  TransitTime: 0.2
-  firstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
-  secondShotInfo: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
+  TransitTime: 0.1
+  VelocityMultiplier: 0.6
+  FirstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
+  SecondShotInfo: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Cooldown: 0.3
-  TimeUntilSecondShot: 0.1
-  firstShotSpray:
-    startValue: 0.25
-    endValue: 3
-    sliderMin: 0
-    sliderMax: 5
-  firstShotSprayADS:
-    startValue: 0
-    endValue: 1
-    sliderMin: 0
-    sliderMax: 5
-  secondShotSpray:
-    startValue: 3
-    endValue: 8
-    sliderMin: 2
-    sliderMax: 15
-  ShotsUntilMaxSpray: 4
-  SprayResetTime: 3
-  SpraySeed: 123214
+  FirstShotSpray: 0.25
+  FirstShotSprayADS: 0
+  SecondShotSpray: 2
   MovementError: 3
-  firstShotAudio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
-  secondShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
+  FirstShotReloadTime: 0.5
+  SecondShotReloadTime: 0.75
+  FirstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
+  SecondShotAudio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}

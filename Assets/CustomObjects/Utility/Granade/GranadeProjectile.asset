@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc0e9a4464a5414ba54096d4a654257, type: 3}
+  m_Name: GranadeProjectile
+  m_EditorClassIdentifier: 
+  Explosion: {fileID: 3067503941469130453, guid: 818484abae03282489445f5901526bf0,
+    type: 3}
+  InitialVelocity: 30
+  Drag: 0.8
+  Dropoff: 10
+  MaxDistance: 100
+  Prefab: {fileID: 239876959721100375, guid: 06df267b60e89f24d9b2f7d900574e76, type: 3}

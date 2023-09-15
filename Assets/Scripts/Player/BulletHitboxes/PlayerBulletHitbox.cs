@@ -39,6 +39,11 @@ namespace ExoplanetStudios.ExtractionShooter
                 return _playerLife.OnHit(info, point - transform.position, damageType, projectileVelocity, ownerId);
             return false;
         }
+        public void Damage(float damage, ulong ownerId, int tickDiff)
+        {
+            if (tickDiff == _tickDiff)
+                _playerLife.Damage(damage, ownerId);
+        }
         private void TransformStateChanged(NetworkTransformState transformState)
         {
             if (!_active)

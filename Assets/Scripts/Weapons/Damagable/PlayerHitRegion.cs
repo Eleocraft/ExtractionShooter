@@ -13,5 +13,11 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public bool OnHit(ProjectileInfo info, Vector3 point, Vector3 normal, ulong ownerId, int tickDiff, ref Vector3 velocity) => 
             _playerBulletHitbox.OnHit(info, point, DamageType, velocity.magnitude, ownerId, tickDiff);
+        
+        public void ExplosionDamage(float damage, ulong ownerId, int tickDiff)
+        {
+            if (DamageType == DamageType.Default)
+                _playerBulletHitbox.Damage(damage, ownerId, tickDiff);
+        }
     }
 }

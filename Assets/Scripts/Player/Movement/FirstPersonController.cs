@@ -62,6 +62,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
 		// player
 		private float _jumpVelocity;
+		private float _movementVelocityMultiplier = 1;
 		private bool _jump; // Owner only
 		private Vector2 _lookDelta; // Owner only
 		private const float TERMINAL_VELOCITY = 100.0f;
@@ -271,7 +272,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			return new NetworkInputState(NetworkManager.LocalTime.Tick,
 				Walk ? Vector2.up : _controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
-				_controls.Player.SlowWalk.ReadValue<float>().AsBool(), _jump, _controls.Player.Crouch.ReadValue<float>().AsBool());
+				_controls.Player.SlowWalk.IsPressed(), _jump, _controls.Player.Crouch.IsPressed());
 		}
 		private NetworkTransformState CreateTransformState()
 		{
@@ -353,7 +354,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			float verticalVelocity = CalculateGravity(inputState.Jump, grounded);
 			
 			// set target speed based on if slowWalk or crouch is pressed
-			float targetSpeed = crouch ? CrouchSpeed : inputState.SlowWalk ? WalkSpeed : RunSpeed;
+			float targetSpeed = (crouch ? CrouchSpeed : inputState.SlowWalk ? WalkSpeed : RunSpeed) * _movementVelocityMultiplier;
 
 			// target speed is 0 if no key is pressed
 			if (inputState.MovementInput == Vector2.zero) targetSpeed = 0.0f;
@@ -428,6 +429,14 @@ namespace ExoplanetStudios.ExtractionShooter
 			}
 			transformState = _bufferedTransformStates[tick];
 			return transformState != null;
+		}
+		public void IncreaseMovementVelocityMultiplier(float amount)
+		{
+			_movementVelocityMultiplier *= amount;
+		}
+		public void DecreaseMovementVelocityMultiplier(float amount)
+		{
+			_movementVelocityMultiplier /= amount;
 		}
 	}
 }

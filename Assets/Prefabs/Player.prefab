@@ -100,7 +100,7 @@ MonoBehaviour:
   WalkSpeed: 2.5
   RunSpeed: 5
   CrouchSpeed: 1.5
-  RotationSpeed: 0.3
+  RotationSensitivity: 1
   GroundAccelerationRate: 10
   GroundDecelerationRate: 20
   AirSpeedChangeRate: 5
@@ -133,7 +133,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
-  MainWeapon: {fileID: 11400000, guid: 95d012b1cb130974eb097995cf582451, type: 2}
+  MainWeapon: {fileID: 11400000, guid: f8bd593bd5742d446867d9d78522d065, type: 2}
+  UtilityItem: {fileID: 11400000, guid: 197eaa75b3c881448a3d89b927ab18f4, type: 2}
 --- !u!114 &3974214662581333730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,6 +148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxLife: 200
+  SpawnProtectionTime: 2
   BreakParticles: {fileID: 3986442999684799994, guid: 03164349f7c3eed40b3038f99952e095,
     type: 3}
   HitParticle: {fileID: 3313443488370423343, guid: 2733d37c3af2844419411c33afcec7c2,

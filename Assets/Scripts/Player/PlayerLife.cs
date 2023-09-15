@@ -44,9 +44,15 @@ namespace ExoplanetStudios.ExtractionShooter
             else
                 Instantiate(HitParticle, point + transform.position, Quaternion.identity);
 
+            Damage(info.GetDamage(damageType, projectileVelocity), ownerId);
+            
+            return true;
+        }
+        public void Damage(float damage, ulong ownerId)
+        {
             if (IsServer && _spawnProtectionTimer <= 0)
             { // Life calculation
-                _life.Value -= info.GetDamage(damageType, projectileVelocity);
+                _life.Value -= damage;
                 if (_life.Value <= 0)
                 {
                     _spawnProtectionTimer = SpawnProtectionTime;
@@ -57,14 +63,12 @@ namespace ExoplanetStudios.ExtractionShooter
                     _firstPersonController.SetPosition(SpawnPoints.GetSpawnPoint()); // Set new position
                 }
             }
-            return true;
         }
         [ClientRpc]
         private void PlayerDeadClientRpc(Vector3 position)
         {
-            Instantiate(BreakParticles, position + Vector3.up, Quaternion.identity);
-            if (IsOwner)
-                Debug.Log("You Died");
+            if (!IsOwner)
+                Instantiate(BreakParticles, position + Vector3.up, Quaternion.identity);
         }
         private void OnLifeChanged(float oldValue, float newValue)
         {

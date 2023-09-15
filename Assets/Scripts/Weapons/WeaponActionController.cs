@@ -8,12 +8,14 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private GlobalInputs GI;
         [SerializeField] private Weapon MainWeapon;
+        [SerializeField] private UtilityItem UtilityItem;
 
         private FirstPersonController _firstPersonController;
 
         // Owner
         private InputMaster _controls;
         private Weapon _weapon;
+        private UtilityItem _utilityItem;
         
         // Server
         private Dictionary<int, NetworkWeaponInputState> _receivedActions; // Serveronly
@@ -26,7 +28,11 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _firstPersonController = GetComponent<FirstPersonController>();
             _weapon = Instantiate(MainWeapon);
-            _weapon.Initialize(OwnerClientId, IsOwner, _firstPersonController.PlayerModel.WeaponTransform, _firstPersonController.PlayerModel.CameraSocket);
+            _weapon.Initialize(OwnerClientId, IsOwner, _firstPersonController);
+            _weapon.Activate();
+
+            _utilityItem = Instantiate(UtilityItem);
+            _utilityItem.Initialize(OwnerClientId, IsOwner, _firstPersonController);
 
             if (IsServer)
                 _receivedActions = new Dictionary<int, NetworkWeaponInputState>();
@@ -63,6 +69,8 @@ namespace ExoplanetStudios.ExtractionShooter
             }
             // Update weapon
             _weapon.UpdateWeapon(_currentWeaponInputState, transformState);
+            _utilityItem.UpdateItem(_currentWeaponInputState, transformState);
+
         }
         [ServerRpc]
         private void OnInputServerRpc(NetworkWeaponInputState state)
@@ -83,8 +91,9 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private NetworkWeaponInputState GetNetworkInputState()
         {
-            return new NetworkWeaponInputState(_controls.Mouse.PrimaryAction.ReadValue<float>().AsBool(),
-                _controls.Mouse.SecondaryAction.ReadValue<float>().AsBool(), NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
+            return new NetworkWeaponInputState(_controls.Mouse.PrimaryAction.IsPressed(),
+                _controls.Mouse.SecondaryAction.IsPressed(), _controls.Player.Reload.IsPressed(), 
+                _controls.Player.Utility.IsPressed(), NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
         }
         private void ExecuteInput(NetworkWeaponInputState weaponInputState)
         {
@@ -103,6 +112,12 @@ namespace ExoplanetStudios.ExtractionShooter
                 else
                     _weapon.StopSecondaryAction();
             }
+
+            if (weaponInputState.ReloadAction && !_currentWeaponInputState.ReloadAction)
+                _weapon.Reload();
+            
+            if (weaponInputState.UtilityAction && !_currentWeaponInputState.UtilityAction)
+                _utilityItem.UseUtility();
 
             _currentWeaponInputState = weaponInputState;
         }
