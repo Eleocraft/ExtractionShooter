@@ -20,11 +20,11 @@ MonoBehaviour:
   VelocityMultiplier: 0.6
   FirstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
   SecondShotInfo: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
-  Cooldown: 0.3
-  FirstShotSpray: 0.25
+  Cooldown: 0.1
+  FirstShotSpray: 0.125
   FirstShotSprayADS: 0
-  SecondShotSpray: 2
-  MovementError: 3
+  SecondShotSpray: 3
+  MovementError: 1.5
   FirstShotReloadTime: 0.5
   SecondShotReloadTime: 0.75
   FirstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
