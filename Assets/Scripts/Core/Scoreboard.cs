@@ -47,7 +47,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private void UpdateScoreboardUI()
         {
             foreach (KeyValuePair<ulong, ScoreboardItem> scoreboardItem in _scores.ScoreboardSlots)
-                _textObjects[scoreboardItem.Key].text = $"Player_ + {scoreboardItem.Key}:  K:{scoreboardItem.Value.Kills}  D:{scoreboardItem.Value.Deaths}";
+                _textObjects[scoreboardItem.Key].text = $"Player_{scoreboardItem.Key}:  K:{scoreboardItem.Value.Kills}  D:{scoreboardItem.Value.Deaths}";
         }
         public static void AddKill(ulong killId, ulong deathId)
         {

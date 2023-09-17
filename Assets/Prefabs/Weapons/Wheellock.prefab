@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7974350088707328771}
   - component: {fileID: 7511839185580059340}
   - component: {fileID: 2333523271532759377}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: WheellockShockMod
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2652430611434333674}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Wheellock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,7 +131,7 @@ GameObject:
   m_Component:
   - component: {fileID: 588185075658697547}
   - component: {fileID: 786929327340619882}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: SecondShotSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -259,7 +259,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8279628349406562590}
   - component: {fileID: 5631305245388966321}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: FirstShotSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -476,7 +476,7 @@ GameObject:
   - component: {fileID: 2973837614633352852}
   - component: {fileID: 3901956273251196544}
   - component: {fileID: 2087169744927313415}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}

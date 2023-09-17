@@ -42,7 +42,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public virtual void Activate() {
             _weaponObject = Instantiate(WeaponPrefab, _weaponParent);
             if (_ownerId == NetworkManager.Singleton.LocalClientId)
-                _weaponObject.layer = LayerMask.GetMask("FirstPerson");
+                _weaponObject.SetLayerAllChildren(LayerMask.NameToLayer("First Person"));
         }
         public virtual void Deactivate() {
             _reloadTimer = 0;
