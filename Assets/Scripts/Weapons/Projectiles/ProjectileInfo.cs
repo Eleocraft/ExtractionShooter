@@ -8,8 +8,10 @@ namespace ExoplanetStudios.ExtractionShooter
     [CreateAssetMenu(fileName = "New Projectile", menuName = "CustomObjects/Weapons/Projectile")]
     public class ProjectileInfo : ScriptableObject
     {
-        [Header("Damage")]
+        [Header("Damage + effects")]
         public EnumDictionary<DamageType, float> Damages;
+        public float SlowTime;
+        public float SlowMultiplier = 1f;
 
         [Header("Physics")]
         public float MuzzleVelocity;

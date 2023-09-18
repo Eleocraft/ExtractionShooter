@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class WeaponActionController : NetworkBehaviour
+    public class ItemActionController : NetworkBehaviour
     {
         [SerializeField] private GlobalInputs GI;
 
@@ -61,7 +61,6 @@ namespace ExoplanetStudios.ExtractionShooter
             }
             // Update weapon
             _playerInventory.ActiveItemObject?.UpdateItem(_currentWeaponInputState, transformState);
-
         }
         [ServerRpc]
         private void OnInputServerRpc(NetworkWeaponInputState state)

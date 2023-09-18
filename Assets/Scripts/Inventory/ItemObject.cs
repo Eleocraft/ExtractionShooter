@@ -4,7 +4,7 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public abstract class ItemObject : ScriptableObject
     {
-        FirstPersonController _controller;
+        protected FirstPersonController _controller;
         protected ulong _ownerId;
         protected bool _isOwner;
         [ReadOnly] public string ItemID;
@@ -23,10 +23,10 @@ namespace ExoplanetStudios.ExtractionShooter
             ItemID = Utility.CreateID(name);
         }
         public virtual void Activate() {
-            _controller.IncreaseMovementVelocityMultiplier(VelocityMultiplier);
+            _controller.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", VelocityMultiplier);
         }
         public virtual void Deactivate() {
-            _controller.DecreaseMovementVelocityMultiplier(VelocityMultiplier);
+            _controller.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", 1f);
         }
         public abstract void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
         

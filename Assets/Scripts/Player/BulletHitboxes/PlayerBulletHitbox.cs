@@ -48,7 +48,6 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (!_active)
                 return;
-            
             if (_controller.GetState(NetworkManager.Singleton.LocalTime.Tick - _tickDiff, out NetworkTransformState state))
             {
                 transform.position = state.Position;

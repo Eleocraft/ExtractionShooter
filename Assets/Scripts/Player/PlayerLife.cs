@@ -12,26 +12,38 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private GameObject HitParticle;
         [SerializeField] private GameObject HeadshotParticle;
         private NetworkVariable<float> _life = new NetworkVariable<float>();
-        private FirstPersonController _firstPersonController; // Serveronly
+        private FirstPersonController _firstPersonController;
         private float _spawnProtectionTimer; // Serveronly
+        private float _slowDownTimer;
+        private float _slowDownMultiplier = 1f;
+
         private void Start()
         {
             if (IsServer)
-            {
                 _life.Value = MaxLife;
-                _firstPersonController = GetComponent<FirstPersonController>();
-            }
+
+            _firstPersonController = GetComponent<FirstPersonController>();
             _life.OnValueChanged += OnLifeChanged;
+            NetworkManager.NetworkTickSystem.Tick += Tick;
         }
         public override void OnDestroy()
         {
             base.OnDestroy();
             _life.OnValueChanged -= OnLifeChanged;
+
+            if (NetworkManager?.NetworkTickSystem != null)
+				NetworkManager.NetworkTickSystem.Tick -= Tick;
         }
-        private void Update()
+        private void Tick()
         {
             if (_spawnProtectionTimer > 0)
-                _spawnProtectionTimer -= Time.deltaTime;
+                _spawnProtectionTimer -= NetworkManager.LocalTime.FixedDeltaTime;
+            if (_slowDownTimer > 0)
+            {
+                _slowDownTimer -= NetworkManager.LocalTime.FixedDeltaTime;
+                if (_slowDownTimer <= 0)
+                    ResetSlowDown();
+            }
         }
         public bool OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong ownerId)
         {
@@ -44,6 +56,7 @@ namespace ExoplanetStudios.ExtractionShooter
             else
                 Instantiate(HitParticle, point + transform.position, Quaternion.identity);
 
+            SetSlowDown(info.SlowTime, info.SlowMultiplier);
             Damage(info.GetDamage(damageType, projectileVelocity), ownerId);
             
             return true;
@@ -63,6 +76,20 @@ namespace ExoplanetStudios.ExtractionShooter
                     _firstPersonController.SetPosition(SpawnPoints.GetSpawnPoint()); // Set new position
                 }
             }
+        }
+        private void SetSlowDown(float time, float multiplier)
+        {
+            if (multiplier < _slowDownMultiplier)
+            {
+                _firstPersonController.SetMovementSpeedMultiplier("PlayerLife", multiplier);
+                _slowDownMultiplier = multiplier;
+                _slowDownTimer = time;
+            }
+        }
+        private void ResetSlowDown()
+        {
+            _slowDownMultiplier = 1;
+            _firstPersonController.SetMovementSpeedMultiplier("PlayerLife", 1f);
         }
         [ClientRpc]
         private void PlayerDeadClientRpc(Vector3 position)

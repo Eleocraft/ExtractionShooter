@@ -20,6 +20,8 @@ MonoBehaviour:
     - name: Headshot
       key: 1
       value: 150
+  SlowTime: 1
+  SlowMultiplier: 0.7
   MuzzleVelocity: 120
   Drag: 1
   Dropoff: 11.83

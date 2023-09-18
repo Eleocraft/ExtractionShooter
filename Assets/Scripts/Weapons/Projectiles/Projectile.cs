@@ -41,11 +41,6 @@ namespace ExoplanetStudios.ExtractionShooter
             GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Projectile], position, Quaternion.identity);
             projectileObj.GetComponent<Projectile>().Initialize(info, graphicsSource, direction, ownerId, tickDiff);
         }
-        public static void SpawnProjectile(ProjectileInfo info, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
-        {
-            GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Projectile], position, Quaternion.identity);
-            projectileObj.GetComponent<Projectile>().Initialize(info, position, direction, ownerId, tickDiff);
-        }
         private void Tick()
         {
             Vector3 movement = _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime;

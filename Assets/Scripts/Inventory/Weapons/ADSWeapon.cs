@@ -10,7 +10,6 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float TransitTime;
         [SerializeField] private float ADSVelocityMul;
         private CinemachineVirtualCamera _camera;
-        private FirstPersonController _controller;
         private Vector3 _weaponADSPos;
         private Vector3 _weaponDefaultPos;
         private float _defaultFOV;
@@ -19,8 +18,6 @@ namespace ExoplanetStudios.ExtractionShooter
         private const string ADS_POS_NAME = "WeaponADSPosition";
         public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             base.Initialize(ownerId, isOwner, controller);
-
-            _controller = controller;
 
             if (isOwner)
             {
@@ -49,10 +46,10 @@ namespace ExoplanetStudios.ExtractionShooter
                 _camera.m_Lens.FieldOfView = _defaultFOV;
         }
         private void StartADS() {
-            _controller.IncreaseMovementVelocityMultiplier(ADSVelocityMul);
+            _controller.SetMovementSpeedMultiplier(GetInstanceID()+"ADS", ADSVelocityMul);
         }
         private void StopADS() {
-            _controller.DecreaseMovementVelocityMultiplier(ADSVelocityMul);
+            _controller.SetMovementSpeedMultiplier(GetInstanceID()+"ADS", 1f);
         }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {

@@ -27,7 +27,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Tick = tick;
         }
         public override NetworkState GetStateWithTick(int tick) => new NetworkWeaponInputState(this, tick);
-        public int TickDiff => NetworkManager.Singleton.ServerTime.Tick - ServerTickOnCreation;
+        public int TickDiff => NetworkManager.Singleton.LocalTime.Tick - ServerTickOnCreation;
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)

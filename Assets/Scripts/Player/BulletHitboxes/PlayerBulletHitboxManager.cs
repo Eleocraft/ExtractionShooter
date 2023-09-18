@@ -10,7 +10,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
         private PlayerLife _playerLife;
         private FirstPersonController _controller;
-        private Dictionary<int, PlayerBulletHitboxContainer> hitboxes; // Serveronly
+        private Dictionary<int, PlayerBulletHitboxContainer> hitboxes;
         private static List<PlayerBulletHitboxManager> managers = new();
         private void Start()
         {
@@ -18,11 +18,8 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _playerLife = GetComponent<PlayerLife>();
             _controller = GetComponent<FirstPersonController>();
-            Instantiate(PlayerBulletHitboxPrefab).Initialize(_playerLife, _controller, 0, true);
-            
 
-            if (IsServer)
-                hitboxes = new();
+            hitboxes = new();
         }
         public override void OnDestroy()
         {
@@ -32,9 +29,6 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void ActivateHitbox(int tickDiff)
         {
-            if (tickDiff == 0 || !IsServer)
-                return;
-            
             if (!hitboxes.ContainsKey(tickDiff))
             {
                 PlayerBulletHitbox newHitbox = Instantiate(PlayerBulletHitboxPrefab);
@@ -46,9 +40,6 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void RemoveHitbox(int tickDiff)
         {
-            if (tickDiff == 0 || !IsServer)
-                return;
-            
             hitboxes[tickDiff].ActiveAmount--;
         }
         public static void AddBullet(int tickDiff)
