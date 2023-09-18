@@ -7,15 +7,12 @@ namespace ExoplanetStudios.ExtractionShooter
     public class WeaponActionController : NetworkBehaviour
     {
         [SerializeField] private GlobalInputs GI;
-        [SerializeField] private Weapon MainWeapon;
-        [SerializeField] private UtilityItem UtilityItem;
 
         private FirstPersonController _firstPersonController;
+        private PlayerInventory _playerInventory;
 
         // Owner
         private InputMaster _controls;
-        private Weapon _weapon;
-        private UtilityItem _utilityItem;
         
         // Server
         private Dictionary<int, NetworkWeaponInputState> _receivedActions; // Serveronly
@@ -27,12 +24,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void OnNetworkSpawn()
         {
             _firstPersonController = GetComponent<FirstPersonController>();
-            _weapon = Instantiate(MainWeapon);
-            _weapon.Initialize(OwnerClientId, IsOwner, _firstPersonController);
-            _weapon.Activate();
-
-            _utilityItem = Instantiate(UtilityItem);
-            _utilityItem.Initialize(OwnerClientId, IsOwner, _firstPersonController);
+            _playerInventory = GetComponent<PlayerInventory>();
 
             if (IsServer)
                 _receivedActions = new Dictionary<int, NetworkWeaponInputState>();
@@ -68,8 +60,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
             // Update weapon
-            _weapon.UpdateWeapon(_currentWeaponInputState, transformState);
-            _utilityItem.UpdateItem(_currentWeaponInputState, transformState);
+            _playerInventory.ActiveItemObject?.UpdateItem(_currentWeaponInputState, transformState);
 
         }
         [ServerRpc]
@@ -92,32 +83,29 @@ namespace ExoplanetStudios.ExtractionShooter
         private NetworkWeaponInputState GetNetworkInputState()
         {
             return new NetworkWeaponInputState(_controls.Mouse.PrimaryAction.IsPressed(),
-                _controls.Mouse.SecondaryAction.IsPressed(), _controls.Player.Reload.IsPressed(), 
-                _controls.Player.Utility.IsPressed(), NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
+                _controls.Mouse.SecondaryAction.IsPressed(), _controls.Player.Reload.IsPressed(),
+                NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
         }
         private void ExecuteInput(NetworkWeaponInputState weaponInputState)
         {
             if (weaponInputState.PrimaryAction != _currentWeaponInputState.PrimaryAction)
             {
                 if (weaponInputState.PrimaryAction)
-                    _weapon.StartPrimaryAction();
+                    _playerInventory.ActiveItemObject?.StartPrimaryAction();
                 else
-                    _weapon.StopPrimaryAction();
+                    _playerInventory.ActiveItemObject?.StopPrimaryAction();
             }
 
             if (weaponInputState.SecondaryAction != _currentWeaponInputState.SecondaryAction)
             {
                 if (weaponInputState.SecondaryAction)
-                    _weapon.StartSecondaryAction();
+                    _playerInventory.ActiveItemObject?.StartSecondaryAction();
                 else
-                    _weapon.StopSecondaryAction();
+                    _playerInventory.ActiveItemObject?.StopSecondaryAction();
             }
 
             if (weaponInputState.ReloadAction && !_currentWeaponInputState.ReloadAction)
-                _weapon.Reload();
-            
-            if (weaponInputState.UtilityAction && !_currentWeaponInputState.UtilityAction)
-                _utilityItem.UseUtility();
+                _playerInventory.ActiveItemObject?.Reload();
 
             _currentWeaponInputState = weaponInputState;
         }

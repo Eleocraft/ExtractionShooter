@@ -10,5 +10,13 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             Instance.Text.text = $"{bullets} / {magSize}";
         }
+        public static void Deactivate()
+        {
+            Instance.Text.gameObject.SetActive(false);
+        }
+        public static void Activate()
+        {
+            Instance.Text.gameObject.SetActive(true);
+        }
     }
 }

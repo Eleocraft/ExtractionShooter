@@ -9,10 +9,12 @@ namespace ExoplanetStudios.ExtractionShooter
 
         [Header("Physics")]
         public float InitialVelocity;
+        public float Bouncyness;
         public float Drag;
         public float Dropoff;
         [Header("DespawnChecks")]
         public float MaxDistance;
+        public float MinVelocity;
         [Header("Graphics")]
         public ProjectileGraphic Prefab;
     }

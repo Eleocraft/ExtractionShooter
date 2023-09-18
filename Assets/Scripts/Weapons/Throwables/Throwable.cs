@@ -1,15 +1,14 @@
 using UnityEngine;
 using Unity.Netcode;
-using UnityEngine.Rendering;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
     public class Throwable : MonoBehaviour
     {
         private Vector3 _spawnPosition;
-        private Vector3 _lastPosition;
         private Vector3 _velocity;
         private float _sqrMaxDistance;
+        private float _sqrMinVelocity;
         private ProjectileGraphic _displayObject;
         ThrowableInfo _info;
         private int _tickDiff;
@@ -21,7 +20,6 @@ namespace ExoplanetStudios.ExtractionShooter
             // Physics
             _velocity = direction.normalized * info.InitialVelocity;
 
-            _lastPosition = transform.position;
             _spawnPosition = transform.position;
 
             _tickDiff = tickDiff;
@@ -30,6 +28,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _info = info;
 
             _sqrMaxDistance = info.MaxDistance * info.MaxDistance;
+            _sqrMinVelocity = info.MinVelocity * info.MinVelocity;
 
             _displayObject.OnInitialisation(transform.position, _velocity);
 
@@ -38,20 +37,34 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public static void SpawnProjectile(ThrowableInfo info, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
         {
-            GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.GranadeProjectile], position, Quaternion.identity);
+            GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Throwable], position, Quaternion.identity);
             projectileObj.GetComponent<Throwable>().Initialize(info, direction, ownerId, tickDiff);
         }
         private void Tick()
         {
             Vector3 movement = _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
-            transform.position += movement;
 
-            if (Physics.Raycast(_lastPosition, movement, out RaycastHit hit, movement.magnitude, ProjectileHitLayer.CanHit))
+            // Physics
+            _velocity -= _velocity * _info.Drag * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Drag
+            _velocity += Vector3.down * _info.Dropoff * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Gravity
+
+            if (Physics.Raycast(transform.position, movement, out RaycastHit hit, movement.magnitude, ProjectileHitLayer.TrowableHit))
             {
-                Instantiate(_info.Explosion, hit.point, Quaternion.identity).ExecuteExplosion(_ownerId, _tickDiff);
-                EndProjectile();
-                return;
+                transform.position = hit.point;
+                _velocity = Vector3.Reflect(_velocity, hit.normal) * _info.Bouncyness;
+
+                if (_velocity.sqrMagnitude < _sqrMinVelocity)
+                {
+                    // Explode granade
+                    Instantiate(_info.Explosion, transform.position, Quaternion.identity).ExecuteExplosion(_ownerId, _tickDiff);
+                    EndProjectile();
+                    return;
+                }
             }
+            else
+                transform.position += movement;
+
+            _displayObject.SetPositionAndDirection(transform.position, _velocity);
 
             // Lifetime
             if ((transform.position - _spawnPosition).sqrMagnitude > _sqrMaxDistance)
@@ -59,13 +72,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 EndProjectile();
                 return;
             }
-            
-            // Physics
-            _velocity -= _velocity * _info.Drag * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Drag
-            _velocity += Vector3.down * _info.Dropoff * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Gravity
-
-            _lastPosition = transform.position;
-            _displayObject.SetPositionAndDirection(transform.position, _velocity);
 
             void EndProjectile()
             {

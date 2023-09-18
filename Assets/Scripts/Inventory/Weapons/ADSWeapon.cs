@@ -8,14 +8,14 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private float ADSFOV;
         [SerializeField] private float TransitTime;
-        [SerializeField] private float VelocityMultiplier;
+        [SerializeField] private float ADSVelocityMul;
         private CinemachineVirtualCamera _camera;
         private FirstPersonController _controller;
         private Vector3 _weaponADSPos;
         private Vector3 _weaponDefaultPos;
         private float _defaultFOV;
-        private float _timer;
-        protected bool InADSTransit => _timer > 0 && _timer < TransitTime;
+        private float _adsState;
+        protected bool InADSTransit => _adsState > 0 && _adsState < TransitTime;
         private const string ADS_POS_NAME = "WeaponADSPosition";
         public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             base.Initialize(ownerId, isOwner, controller);
@@ -39,40 +39,43 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             base.Deactivate();
 
-            if (_timer > 0)
+            if (_adsState > 0)
+            {
                 StopADS();
+                _adsState = 0;
+            }
                 
             if (_camera != null)
                 _camera.m_Lens.FieldOfView = _defaultFOV;
         }
         private void StartADS() {
-            _controller.IncreaseMovementVelocityMultiplier(VelocityMultiplier);
+            _controller.IncreaseMovementVelocityMultiplier(ADSVelocityMul);
         }
         private void StopADS() {
-            _controller.DecreaseMovementVelocityMultiplier(VelocityMultiplier);
+            _controller.DecreaseMovementVelocityMultiplier(ADSVelocityMul);
         }
-        public override void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
-            base.UpdateWeapon(weaponInputState, playerState);
+            base.UpdateItem(weaponInputState, playerState);
 
             if (weaponInputState.SecondaryAction && !IsReloading)
             {
-                if (_timer <= 0)
+                if (_adsState <= 0)
                     StartADS();
 
-                _timer += NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+                _adsState += NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             }
             else
             {
-                if (_timer > 0 && _timer - NetworkManager.Singleton.LocalTime.FixedDeltaTime <= 0)
+                if (_adsState > 0 && _adsState - NetworkManager.Singleton.LocalTime.FixedDeltaTime <= 0)
                     StopADS();
 
-                _timer -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+                _adsState -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
             }
             
-            _timer = Mathf.Clamp(_timer, 0, TransitTime);
+            _adsState = Mathf.Clamp(_adsState, 0, TransitTime);
 
-            float relativeTimer = _timer / TransitTime;
+            float relativeTimer = _adsState / TransitTime;
 
             _weaponObject.transform.localPosition = Vector3.Lerp(_weaponDefaultPos, _weaponADSPos, relativeTimer);
 

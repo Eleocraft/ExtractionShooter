@@ -248,6 +248,7 @@ MonoBehaviour:
   WeaponTransform: {fileID: 3994248005739612147}
   CrouchBodyYScale: 0.73
   CrouchCamYPos: 1.2
+  DefaultCamYPos: 1.6
   Body: {fileID: 3670707894309894360}
 --- !u!1 &3475960540242983940
 GameObject:

@@ -4,7 +4,8 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class DefaultProjectileGraphic : ProjectileGraphic
     {
-        [SerializeField] private float RemainAfterEnd = 2f;
+        [SerializeField] private float DecayTime = 2f;
+        [SerializeField] private float FadeTime = 2f;
         public override void SetPositionAndDirection(Vector3 newPosition, Vector3 newDirection)
         {
             transform.position = newPosition;
@@ -12,7 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override void EndProjectile()
         {
-            this.Invoke(() => Destroy(gameObject), RemainAfterEnd);
+            GetComponent<FadeController>().StartTimer(DecayTime, FadeTime);
         }
     }
 }

@@ -3,16 +3,14 @@ using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public abstract class Weapon : ScriptableObject
+    public abstract class Weapon : ItemObject
     {
-        protected ulong _ownerId;
         [SerializeField] private GameObject WeaponPrefab;
         
         [SerializeField] private int Seed;
         
         private System.Random _rng;
 
-        protected Transform _cameraTransform;
         protected Transform _weaponParent;
 
         protected GameObject _weaponObject;
@@ -22,33 +20,45 @@ namespace ExoplanetStudios.ExtractionShooter
         protected int BulletsLoaded {
             get => _bulletsLoaded;
             set {
-                MagazineDisplay.SetMagazineInfo(value, MagSize);
+                if (_isOwner)
+                    MagazineDisplay.SetMagazineInfo(value, MagSize);
                 _bulletsLoaded = value;
             }
         }
         private float _reloadTimer;
         protected bool IsReloading => _reloadTimer > 0;
 
-        public virtual void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
+        public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
+            
+            base.Initialize(ownerId, isOwner, controller);
 
-            _cameraTransform = controller.PlayerModel.CameraSocket;
-            _ownerId = ownerId;
             _weaponParent = controller.PlayerModel.WeaponTransform;
             BulletsLoaded = MagSize;
             
             if (_rng == null)
                 _rng = new System.Random(Seed);
         }
-        public virtual void Activate() {
+        public override void Activate() {
+            base.Activate();
+
             _weaponObject = Instantiate(WeaponPrefab, _weaponParent);
-            if (_ownerId == NetworkManager.Singleton.LocalClientId)
+            if (_isOwner)
+            {
+                MagazineDisplay.Activate();
+                MagazineDisplay.SetMagazineInfo(BulletsLoaded, MagSize);
                 _weaponObject.SetLayerAllChildren(LayerMask.NameToLayer("First Person"));
+            }
         }
-        public virtual void Deactivate() {
+        public override void Deactivate() {
+            base.Deactivate();
+            
+            if (_isOwner)
+                MagazineDisplay.Deactivate();
+
             _reloadTimer = 0;
             Destroy(_weaponObject);
         }
-        public virtual void UpdateWeapon(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             if (_reloadTimer > 0)
             {
@@ -58,20 +68,13 @@ namespace ExoplanetStudios.ExtractionShooter
                     BulletsLoaded = MagSize;
             }
         }
-        public virtual void StartPrimaryAction() { }
-        public virtual void StopPrimaryAction() { }
-        public virtual void StartSecondaryAction() { }
-        public virtual void StopSecondaryAction() { }
 
-        public virtual void Reload() {
+        public override void Reload() {
             if (BulletsLoaded == MagSize || IsReloading)
                 return;
             
             _reloadTimer = ReloadTime;
         }
-        
-        protected Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * _cameraTransform.localPosition.y + playerState.Position;
-        protected Vector3 GetLookDirection(NetworkTransformState playerState) => Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * Vector3.forward;
 
         protected Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)
         {

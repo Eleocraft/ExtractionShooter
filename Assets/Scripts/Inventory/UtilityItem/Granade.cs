@@ -1,0 +1,31 @@
+using Unity.Netcode;
+using UnityEngine;
+
+namespace ExoplanetStudios.ExtractionShooter
+{
+    [CreateAssetMenu(fileName = "New Granade Weapon", menuName = "CustomObjects/Utility/Granade")]
+    public class Granade : UtilityItem
+    {
+        [SerializeField] private ThrowableInfo throwableInfo;
+        [SerializeField] private float Cooldown;
+        private float _cooldown;
+        private bool _threw;
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        {
+            if (_cooldown > 0)
+                _cooldown -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+
+            else if (weaponInputState.PrimaryAction && !_threw)
+            {
+                Throwable.SpawnProjectile(throwableInfo, GetCameraPosition(playerState), GetLookDirection(playerState), _ownerId, weaponInputState.TickDiff);
+                _threw = true;
+                _cooldown = Cooldown;
+            }
+        }
+
+        public override void StopPrimaryAction()
+        {
+            _threw = false;
+        }
+    }
+}

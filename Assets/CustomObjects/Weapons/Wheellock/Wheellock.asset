@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91481c85a810114daee984fcd2c4de9, type: 3}
   m_Name: Wheellock
   m_EditorClassIdentifier: 
+  ItemID: wheellock
+  VelocityMultiplier: 0.7
   WeaponPrefab: {fileID: 3726804448589417541, guid: b120790e657f1cb4480e058063a4d548,
     type: 3}
   Seed: 234
   ADSFOV: 50
   TransitTime: 0.1
-  VelocityMultiplier: 0.6
+  ADSVelocityMul: 0.8
   FirstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
   SecondShotInfo: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Cooldown: 0.1

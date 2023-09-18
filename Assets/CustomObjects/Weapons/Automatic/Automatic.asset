@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df2975fe62b16814fbd9ece340aec5cd, type: 3}
   m_Name: Automatic
   m_EditorClassIdentifier: 
+  ItemID: automatic
+  VelocityMultiplier: 0.6
   WeaponPrefab: {fileID: 3726804448589417541, guid: ada40baacb48c2444b17b44876cfc118,
     type: 3}
   Seed: 5534
   ADSFOV: 50
   TransitTime: 0.2
-  VelocityMultiplier: 0.5
+  ADSVelocityMul: 0.8
   projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}
   Cooldown: 0.1
   Spray:

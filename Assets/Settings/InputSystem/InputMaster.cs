@@ -328,6 +328,94 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             ]
         },
         {
+            ""name"": ""Inventory"",
+            ""id"": ""37e27f55-2b99-4e2a-82de-4c529c32f09a"",
+            ""actions"": [
+                {
+                    ""name"": ""MainWeaponSlot"",
+                    ""type"": ""Button"",
+                    ""id"": ""fa78c691-0642-4a0a-a12a-2e669d139893"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SecondaryWeaponSlot"",
+                    ""type"": ""Button"",
+                    ""id"": ""6a00b362-ab87-4ac8-93b5-4466aacb7239"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""UtilitySlot"",
+                    ""type"": ""Button"",
+                    ""id"": ""e26c2286-9795-4a5a-adf7-5541de5035c0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Unequip"",
+                    ""type"": ""Button"",
+                    ""id"": ""c2148027-8893-459b-b69d-8fecdf335083"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""43a7645a-3647-4c27-9566-fdc73540a9e1"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MainWeaponSlot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""75e86607-6b4d-47e2-89c0-bd3b09f3b646"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SecondaryWeaponSlot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""418751fc-ab52-46ba-8056-ef2b15c011b7"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Unequip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""17614edf-7cfb-4995-a119-2ed847327553"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UtilitySlot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
             ""name"": ""Menus"",
             ""id"": ""f3efd201-845a-4431-bc3f-70da7f6d4b14"",
             ""actions"": [
@@ -457,6 +545,12 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Mouse_Look = m_Mouse.FindAction("Look", throwIfNotFound: true);
         m_Mouse_PrimaryAction = m_Mouse.FindAction("PrimaryAction", throwIfNotFound: true);
         m_Mouse_SecondaryAction = m_Mouse.FindAction("SecondaryAction", throwIfNotFound: true);
+        // Inventory
+        m_Inventory = asset.FindActionMap("Inventory", throwIfNotFound: true);
+        m_Inventory_MainWeaponSlot = m_Inventory.FindAction("MainWeaponSlot", throwIfNotFound: true);
+        m_Inventory_SecondaryWeaponSlot = m_Inventory.FindAction("SecondaryWeaponSlot", throwIfNotFound: true);
+        m_Inventory_UtilitySlot = m_Inventory.FindAction("UtilitySlot", throwIfNotFound: true);
+        m_Inventory_Unequip = m_Inventory.FindAction("Unequip", throwIfNotFound: true);
         // Menus
         m_Menus = asset.FindActionMap("Menus", throwIfNotFound: true);
         m_Menus_Escape = m_Menus.FindAction("Escape", throwIfNotFound: true);
@@ -679,6 +773,76 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     }
     public MouseActions @Mouse => new MouseActions(this);
 
+    // Inventory
+    private readonly InputActionMap m_Inventory;
+    private List<IInventoryActions> m_InventoryActionsCallbackInterfaces = new List<IInventoryActions>();
+    private readonly InputAction m_Inventory_MainWeaponSlot;
+    private readonly InputAction m_Inventory_SecondaryWeaponSlot;
+    private readonly InputAction m_Inventory_UtilitySlot;
+    private readonly InputAction m_Inventory_Unequip;
+    public struct InventoryActions
+    {
+        private @InputMaster m_Wrapper;
+        public InventoryActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
+        public InputAction @MainWeaponSlot => m_Wrapper.m_Inventory_MainWeaponSlot;
+        public InputAction @SecondaryWeaponSlot => m_Wrapper.m_Inventory_SecondaryWeaponSlot;
+        public InputAction @UtilitySlot => m_Wrapper.m_Inventory_UtilitySlot;
+        public InputAction @Unequip => m_Wrapper.m_Inventory_Unequip;
+        public InputActionMap Get() { return m_Wrapper.m_Inventory; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(InventoryActions set) { return set.Get(); }
+        public void AddCallbacks(IInventoryActions instance)
+        {
+            if (instance == null || m_Wrapper.m_InventoryActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_InventoryActionsCallbackInterfaces.Add(instance);
+            @MainWeaponSlot.started += instance.OnMainWeaponSlot;
+            @MainWeaponSlot.performed += instance.OnMainWeaponSlot;
+            @MainWeaponSlot.canceled += instance.OnMainWeaponSlot;
+            @SecondaryWeaponSlot.started += instance.OnSecondaryWeaponSlot;
+            @SecondaryWeaponSlot.performed += instance.OnSecondaryWeaponSlot;
+            @SecondaryWeaponSlot.canceled += instance.OnSecondaryWeaponSlot;
+            @UtilitySlot.started += instance.OnUtilitySlot;
+            @UtilitySlot.performed += instance.OnUtilitySlot;
+            @UtilitySlot.canceled += instance.OnUtilitySlot;
+            @Unequip.started += instance.OnUnequip;
+            @Unequip.performed += instance.OnUnequip;
+            @Unequip.canceled += instance.OnUnequip;
+        }
+
+        private void UnregisterCallbacks(IInventoryActions instance)
+        {
+            @MainWeaponSlot.started -= instance.OnMainWeaponSlot;
+            @MainWeaponSlot.performed -= instance.OnMainWeaponSlot;
+            @MainWeaponSlot.canceled -= instance.OnMainWeaponSlot;
+            @SecondaryWeaponSlot.started -= instance.OnSecondaryWeaponSlot;
+            @SecondaryWeaponSlot.performed -= instance.OnSecondaryWeaponSlot;
+            @SecondaryWeaponSlot.canceled -= instance.OnSecondaryWeaponSlot;
+            @UtilitySlot.started -= instance.OnUtilitySlot;
+            @UtilitySlot.performed -= instance.OnUtilitySlot;
+            @UtilitySlot.canceled -= instance.OnUtilitySlot;
+            @Unequip.started -= instance.OnUnequip;
+            @Unequip.performed -= instance.OnUnequip;
+            @Unequip.canceled -= instance.OnUnequip;
+        }
+
+        public void RemoveCallbacks(IInventoryActions instance)
+        {
+            if (m_Wrapper.m_InventoryActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IInventoryActions instance)
+        {
+            foreach (var item in m_Wrapper.m_InventoryActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_InventoryActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public InventoryActions @Inventory => new InventoryActions(this);
+
     // Menus
     private readonly InputActionMap m_Menus;
     private List<IMenusActions> m_MenusActionsCallbackInterfaces = new List<IMenusActions>();
@@ -810,6 +974,13 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnPrimaryAction(InputAction.CallbackContext context);
         void OnSecondaryAction(InputAction.CallbackContext context);
+    }
+    public interface IInventoryActions
+    {
+        void OnMainWeaponSlot(InputAction.CallbackContext context);
+        void OnSecondaryWeaponSlot(InputAction.CallbackContext context);
+        void OnUtilitySlot(InputAction.CallbackContext context);
+        void OnUnequip(InputAction.CallbackContext context);
     }
     public interface IMenusActions
     {

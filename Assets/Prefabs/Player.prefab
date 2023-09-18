@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6289551013835034741}
   - component: {fileID: 3974214662581333730}
   - component: {fileID: -3934378158165779511}
+  - component: {fileID: 75289227857450993}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -97,10 +98,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Playermodel: {fileID: 3637600293124795170, guid: 35200bd5f0019b44ca8fa7e8d605a211,
     type: 3}
-  WalkSpeed: 2.5
-  RunSpeed: 5
-  CrouchSpeed: 1.5
-  RotationSensitivity: 1
+  WalkSpeed: 3
+  RunSpeed: 7
+  CrouchSpeed: 2
+  RotationSensitivity: 0.2
   GroundAccelerationRate: 10
   GroundDecelerationRate: 20
   AirSpeedChangeRate: 5
@@ -133,8 +134,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
-  MainWeapon: {fileID: 11400000, guid: 95d012b1cb130974eb097995cf582451, type: 2}
-  UtilityItem: {fileID: 11400000, guid: 197eaa75b3c881448a3d89b927ab18f4, type: 2}
 --- !u!114 &3974214662581333730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,3 +168,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerBulletHitboxPrefab: {fileID: 6482935497804960563, guid: 154c0b532dae9a0468376585c46bc317,
     type: 3}
+--- !u!114 &75289227857450993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5565047739996945905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb0eece7abd2c894ba7acbf129faba2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}

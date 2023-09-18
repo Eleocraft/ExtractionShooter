@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1593023639722151801}
   - component: {fileID: -6792164485709849913}
   m_Layer: 0
-  m_Name: GranadeProjectile
+  m_Name: Throwable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

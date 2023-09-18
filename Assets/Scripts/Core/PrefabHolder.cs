@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public enum PrefabTypes { Projectile, GranadeProjectile }
+    public enum PrefabTypes { Projectile, Throwable }
     public class PrefabHolder : MonoSingleton<PrefabHolder>
     {
         [SerializeField] private EnumDictionary<PrefabTypes, GameObject> prefabs;

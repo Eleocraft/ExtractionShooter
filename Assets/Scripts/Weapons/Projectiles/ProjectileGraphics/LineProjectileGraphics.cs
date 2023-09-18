@@ -9,10 +9,8 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float SqrCornerDistance = 2f;
         private LineRenderer _lineRenderer;
         private Vector3 _lastSavePosition;
-        private FadeController _lineFadeController;
         public override void OnInitialisation(Vector3 position, Vector3 direction)
         {
-            _lineFadeController = GetComponent<FadeController>();
             _lineRenderer = GetComponent<LineRenderer>();
             _lineRenderer.positionCount = 1;
             AddPosition(position);
@@ -35,7 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void EndProjectile()
         {
             _lineRenderer.positionCount--;
-            _lineFadeController.StartTimer(DecayTime, FadeTime, () => Destroy(gameObject));
+            GetComponent<FadeController>().StartTimer(DecayTime, FadeTime, () => Destroy(gameObject));
         }
     }
 }

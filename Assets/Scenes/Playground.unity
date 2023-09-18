@@ -1658,7 +1658,7 @@ MonoBehaviour:
       key: 0
       value: {fileID: 5057328359918851080, guid: 35db20243febf2d43ad7898d9bb95328,
         type: 3}
-    - name: GranadeProjectile
+    - name: Throwable
       key: 1
       value: {fileID: 5057328359918851080, guid: e338883080dff17438ecfe34d351b7b3,
         type: 3}
@@ -1677,6 +1677,9 @@ MonoBehaviour:
   canHit:
     serializedVersion: 2
     m_Bits: 769
+  throwableHit:
+    serializedVersion: 2
+    m_Bits: 513
 --- !u!114 &507968759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1689,9 +1692,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7b67339e2361ff4b8170a3bb1a13fde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WeaponObjects:
+  ItemObjects:
   - {fileID: 11400000, guid: f8bd593bd5742d446867d9d78522d065, type: 2}
   - {fileID: 11400000, guid: 95d012b1cb130974eb097995cf582451, type: 2}
+  - {fileID: 11400000, guid: 197eaa75b3c881448a3d89b927ab18f4, type: 2}
 --- !u!1 &515480884
 GameObject:
   m_ObjectHideFlags: 0

@@ -60,5 +60,5 @@ Material:
     - _Threshold: 0.25
     m_Colors:
     - _BaseColor: {r: 0, g: 0.06345191, b: 0.7264151, a: 0.64705884}
-    - _EmissiveColor: {r: 0, g: 15.939967, b: 37.12846, a: 1}
+    - _EmissiveColor: {r: 0, g: 7.9699836, b: 18.56423, a: 0.5882353}
   m_BuildTextureStacks: []

@@ -5,67 +5,41 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class ItemDatabase : MonoBehaviour
     {
-        [SerializeField] private List<Weapon> WeaponObjects;
-        [SerializeField] private List<UtilityItem> UtilityObjects;
-        public static Dictionary<string, Weapon> WeaponItems { get; private set; }
-        public static Dictionary<string, UtilityItem> UtilityItems { get; private set; }
+        [SerializeField] private List<ItemObject> ItemObjects;
+        public static Dictionary<string, ItemObject> Items { get; private set; }
 
-        public void Awake()
+        private void Awake()
         {
 #if UNITY_EDITOR
             GetItems();
 #endif
-            // Weapons
-            WeaponItems = new();
-            for (int i = 0; i < WeaponObjects.Count; i++)
+            Items = new();
+            for (int i = 0; i < ItemObjects.Count; i++)
             {
-                if (WeaponObjects[i] == null)
+                if (ItemObjects[i] == null)
                 {
-                    WeaponObjects.RemoveAt(i);
+                    ItemObjects.RemoveAt(i);
                     i--;
                     continue;
                 }
-                WeaponItems.Add(WeaponObjects[i].name, WeaponObjects[i]);
-            }
-            // Utility
-            UtilityItems = new();
-            for (int i = 0; i < UtilityObjects.Count; i++)
-            {
-                if (UtilityObjects[i] == null)
-                {
-                    UtilityObjects.RemoveAt(i);
-                    i--;
-                    continue;
-                }
-                UtilityItems.Add(UtilityObjects[i].name, UtilityObjects[i]);
+                Items.Add(ItemObjects[i].ItemID, ItemObjects[i]);
             }
         }
         public void OnValidate()
         {
-            // Weapons
-            for (int i = 0; i < WeaponObjects.Count; i++)
-                if (WeaponObjects[i] == null)
-                    WeaponObjects.RemoveAt(i);
-            // Utility
-            for (int i = 0; i < UtilityObjects.Count; i++)
-                if (UtilityObjects[i] == null)
-                    UtilityObjects.RemoveAt(i);
+            for (int i = 0; i < ItemObjects.Count; i++)
+                if (ItemObjects[i] == null)
+                    ItemObjects.RemoveAt(i);
         }
 #if UNITY_EDITOR
         [ContextMenu("Update")]
         public void GetItems()
         {
-            WeaponObjects ??= new();
+            ItemObjects ??= new();
 
-            foreach (Weapon i in Utility.FindAssetsByType<Weapon>())
-                if (!WeaponObjects.Contains(i))
-                    WeaponObjects.Add(i);
-
-            UtilityObjects ??= new();
-
-            foreach (UtilityItem i in Utility.FindAssetsByType<UtilityItem>())
-                if (!UtilityObjects.Contains(i))
-                    UtilityObjects.Add(i);
+            foreach (ItemObject i in Utility.FindAssetsByType<ItemObject>())
+                if (!ItemObjects.Contains(i))
+                    ItemObjects.Add(i);
                     
             OnValidate();
         }

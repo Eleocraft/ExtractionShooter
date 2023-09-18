@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3280878a2bc2754686700180cb8b0bf, type: 3}
   m_Name: Granade
   m_EditorClassIdentifier: 
+  ItemID: granade
+  VelocityMultiplier: 0.8
   throwableInfo: {fileID: 11400000, guid: 9349f9d46be4c1345a5eb00a37f84825, type: 2}
+  Cooldown: 6

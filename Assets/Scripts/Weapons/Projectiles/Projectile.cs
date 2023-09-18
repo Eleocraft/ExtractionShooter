@@ -7,7 +7,6 @@ namespace ExoplanetStudios.ExtractionShooter
     public class Projectile : MonoBehaviour
     {
         private Vector3 _spawnPosition;
-        private Vector3 _lastPosition;
         private Vector3 _velocity;
         private ProjectileInfo _info;
         private float _sqrMaxDistance;
@@ -23,7 +22,6 @@ namespace ExoplanetStudios.ExtractionShooter
             // Physics
             _velocity = direction.normalized * info.MuzzleVelocity;
 
-            _lastPosition = transform.position;
             _spawnPosition = transform.position;
 
             _ownerId = ownerId;
@@ -51,13 +49,19 @@ namespace ExoplanetStudios.ExtractionShooter
         private void Tick()
         {
             Vector3 movement = _velocity * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
-            transform.position += movement;
 
-            if (Hitscan(movement, _lastPosition, ref _velocity))
+            // Physics
+            _velocity -= _velocity * _info.Drag * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Drag
+            _velocity += Vector3.down * _info.Dropoff * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Gravity
+
+            if (Hitscan(movement, transform.position, ref _velocity))
             {
                 EndProjectile();
                 return;
             }
+
+            transform.position += movement;
+            _displayObject.SetPositionAndDirection(transform.position, _velocity);
 
             // Lifetime
             if ((transform.position - _spawnPosition).sqrMagnitude > _sqrMaxDistance)
@@ -65,20 +69,13 @@ namespace ExoplanetStudios.ExtractionShooter
                 EndProjectile();
                 return;
             }
-            
-            // Physics
-            _velocity -= _velocity * _info.Drag * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Drag
-            _velocity += Vector3.down * _info.Dropoff * NetworkManager.Singleton.LocalTime.FixedDeltaTime; // Gravity
 
             // Check for min velocity
-            if (_velocity.sqrMagnitude <= _sqrMinVelocity)
+            else if (_velocity.sqrMagnitude <= _sqrMinVelocity)
             {
                 EndProjectile();
                 return;
             }
-
-            _lastPosition = transform.position;
-            _displayObject.SetPositionAndDirection(transform.position, _velocity);
 
             void EndProjectile()
             {

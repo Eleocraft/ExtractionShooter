@@ -7,7 +7,6 @@ namespace ExoplanetStudios.ExtractionShooter
         public bool PrimaryAction;
         public bool SecondaryAction;
         public bool ReloadAction;
-        public bool UtilityAction;
         public int ServerTickOnCreation;
         public NetworkWeaponInputState() {}
         public NetworkWeaponInputState(NetworkWeaponInputState oldState, int tick)
@@ -15,17 +14,15 @@ namespace ExoplanetStudios.ExtractionShooter
             PrimaryAction = oldState.PrimaryAction;
             SecondaryAction = oldState.SecondaryAction;
             ReloadAction = oldState.ReloadAction;
-            UtilityAction = oldState.UtilityAction;
             ServerTickOnCreation = oldState.ServerTickOnCreation;
 
             Tick = tick;
         }
-        public NetworkWeaponInputState(bool primaryAction, bool secondaryAction, bool reloadAction, bool utilityAction, int serverTick, int tick)
+        public NetworkWeaponInputState(bool primaryAction, bool secondaryAction, bool reloadAction, int serverTick, int tick)
         {
             PrimaryAction = primaryAction;
             SecondaryAction = secondaryAction;
             ReloadAction = reloadAction;
-            UtilityAction = utilityAction;
             ServerTickOnCreation = serverTick;
             Tick = tick;
         }
@@ -40,7 +37,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 reader.ReadValueSafe(out PrimaryAction);
                 reader.ReadValueSafe(out SecondaryAction);
                 reader.ReadValueSafe(out ReloadAction);
-                reader.ReadValueSafe(out UtilityAction);
                 reader.ReadValueSafe(out ServerTickOnCreation);
             }
             else
@@ -50,7 +46,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(PrimaryAction);
                 writer.WriteValueSafe(SecondaryAction);
                 writer.WriteValueSafe(ReloadAction);
-                writer.WriteValueSafe(UtilityAction);
                 writer.WriteValueSafe(ServerTickOnCreation);
             }
         }
