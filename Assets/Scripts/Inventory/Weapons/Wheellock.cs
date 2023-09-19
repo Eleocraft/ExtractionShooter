@@ -6,22 +6,23 @@ namespace ExoplanetStudios.ExtractionShooter
     [CreateAssetMenu(fileName = "New Wheellock Weapon", menuName = "CustomObjects/Weapons/Wheellock")]
     public class Wheellock : ADSWeapon
     {
-        [Header("ProjectileInfo")]
-        [SerializeField] private ProjectileInfo FirstShotInfo;
-        [SerializeField] private ProjectileInfo SecondShotInfo;
         [Header("Time")]
         [SerializeField] private float Cooldown;
-        [Header("SprayAmountDegrees")]
-        [SerializeField] private float FirstShotSpray;
-        [SerializeField] private float FirstShotSprayADS;
-        [SerializeField] private float SecondShotSpray;
-        [SerializeField] private float MovementError;
         [Header("Reload")]
         [SerializeField] private float FirstShotReloadTime;
         [SerializeField] private float SecondShotReloadTime;
-        [Header("Audio")]
+        [Header("FirstShot")]
+        [SerializeField] private ProjectileInfo FirstShotInfo;
+        [SerializeField] private float FirstShotSpray;
+        [SerializeField] private float FirstShotSprayADS;
+        [SerializeField] private float MovementError;
         [SerializeField] private AudioClip FirstShotAudio;
-        [SerializeField] private AudioClip SecondShotAudio;
+        [Header("SecondShot")]
+        [SerializeField] private WheellockSecondShotData DefaultSecondShotData;
+        [SerializeField] private WheellockSecondShotData StunSecondShotData;
+        [SerializeField] private WheellockSecondShotData AccurateSecondShotData;
+        [SerializeField] private WheellockSecondShotData ShotgunSecondShotData;
+        [SerializeField] private int ShotgunProjectileAmount;
 
         private float _cooldown;
 
@@ -95,14 +96,70 @@ namespace ExoplanetStudios.ExtractionShooter
                 
                 BulletsLoaded--;
             }
+            // All glitches
             void SecondShot()
             {
-                Vector3 direction = GetShootDirection(playerState, SecondShotSpray, MovementError);
-                Projectile.SpawnProjectile(SecondShotInfo, _secondShotSource.position, GetCameraPosition(playerState), direction, _ownerId, weaponInputState.TickDiff);
-                _gunAudioSource[1].PlayOneShot(SecondShotAudio);
+                switch (ActiveModifier)
+                {
+                    case 0:
+                        DefaultSecondShot();
+                        break;
+                    case 1:
+                        StunSecondShot();
+                        break;
+                    case 2:
+                        AccurateSecondShot();
+                        break;
+                    case 3:
+                        ShotgunSecondShot();
+                        break;
+                }
 
                 BulletsLoaded--;
             }
+            void DefaultSecondShot()
+            {
+                float spray = weaponInputState.SecondaryAction ? DefaultSecondShotData.SprayADS : DefaultSecondShotData.Spray;
+
+                Vector3 direction = GetShootDirection(playerState, spray, MovementError);
+                Projectile.SpawnProjectile(DefaultSecondShotData.Info, _secondShotSource.position, GetCameraPosition(playerState), direction, _ownerId, weaponInputState.TickDiff);
+                _gunAudioSource[1].PlayOneShot(DefaultSecondShotData.Audio);
+            }
+            void StunSecondShot()
+            {
+                float spray = weaponInputState.SecondaryAction ? StunSecondShotData.SprayADS : StunSecondShotData.Spray;
+
+                Vector3 direction = GetShootDirection(playerState, spray, MovementError);
+                Projectile.SpawnProjectile(StunSecondShotData.Info, _secondShotSource.position, GetCameraPosition(playerState), direction, _ownerId, weaponInputState.TickDiff);
+                _gunAudioSource[1].PlayOneShot(StunSecondShotData.Audio);
+            }
+            void AccurateSecondShot()
+            {
+                float spray = weaponInputState.SecondaryAction ? AccurateSecondShotData.SprayADS : AccurateSecondShotData.Spray;
+
+                Vector3 direction = GetShootDirection(playerState, spray, MovementError);
+                Projectile.SpawnProjectile(AccurateSecondShotData.Info, _secondShotSource.position, GetCameraPosition(playerState), direction, _ownerId, weaponInputState.TickDiff);
+                _gunAudioSource[1].PlayOneShot(AccurateSecondShotData.Audio);
+            }
+            void ShotgunSecondShot()
+            {
+                float spray = weaponInputState.SecondaryAction ? ShotgunSecondShotData.SprayADS : ShotgunSecondShotData.Spray;
+
+                for (int i = 0; i < ShotgunProjectileAmount; i++)
+                {
+                    Vector3 direction = GetShootDirection(playerState, spray, MovementError);
+                    Projectile.SpawnProjectile(ShotgunSecondShotData.Info, _secondShotSource.position, GetCameraPosition(playerState), direction, _ownerId, weaponInputState.TickDiff);
+                }
+                _gunAudioSource[1].PlayOneShot(ShotgunSecondShotData.Audio);
+            }
+        }
+        [System.Serializable]
+        public class WheellockSecondShotData
+        {
+            public AudioClip Audio;
+            public ProjectileInfo Info;
+            public float Spray;
+            public float SprayADS;
         }
     }
 }

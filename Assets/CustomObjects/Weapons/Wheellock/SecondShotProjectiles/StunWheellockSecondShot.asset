@@ -10,25 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c07420cc09fb4c409ba3c4fcdd04df7, type: 3}
-  m_Name: WheellockFirstShot
+  m_Name: StunWheellockSecondShot
   m_EditorClassIdentifier: 
   Damages:
     values:
     - name: Default
       key: 0
-      value: 40
+      value: 80
     - name: Headshot
       key: 1
-      value: 80
-  SlowTime: 1
-  SlowMultiplier: 0.8
-  MuzzleVelocity: 200
-  Drag: 0.6
-  Dropoff: 9.81
-  PenetrationForce: 0.1
+      value: 150
+  SlowTime: 0.5
+  SlowMultiplier: 0
+  MuzzleVelocity: 120
+  Drag: 0.8
+  Dropoff: 11.83
+  PenetrationForce: 0.008
   MaxDistance: 200
   MinVelocity: 20
-  Prefab: {fileID: 6847435988720863931, guid: dde4e3477d432684d90158d6e538fb9d, type: 3}
+  Prefab: {fileID: 6847435988720863931, guid: de631dc22f57fe846931ce7cc836e12b, type: 3}
   HitMarker: {fileID: 7882812698031039389, guid: 2c512890680e9564b825dfb025b298a3,
     type: 3}
   PenetrateMarker: {fileID: 7882812698031039389, guid: adb0c5e100999ab44b168c830eae7736,

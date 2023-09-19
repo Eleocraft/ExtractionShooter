@@ -8,6 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
         protected ulong _ownerId;
         protected bool _isOwner;
         [ReadOnly] public string ItemID;
+        public int ActiveModifier;
         public float VelocityMultiplier;
         
         protected Transform _cameraTransform;

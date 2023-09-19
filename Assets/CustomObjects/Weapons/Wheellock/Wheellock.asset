@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Wheellock
   m_EditorClassIdentifier: 
   ItemID: wheellock
+  ActiveModifier: 3
   VelocityMultiplier: 0.7
   WeaponPrefab: {fileID: 3726804448589417541, guid: b120790e657f1cb4480e058063a4d548,
     type: 3}
@@ -20,14 +21,32 @@ MonoBehaviour:
   ADSFOV: 50
   TransitTime: 0.1
   ADSVelocityMul: 0.8
-  FirstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
-  SecondShotInfo: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Cooldown: 0.1
-  FirstShotSpray: 0.125
-  FirstShotSprayADS: 0
-  SecondShotSpray: 3
-  MovementError: 1.5
   FirstShotReloadTime: 0.5
   SecondShotReloadTime: 0.75
+  FirstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
+  FirstShotSpray: 0.125
+  FirstShotSprayADS: 0
+  MovementError: 1.5
   FirstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
-  SecondShotAudio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
+  DefaultSecondShotData:
+    Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
+    Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
+    Spray: 3
+    SprayADS: 2
+  StunSecondShotData:
+    Audio: {fileID: 8300000, guid: 061d9650a1057794196c8601704b86bb, type: 3}
+    Info: {fileID: 11400000, guid: c785ac9420052194ab8fe3a2cc79082e, type: 2}
+    Spray: 3
+    SprayADS: 2
+  AccurateSecondShotData:
+    Audio: {fileID: 8300000, guid: 582bd6a756326ae49b59ac58c8cb62ad, type: 3}
+    Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
+    Spray: 0.125
+    SprayADS: 0
+  ShotgunSecondShotData:
+    Audio: {fileID: 8300000, guid: 3c7e151c14f8fcd429a2b019c60c7306, type: 3}
+    Info: {fileID: 11400000, guid: 657b6ccd717dbb44f8a6e7c4e054b8ee, type: 2}
+    Spray: 4
+    SprayADS: 4
+  ShotgunProjectileAmount: 8
