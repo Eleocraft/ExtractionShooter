@@ -82,7 +82,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 shootDirection = GetLookDirection(playerState); 
             Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
 
-            return Quaternion.AngleAxis((spray + maxMovementError * playerState.Velocity.XZ().magnitude) * (float)_rng.NextDouble(), rotationVector) * shootDirection;
+            return Quaternion.AngleAxis((spray + maxMovementError * playerState.Velocity.magnitude) * (float)_rng.NextDouble(), rotationVector) * shootDirection;
         }
     }
 }

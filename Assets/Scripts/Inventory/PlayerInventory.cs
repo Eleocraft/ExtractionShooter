@@ -15,23 +15,24 @@ namespace ExoplanetStudios.ExtractionShooter
         private Dictionary<ItemSlot, ItemObject> _itemObjects = new();
 
         private NetworkVariable<ItemSlot> ActiveSlot = new();
-        private NetworkVariable<NetworkItems> Items = new();
 
-        public ItemObject ActiveItemObject => ActiveSlot.Value == ItemSlot.None ? null : _itemObjects[ActiveSlot.Value];
+        public ItemObject ActiveItemObject => _itemObjects.ContainsKey(ActiveSlot.Value) ? _itemObjects[ActiveSlot.Value] : null;
         public event Action<ItemObject> ChangedActiveItem;
+        private void Awake()
+        {
+            _firstPersonController = GetComponent<FirstPersonController>();
+        }
         private void Start()
         {
             _controls = GI.Controls;
-            _firstPersonController = GetComponent<FirstPersonController>();
-            ActiveSlot.OnValueChanged += ActivateItem;
-            Items.OnValueChanged += UpdateActiveItems;
-
+            
             if (IsServer)
             {
-                Items.Value = new();
-                AddItem(ItemSlot.MainSlot, "wheellock");
-                AddItem(ItemSlot.SecondarySlot, "automatic");
-                AddItem(ItemSlot.Utility, "granade");
+                NetworkManager.OnClientConnectedCallback += OnClientConnected;
+
+                SetItem(new(ItemSlot.MainSlot, "wheellock"));
+                SetItem(new(ItemSlot.SecondarySlot, "automatic"));
+                SetItem(new(ItemSlot.Utility, "granade"));
             }
             if (IsOwner)
             {
@@ -41,12 +42,22 @@ namespace ExoplanetStudios.ExtractionShooter
                 _controls.Inventory.Unequip.performed += Unequip;
             }
         }
+        private void OnClientConnected(ulong id)
+        {
+            foreach (KeyValuePair<ItemSlot, ItemObject> itemObject in _itemObjects)
+                UpdateItemObjectClientRpc(new(itemObject.Key, itemObject.Value.ItemID, itemObject.Value.ActiveModifier));
+        }
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            ActiveSlot.OnValueChanged += ActivateItem;
+        }
         public override void OnDestroy()
         {
             base.OnDestroy();
 
             ActiveSlot.OnValueChanged -= ActivateItem;
-            Items.OnValueChanged -= UpdateActiveItems;
 
             if (!IsOwner)
                 return;
@@ -56,6 +67,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _controls.Inventory.UtilitySlot.performed -= ChangeToUtilitySlot;
             _controls.Inventory.Unequip.performed -= Unequip;
         }
+
         private void ChangeToMainWeaponSlot(InputAction.CallbackContext ctx) => ActivateItemServerRpc(ItemSlot.MainSlot);
         private void ChangeToSecondaryWeaponSlot(InputAction.CallbackContext ctx) => ActivateItemServerRpc(ItemSlot.SecondarySlot);
         private void ChangeToUtilitySlot(InputAction.CallbackContext ctx) => ActivateItemServerRpc(ItemSlot.Utility);
@@ -84,66 +96,56 @@ namespace ExoplanetStudios.ExtractionShooter
 
             ChangedActiveItem?.Invoke(_itemObjects[newSlot]);
         }
-
-        public void AddItem(ItemSlot slot, string itemID)
+        
+        public void SetModifier(ItemSlot itemSlot, int modifier)
         {
             if (!IsServer) return;
 
-            Items.Value.Items.Add((slot, itemID));
-            Items.Value = new NetworkItems { Items = Items.Value.Items };
+            SetItem(new(itemSlot, _itemObjects[itemSlot].ItemID, modifier));
         }
-        private void UpdateActiveItems(NetworkItems old, NetworkItems newItems)
+        public void SetItem(Item item)
         {
-            foreach ((ItemSlot slot, string id) item in newItems.Items)
-                if (!_itemObjects.ContainsKey(item.slot) || _itemObjects[item.slot].ItemID != item.id)
-                    InstantiateItem(item.slot, item.id);
+            if (!IsServer) return;
 
-
-            void InstantiateItem(ItemSlot slot, string itemID)
+            UpdateItemObject(item);
+            UpdateItemObjectClientRpc(item);
+        }
+        [ClientRpc]
+        private void UpdateItemObjectClientRpc(Item item)
+        {
+            if (IsServer) return;
+            UpdateItemObject(item);
+        }
+        private void UpdateItemObject(Item item)
+        {
+            if (!_itemObjects.ContainsKey(item.Slot) || _itemObjects[item.Slot].ItemID != item.Id)
+                InstantiateItem(item.Slot, item.Id);
+                
+            _itemObjects[item.Slot].ActiveModifier = item.ActiveModifier;
+                
+            void InstantiateItem(ItemSlot slot, string itemId)
             {
-                if (ActiveSlot.Value == slot)
-                    _itemObjects[slot].Deactivate();
-
                 if (!_itemObjects.ContainsKey(slot))
                     _itemObjects.Add(slot, default);
                 else
+                {
+                    if (ActiveSlot.Value == slot)
+                        _itemObjects[slot].Deactivate();
+                        
                     Destroy(_itemObjects[slot]);
-                
-                _itemObjects[slot] = Instantiate(ItemDatabase.Items[itemID]);
+                }
+                    
+                _itemObjects[slot] = Instantiate(ItemDatabase.Items[itemId]);
                 _itemObjects[slot].Initialize(OwnerClientId, IsOwner, _firstPersonController);
-                
+                    
                 if (ActiveSlot.Value == slot)
                     _itemObjects[slot].Activate();
             }
         }
-        private class NetworkItems : INetworkSerializable
+        [Command]
+        public static void SetWeaponModifier(List<string> args)
         {
-            public List<(ItemSlot, string)> Items = new();
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                if (serializer.IsReader)
-                {
-                    FastBufferReader reader = serializer.GetFastBufferReader();
-                    reader.ReadValueSafe(out int count);
-                    Items = new();
-                    for (int i = 0; i < count; i++)
-                    {
-                        reader.ReadValueSafe(out ItemSlot slot);
-                        reader.ReadValueSafe(out string id);
-                        Items.Add((slot, id));
-                    }
-                }
-                else
-                {
-                    FastBufferWriter writer = serializer.GetFastBufferWriter();
-                    writer.WriteValueSafe(Items.Count);
-                    foreach ((ItemSlot slot, string id) item in Items)
-                    {
-                        writer.WriteValueSafe(item.slot);
-                        writer.WriteValueSafe(item.id);
-                    }
-                }
-            }
+            NetworkManager.Singleton.ConnectedClients[ulong.Parse(args[0])].PlayerObject.GetComponent<PlayerInventory>().SetModifier(Enum.Parse<ItemSlot>(args[1]), int.Parse(args[2]));
         }
     }
 }

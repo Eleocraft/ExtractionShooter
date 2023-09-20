@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Wheellock
   m_EditorClassIdentifier: 
   ItemID: wheellock
-  ActiveModifier: 3
+  ActiveModifier: 1
   VelocityMultiplier: 0.7
   WeaponPrefab: {fileID: 3726804448589417541, guid: b120790e657f1cb4480e058063a4d548,
     type: 3}

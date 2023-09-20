@@ -28,7 +28,7 @@ MonoBehaviour:
   PenetrationForce: 0
   MaxDistance: 200
   MinVelocity: 20
-  Prefab: {fileID: 6847435988720863931, guid: de631dc22f57fe846931ce7cc836e12b, type: 3}
+  Prefab: {fileID: 6847435988720863931, guid: 123d21e1ca9b4f2449c621a4953c2418, type: 3}
   HitMarker: {fileID: 7882812698031039389, guid: 2c512890680e9564b825dfb025b298a3,
     type: 3}
   PenetrateMarker: {fileID: 7882812698031039389, guid: adb0c5e100999ab44b168c830eae7736,

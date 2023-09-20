@@ -1,4 +1,6 @@
+using Unity.Netcode;
 using UnityEngine;
+using Unity.Collections;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -14,8 +16,8 @@ namespace ExoplanetStudios.ExtractionShooter
         protected Transform _cameraTransform;
         public virtual void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             
-            _controller = controller;
             _cameraTransform = controller.PlayerModel.CameraSocket;
+            _controller = controller;
             _ownerId = ownerId;
             _isOwner = isOwner;
         }
@@ -40,5 +42,47 @@ namespace ExoplanetStudios.ExtractionShooter
 
         protected Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * _cameraTransform.localPosition.y + playerState.Position;
         protected Vector3 GetLookDirection(NetworkTransformState playerState) => Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * Vector3.forward;
+    }
+    public struct Item : INetworkSerializable, System.IEquatable<Item>
+    {
+        public ItemSlot Slot;
+        public string Id;
+        public int ActiveModifier;
+
+        public Item(ItemSlot slot, string id)
+        {
+            Slot = slot;
+            Id = id;
+            ActiveModifier = 0;
+        }
+        public Item(ItemSlot slot, string id, int activeModifier)
+        {
+            Slot = slot;
+            Id = id;
+            ActiveModifier = activeModifier;
+        }
+
+        public bool Equals(Item other)
+        {
+            return Slot == other.Slot && Id == other.Id && ActiveModifier == other.ActiveModifier;
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            if (serializer.IsReader)
+            {
+                FastBufferReader reader = serializer.GetFastBufferReader();
+                reader.ReadValueSafe(out Slot);
+                reader.ReadValueSafe(out Id);
+                reader.ReadValueSafe(out ActiveModifier);
+            }
+            else
+            {
+                FastBufferWriter writer = serializer.GetFastBufferWriter();
+                writer.WriteValueSafe(Slot);
+                writer.WriteValueSafe(Id);
+                writer.WriteValueSafe(ActiveModifier);
+            }
+        }
     }
 }

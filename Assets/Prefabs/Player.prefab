@@ -106,12 +106,12 @@ MonoBehaviour:
   GroundDecelerationRate: 20
   AirSpeedChangeRate: 5
   CrouchEnterSpeed: 10
-  JumpHeight: 1.71
+  JumpHeight: 1.5
   Gravity: -30
   JumpTimeout: 0.1
   FallTimeout: 0.15
-  GroundedOffset: 0
-  GroundedRadius: 0.15
+  GroundedOffset: 0.195
+  GroundedRadius: 0.3
   GroundLayers:
     serializedVersion: 2
     m_Bits: 513

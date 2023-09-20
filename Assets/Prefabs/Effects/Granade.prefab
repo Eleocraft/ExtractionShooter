@@ -87,7 +87,7 @@ VisualEffect:
       m_Array:
       - m_Value:
           serializedVersion: 2
-          key0: {r: 0, g: 5.0680623, b: 7.999999, a: 1}
+          key0: {r: 7.999999, g: 6.077165, b: 0, a: 1}
           key1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
           key2: {r: 0, g: 0, b: 0, a: 0}
           key3: {r: 0, g: 0, b: 0, a: 0}
@@ -112,7 +112,7 @@ VisualEffect:
           atime6: 0
           atime7: 0
           m_Mode: 0
-          m_ColorSpace: -1
+          m_ColorSpace: 1
           m_NumColorKeys: 2
           m_NumAlphaKeys: 3
         m_Name: EmissiveColor
@@ -364,7 +364,7 @@ Light:
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
-  m_Color: {r: 0, g: 0.95956135, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.89839494, b: 0, a: 1}
   m_Intensity: 300
   m_Range: 10
   m_SpotAngle: 30

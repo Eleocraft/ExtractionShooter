@@ -422,7 +422,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
 					// stop our velocity dropping infinitely when grounded
 					if (verticalVelocity < 0.0f)
-						verticalVelocity = -2f;
+						verticalVelocity = 0.0f;
 
 					// jump timeout
 					if (_jumpTimeoutDelta >= 0.0f)
@@ -440,7 +440,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			}
 
 			// apply gravity over time if under terminal
-			if (verticalVelocity < TERMINAL_VELOCITY)
+			if (verticalVelocity < TERMINAL_VELOCITY && !grounded)
 				verticalVelocity += Gravity * NetworkManager.LocalTime.FixedDeltaTime;
 			
 			if (HeadblockCheck() && verticalVelocity > 0)
