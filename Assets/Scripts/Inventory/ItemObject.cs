@@ -11,6 +11,7 @@ namespace ExoplanetStudios.ExtractionShooter
         protected bool _isOwner;
         [ReadOnly] public string ItemID;
         public int ActiveModifier;
+        public int Ammunition;
         public float VelocityMultiplier;
         
         protected Transform _cameraTransform;
@@ -48,18 +49,21 @@ namespace ExoplanetStudios.ExtractionShooter
         public ItemSlot Slot;
         public string Id;
         public int ActiveModifier;
+        public int Ammunition;
 
         public Item(ItemSlot slot, string id)
         {
             Slot = slot;
             Id = id;
             ActiveModifier = 0;
+            Ammunition = 0;
         }
-        public Item(ItemSlot slot, string id, int activeModifier)
+        public Item(ItemSlot slot, string id, int activeModifier, int ammunition)
         {
             Slot = slot;
             Id = id;
             ActiveModifier = activeModifier;
+            Ammunition = ammunition;
         }
 
         public bool Equals(Item other)

@@ -16,13 +16,12 @@ namespace ExoplanetStudios.ExtractionShooter
         protected GameObject _weaponObject;
         public abstract int MagSize { get; }
         public abstract float ReloadTime { get; }
-        private int _bulletsLoaded;
         protected int BulletsLoaded {
-            get => _bulletsLoaded;
+            get => Ammunition;
             set {
                 if (_isOwner)
                     MagazineDisplay.SetMagazineInfo(value, MagSize);
-                _bulletsLoaded = value;
+                Ammunition = value;
             }
         }
         private float _reloadTimer;

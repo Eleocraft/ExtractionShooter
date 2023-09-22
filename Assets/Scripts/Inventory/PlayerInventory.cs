@@ -45,7 +45,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private void OnClientConnected(ulong id)
         {
             foreach (KeyValuePair<ItemSlot, ItemObject> itemObject in _itemObjects)
-                UpdateItemObjectClientRpc(new(itemObject.Key, itemObject.Value.ItemID, itemObject.Value.ActiveModifier));
+                UpdateItemObjectClientRpc(new(itemObject.Key, itemObject.Value.ItemID, itemObject.Value.ActiveModifier, itemObject.Value.Ammunition));
         }
         public override void OnNetworkSpawn()
         {
@@ -101,22 +101,16 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (!IsServer) return;
 
-            SetItem(new(itemSlot, _itemObjects[itemSlot].ItemID, modifier));
+            SetItem(new(itemSlot, _itemObjects[itemSlot].ItemID, modifier, _itemObjects[itemSlot].Ammunition));
         }
         public void SetItem(Item item)
         {
             if (!IsServer) return;
 
-            UpdateItemObject(item);
             UpdateItemObjectClientRpc(item);
         }
         [ClientRpc]
         private void UpdateItemObjectClientRpc(Item item)
-        {
-            if (IsServer) return;
-            UpdateItemObject(item);
-        }
-        private void UpdateItemObject(Item item)
         {
             if (!_itemObjects.ContainsKey(item.Slot) || _itemObjects[item.Slot].ItemID != item.Id)
                 InstantiateItem(item.Slot, item.Id);
