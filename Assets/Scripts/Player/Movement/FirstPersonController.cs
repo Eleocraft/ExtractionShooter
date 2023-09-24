@@ -62,8 +62,9 @@ namespace ExoplanetStudios.ExtractionShooter
 		public Action<NetworkTransformState> TransformStateChanged;
 
 		// player
-		private float _jumpVelocity;
 		private Dictionary<string, float> _velocityMultipliers = new();
+		private float _cameraRecoil;
+		private float _jumpVelocity;
 		private bool _jump; // Owner only
 		private Vector2 _lookDelta; // Owner only
 		private const float TERMINAL_VELOCITY = 100.0f;
@@ -161,6 +162,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 		private void Tick()
 		{
+			_cameraRecoil = 0;
 			if (IsOwner || IsServer)
 				StoreVelocityMultiplierBuffer();
 			
@@ -354,7 +356,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				// if this is the owner the lookrotation should be calculated locally
 				ReadRotationDelta();
-				PlayerModel.Rotate(GetLookRotation(_lookDelta));
+				PlayerModel.Rotate(GetLookRotation(_lookDelta), _cameraRecoil);
 			}
 		}
 		private void ReadRotationDelta()
@@ -469,6 +471,10 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			if (_velocityMultipliers.ContainsKey(id))
 				_velocityMultipliers.Remove(id);
+		}
+		public void SetCameraRecoil(float amount)
+		{
+			_cameraRecoil = amount;
 		}
 	}
 }

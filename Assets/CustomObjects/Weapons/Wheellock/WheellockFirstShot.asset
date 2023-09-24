@@ -25,7 +25,7 @@ MonoBehaviour:
   MuzzleVelocity: 200
   Drag: 0.6
   Dropoff: 9.81
-  PenetrationForce: 0.1
+  PenetrationForce: 0.085
   MaxDistance: 200
   MinVelocity: 20
   Prefab: {fileID: 6847435988720863931, guid: dde4e3477d432684d90158d6e538fb9d, type: 3}

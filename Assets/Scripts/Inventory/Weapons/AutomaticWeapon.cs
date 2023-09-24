@@ -15,6 +15,8 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float MovementError;
         [SerializeField] private int MagazineSize;
         [SerializeField] private float TimeToReload;
+        [SerializeField] private float MaxRecoil;
+        [SerializeField] private float RelativeRecoil;
 
         private float _cooldown;
         private float _relativeSpray;
@@ -63,6 +65,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _cooldown += Cooldown;
                 BulletsLoaded--;
                 _relativeSpray += _sprayIncreaseByShot;
+                _recoil += RelativeRecoil * (1f - (_recoil / MaxRecoil));
             }
             else
                 _relativeSpray -= NetworkManager.Singleton.LocalTime.FixedDeltaTime * _sprayDecreaseSpeed;

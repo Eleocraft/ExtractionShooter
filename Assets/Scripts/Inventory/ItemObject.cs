@@ -6,19 +6,19 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public abstract class ItemObject : ScriptableObject
     {
-        protected FirstPersonController _controller;
+        protected FirstPersonController _firstPersonController;
         protected ulong _ownerId;
         protected bool _isOwner;
         [ReadOnly] public string ItemID;
-        public int ActiveModifier;
-        public int Ammunition;
+        [HideInInspector] public int ActiveModifier;
+        [HideInInspector] public int Ammunition;
         public float VelocityMultiplier;
         
         protected Transform _cameraTransform;
         public virtual void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             
             _cameraTransform = controller.PlayerModel.CameraSocket;
-            _controller = controller;
+            _firstPersonController = controller;
             _ownerId = ownerId;
             _isOwner = isOwner;
         }
@@ -27,10 +27,10 @@ namespace ExoplanetStudios.ExtractionShooter
             ItemID = Utility.CreateID(name);
         }
         public virtual void Activate() {
-            _controller.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", VelocityMultiplier);
+            _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", VelocityMultiplier);
         }
         public virtual void Deactivate() {
-            _controller.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", 1f);
+            _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", 1f);
         }
         public abstract void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
         

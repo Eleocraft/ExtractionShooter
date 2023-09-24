@@ -62,10 +62,10 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (!_isOwner)
 			    Rotate(Utility.Vector2RotateLerp(_lerpStartInterpolationState.LookRotation, _lerpEndInterpolationState.LookRotation, relativeDeltaTime));
 		}
-        public void Rotate(Vector2 lookRotation)
+        public void Rotate(Vector2 lookRotation, float cameraRecoil = 0)
 		{
 			// Update camera target pitch
-			CameraSocket.localRotation = Quaternion.Euler(lookRotation.x, 0.0f, 0.0f);
+			CameraSocket.localRotation = Quaternion.Euler(lookRotation.x - cameraRecoil, 0.0f, 0.0f);
 
 			// rotate the player left and right
 			transform.rotation = Quaternion.Euler(0, lookRotation.y, 0);

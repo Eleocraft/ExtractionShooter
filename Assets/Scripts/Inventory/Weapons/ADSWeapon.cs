@@ -46,10 +46,10 @@ namespace ExoplanetStudios.ExtractionShooter
                 _camera.m_Lens.FieldOfView = _defaultFOV;
         }
         private void StartADS() {
-            _controller.SetMovementSpeedMultiplier(GetInstanceID()+"ADS", ADSVelocityMul);
+            _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ADS", ADSVelocityMul);
         }
         private void StopADS() {
-            _controller.SetMovementSpeedMultiplier(GetInstanceID()+"ADS", 1f);
+            _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ADS", 1f);
         }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {

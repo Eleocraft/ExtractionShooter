@@ -14,16 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemID: wheellock
   ActiveModifier: 1
+  Ammunition: 0
   VelocityMultiplier: 0.7
   WeaponPrefab: {fileID: 3726804448589417541, guid: b120790e657f1cb4480e058063a4d548,
     type: 3}
   Seed: 234
+  RecoilDecreaseSpeed: 15
   ADSFOV: 50
   TransitTime: 0.1
   ADSVelocityMul: 0.8
   Cooldown: 0.1
   FirstShotReloadTime: 0.5
   SecondShotReloadTime: 0.75
+  Recoil: 5
   FirstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
   FirstShotSpray: 0.125
   FirstShotSprayADS: 0

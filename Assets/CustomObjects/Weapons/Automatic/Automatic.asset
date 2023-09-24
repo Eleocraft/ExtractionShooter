@@ -13,10 +13,13 @@ MonoBehaviour:
   m_Name: Automatic
   m_EditorClassIdentifier: 
   ItemID: automatic
+  ActiveModifier: 0
+  Ammunition: 0
   VelocityMultiplier: 0.6
   WeaponPrefab: {fileID: 3726804448589417541, guid: ada40baacb48c2444b17b44876cfc118,
     type: 3}
   Seed: 5534
+  RecoilDecreaseSpeed: 12
   ADSFOV: 50
   TransitTime: 0.2
   ADSVelocityMul: 0.8
@@ -37,3 +40,5 @@ MonoBehaviour:
   MovementError: 2
   MagazineSize: 30
   TimeToReload: 1
+  MaxRecoil: 10
+  RelativeRecoil: 2

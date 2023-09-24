@@ -6,8 +6,8 @@ namespace ExoplanetStudios.ExtractionShooter
     public abstract class Weapon : ItemObject
     {
         [SerializeField] private GameObject WeaponPrefab;
-        
         [SerializeField] private int Seed;
+        [SerializeField] private float RecoilDecreaseSpeed = 1;
         
         private System.Random _rng;
 
@@ -26,6 +26,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private float _reloadTimer;
         protected bool IsReloading => _reloadTimer > 0;
+        protected float _recoil;
 
         public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             
@@ -59,6 +60,14 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
+            if (_recoil > 0)
+            {
+                _recoil -= NetworkManager.Singleton.LocalTime.FixedDeltaTime * RecoilDecreaseSpeed;
+                if (_recoil < 0)
+                    _recoil = 0;
+            }
+            _firstPersonController.SetCameraRecoil(_recoil);
+
             if (_reloadTimer > 0)
             {
                 _reloadTimer -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
@@ -78,7 +87,8 @@ namespace ExoplanetStudios.ExtractionShooter
         protected Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)
         {
             Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*360f-180f, 0, (float)_rng.NextDouble()*360f-180f) * Vector3.up;
-            Vector3 shootDirection = GetLookDirection(playerState); 
+            Vector3 shootDirection = GetLookDirection(playerState);
+            shootDirection = Quaternion.AngleAxis(-_recoil, Quaternion.Euler(0, 90, 0) * shootDirection.WithHeight(0).normalized) * shootDirection;
             Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
 
             return Quaternion.AngleAxis((spray + maxMovementError * playerState.Velocity.magnitude) * (float)_rng.NextDouble(), rotationVector) * shootDirection;

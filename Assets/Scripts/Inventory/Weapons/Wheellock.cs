@@ -11,6 +11,8 @@ namespace ExoplanetStudios.ExtractionShooter
         [Header("Reload")]
         [SerializeField] private float FirstShotReloadTime;
         [SerializeField] private float SecondShotReloadTime;
+        [Header("Recoil")]
+        [SerializeField] private float Recoil;
         [Header("FirstShot")]
         [SerializeField] private ProjectileInfo FirstShotInfo;
         [SerializeField] private float FirstShotSpray;
@@ -95,6 +97,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _gunAudioSource[0].PlayOneShot(FirstShotAudio);
                 
                 BulletsLoaded--;
+                _recoil += Recoil;
             }
             // All glitches
             void SecondShot()
@@ -116,6 +119,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
 
                 BulletsLoaded--;
+                _recoil += Recoil;
             }
             void DefaultSecondShot()
             {
