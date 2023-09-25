@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Automatic
   m_EditorClassIdentifier: 
   ItemID: automatic
+  Icon: {fileID: 21300000, guid: e7b7ef9eb016d43418eee826967619dc, type: 3}
   ActiveModifier: 0
   Ammunition: 0
   VelocityMultiplier: 0.6

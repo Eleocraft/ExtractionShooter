@@ -61,7 +61,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 float spray = weaponInputState.SecondaryAction ? ADSSpray.Evaluate(_relativeSpray) : Spray.Evaluate(_relativeSpray);
                 Vector3 direction = GetShootDirection(playerState, spray, MovementError);
 
-                Projectile.SpawnProjectile(projectileInfo, _shotSource.position, GetCameraPosition(playerState), direction, _ownerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(projectileInfo, _shotSource.position, GetCameraPosition(playerState), direction, OwnerId, weaponInputState.TickDiff);
                 _cooldown += Cooldown;
                 BulletsLoaded--;
                 _relativeSpray += _sprayIncreaseByShot;

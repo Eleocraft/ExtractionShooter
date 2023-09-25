@@ -13,12 +13,12 @@ namespace ExoplanetStudios.ExtractionShooter
         ThrowableInfo _info;
         private int _tickDiff;
         private ulong _ownerId;
-        private void Initialize(ThrowableInfo info, Vector3 direction, ulong ownerId, int tickDiff)
+        private void Initialize(ThrowableInfo info, Vector3 veloctiy, ulong ownerId, int tickDiff)
         {
             // Graphics
             _displayObject = Instantiate(info.Prefab, transform.position, Quaternion.identity);
             // Physics
-            _velocity = direction.normalized * info.InitialVelocity;
+            _velocity = veloctiy;
 
             _spawnPosition = transform.position;
 
@@ -35,10 +35,10 @@ namespace ExoplanetStudios.ExtractionShooter
             NetworkManager.Singleton.NetworkTickSystem.Tick += Tick;
             PlayerBulletHitboxManager.AddBullet(_tickDiff);
         }
-        public static void SpawnProjectile(ThrowableInfo info, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
+        public static void SpawnProjectile(ThrowableInfo info, Vector3 position, Vector3 velocity, ulong ownerId, int tickDiff)
         {
             GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Throwable], position, Quaternion.identity);
-            projectileObj.GetComponent<Throwable>().Initialize(info, direction, ownerId, tickDiff);
+            projectileObj.GetComponent<Throwable>().Initialize(info, velocity, ownerId, tickDiff);
         }
         private void Tick()
         {

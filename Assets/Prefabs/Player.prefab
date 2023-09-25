@@ -181,3 +181,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
+  UnSelectedColor: {r: 0.745283, g: 0.745283, b: 0.745283, a: 0.5882353}
+  SelectedColor: {r: 1, g: 1, b: 1, a: 1}

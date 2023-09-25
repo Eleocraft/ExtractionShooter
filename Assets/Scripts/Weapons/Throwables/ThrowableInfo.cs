@@ -8,7 +8,6 @@ namespace ExoplanetStudios.ExtractionShooter
         public ThrowableExplosion Explosion;
 
         [Header("Physics")]
-        public float InitialVelocity;
         public float Bouncyness;
         public float Drag;
         public float Dropoff;

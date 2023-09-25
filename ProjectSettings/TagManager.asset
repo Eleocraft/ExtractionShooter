@@ -7,6 +7,9 @@ TagManager:
   - CinemachineTarget
   - PlayerCam
   - GunAudioSource
+  - MainSlot
+  - SecondarySlot
+  - Utility
   layers:
   - Default
   - TransparentFX

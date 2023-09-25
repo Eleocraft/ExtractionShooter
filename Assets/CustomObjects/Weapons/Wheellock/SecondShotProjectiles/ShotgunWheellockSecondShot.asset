@@ -22,9 +22,9 @@ MonoBehaviour:
       value: 20
   SlowTime: 1
   SlowMultiplier: 0.7
-  MuzzleVelocity: 120
+  MaxVelocity: 150
   Drag: 0.8
-  Dropoff: 11.83
+  Dropoff: 5
   PenetrationForce: 0
   MaxDistance: 200
   MinVelocity: 20

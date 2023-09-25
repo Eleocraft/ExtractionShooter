@@ -14,7 +14,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public float SlowMultiplier = 1f;
 
         [Header("Physics")]
-        public float MuzzleVelocity;
+        public float MaxVelocity;
         public float Drag;
         public float Dropoff;
         [Range(0, 0.3f)] public float PenetrationForce;
@@ -33,7 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public float GetDamage(DamageType damageType, float projectileVelocity)
         {
-            return Damages[damageType] * (projectileVelocity / MuzzleVelocity);
+            return Damages[damageType] * (projectileVelocity / MaxVelocity);
         }
     }
 }

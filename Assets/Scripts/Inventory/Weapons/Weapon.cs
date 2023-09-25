@@ -56,6 +56,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 MagazineDisplay.Deactivate();
 
             _reloadTimer = 0;
+            _recoil = 0;
             Destroy(_weaponObject);
         }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
@@ -84,7 +85,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _reloadTimer = ReloadTime;
         }
 
-        protected Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)
+        public Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)
         {
             Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*360f-180f, 0, (float)_rng.NextDouble()*360f-180f) * Vector3.up;
             Vector3 shootDirection = GetLookDirection(playerState);

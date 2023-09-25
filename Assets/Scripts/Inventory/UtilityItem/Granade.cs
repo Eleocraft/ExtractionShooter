@@ -8,6 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private ThrowableInfo throwableInfo;
         [SerializeField] private float Cooldown;
+        [SerializeField] private float ThrowVelocity;
         private float _cooldown;
         private bool _threw;
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
@@ -17,7 +18,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
             else if (weaponInputState.PrimaryAction && !_threw)
             {
-                Throwable.SpawnProjectile(throwableInfo, GetCameraPosition(playerState), GetLookDirection(playerState), _ownerId, weaponInputState.TickDiff);
+                Throwable.SpawnProjectile(throwableInfo, GetCameraPosition(playerState), GetLookDirection(playerState) * ThrowVelocity, OwnerId, weaponInputState.TickDiff);
                 _threw = true;
                 _cooldown = Cooldown;
             }

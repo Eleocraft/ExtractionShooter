@@ -1,17 +1,19 @@
 using Unity.Netcode;
 using UnityEngine;
-using Unity.Collections;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
     public abstract class ItemObject : ScriptableObject
     {
         protected FirstPersonController _firstPersonController;
-        protected ulong _ownerId;
+        [HideInInspector] public ulong OwnerId;
         protected bool _isOwner;
         [ReadOnly] public string ItemID;
+        public Sprite Icon;
         [HideInInspector] public int ActiveModifier;
         [HideInInspector] public int Ammunition;
+        [Header("Modifiers")]
+        [SerializeField] protected ItemModifier[] Modifiers;
         public float VelocityMultiplier;
         
         protected Transform _cameraTransform;
@@ -19,7 +21,7 @@ namespace ExoplanetStudios.ExtractionShooter
             
             _cameraTransform = controller.PlayerModel.CameraSocket;
             _firstPersonController = controller;
-            _ownerId = ownerId;
+            OwnerId = ownerId;
             _isOwner = isOwner;
         }
         private void OnValidate()
@@ -41,8 +43,14 @@ namespace ExoplanetStudios.ExtractionShooter
 
         public virtual void Reload() { }
 
-        protected Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * _cameraTransform.localPosition.y + playerState.Position;
-        protected Vector3 GetLookDirection(NetworkTransformState playerState) => Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * Vector3.forward;
+        public Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * _cameraTransform.localPosition.y + playerState.Position;
+        public Vector3 GetLookDirection(NetworkTransformState playerState) => Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * Vector3.forward;
+
+        public abstract class ItemModifier : ScriptableObject
+        {
+            protected abstract int Id { get; }
+            [TextArea()] public string Description;
+        }
     }
     public struct Item : INetworkSerializable, System.IEquatable<Item>
     {

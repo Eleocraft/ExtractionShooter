@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -10,14 +11,16 @@ namespace ExoplanetStudios.ExtractionShooter
     public class PlayerInventory : NetworkBehaviour
     {
         [SerializeField] private GlobalInputs GI;
+        [SerializeField] private Color UnSelectedColor;
+        [SerializeField] private Color SelectedColor;
         private FirstPersonController _firstPersonController;
         private InputMaster _controls;
         private Dictionary<ItemSlot, ItemObject> _itemObjects = new();
+        private Dictionary<ItemSlot, Image> _itemDisplays; // OwnerOnly
 
         private NetworkVariable<ItemSlot> ActiveSlot = new();
 
         public ItemObject ActiveItemObject => _itemObjects.ContainsKey(ActiveSlot.Value) ? _itemObjects[ActiveSlot.Value] : null;
-        public event Action<ItemObject> ChangedActiveItem;
         private void Awake()
         {
             _firstPersonController = GetComponent<FirstPersonController>();
@@ -26,20 +29,29 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _controls = GI.Controls;
             
-            if (IsServer)
-            {
-                NetworkManager.OnClientConnectedCallback += OnClientConnected;
-
-                SetItem(new(ItemSlot.MainSlot, "wheellock"));
-                SetItem(new(ItemSlot.SecondarySlot, "automatic"));
-                SetItem(new(ItemSlot.Utility, "granade"));
-            }
             if (IsOwner)
             {
                 _controls.Inventory.MainWeaponSlot.performed += ChangeToMainWeaponSlot;
                 _controls.Inventory.SecondaryWeaponSlot.performed += ChangeToSecondaryWeaponSlot;
                 _controls.Inventory.UtilitySlot.performed += ChangeToUtilitySlot;
                 _controls.Inventory.Unequip.performed += Unequip;
+
+                _itemDisplays = new();
+                foreach (ItemSlot slot in Utility.GetEnumValues<ItemSlot>())
+                {
+                    if (slot == ItemSlot.None) continue;
+                    
+                    Image slotDisplay = GameObject.FindGameObjectWithTag(slot.ToString()).GetComponent<Image>();
+                    _itemDisplays.Add(slot, slotDisplay);
+                }
+            }
+            if (IsServer)
+            {
+                NetworkManager.OnClientConnectedCallback += OnClientConnected;
+
+                SetItem(new(ItemSlot.MainSlot, "automatic"));
+                SetItem(new(ItemSlot.SecondarySlot, "wheellock"));
+                SetItem(new(ItemSlot.Utility, "granade"));
             }
         }
         private void OnClientConnected(ulong id)
@@ -88,13 +100,19 @@ namespace ExoplanetStudios.ExtractionShooter
 
             // Deactivate old item
             if (_itemObjects.ContainsKey(oldSlot))
+            {
                 _itemObjects[oldSlot].Deactivate();
+                if (IsOwner)
+                    _itemDisplays[oldSlot].color = UnSelectedColor;
+            }
 
             // Activate new item
             if (_itemObjects.ContainsKey(newSlot))
+            {
                 _itemObjects[newSlot].Activate();
-
-            ChangedActiveItem?.Invoke(_itemObjects[newSlot]);
+                if (IsOwner)
+                    _itemDisplays[newSlot].color = SelectedColor;
+            }
         }
         
         public void SetModifier(ItemSlot itemSlot, int modifier)
@@ -119,18 +137,23 @@ namespace ExoplanetStudios.ExtractionShooter
                 
             void InstantiateItem(ItemSlot slot, string itemId)
             {
-                if (!_itemObjects.ContainsKey(slot))
-                    _itemObjects.Add(slot, default);
-                else
+                if (_itemObjects.ContainsKey(slot))
                 {
                     if (ActiveSlot.Value == slot)
                         _itemObjects[slot].Deactivate();
                         
                     Destroy(_itemObjects[slot]);
+                    _itemObjects.Remove(slot);
                 }
-                    
-                _itemObjects[slot] = Instantiate(ItemDatabase.Items[itemId]);
+                
+                _itemObjects.Add(slot, Instantiate(ItemDatabase.Items[itemId]));
                 _itemObjects[slot].Initialize(OwnerClientId, IsOwner, _firstPersonController);
+                
+                if (IsOwner)
+                {
+                    _itemDisplays[slot].sprite = _itemObjects[slot].Icon;
+                    _itemDisplays[slot].color = (ActiveSlot.Value == slot) ? SelectedColor : UnSelectedColor;
+                }
                     
                 if (ActiveSlot.Value == slot)
                     _itemObjects[slot].Activate();
