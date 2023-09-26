@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    [CreateAssetMenu(fileName = "New Granade Weapon", menuName = "CustomObjects/Utility/Granade")]
     public class Granade : UtilityItem
     {
         [SerializeField] private ThrowableInfo throwableInfo;

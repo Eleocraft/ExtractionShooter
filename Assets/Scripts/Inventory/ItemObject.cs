@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public abstract class ItemObject : ScriptableObject
+    public abstract class ItemObject : MonoBehaviour
     {
         protected FirstPersonController _firstPersonController;
         [HideInInspector] public ulong OwnerId;
@@ -20,6 +20,11 @@ namespace ExoplanetStudios.ExtractionShooter
         protected Transform _cameraTransform;
         public virtual void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             
+            gameObject.SetActive(false);
+
+            foreach(ItemModifier modifier in Modifiers)
+                modifier.Initialize(this);
+
             _cameraTransform = controller.PlayerModel.CameraSocket;
             _firstPersonController = controller;
             OwnerId = ownerId;
@@ -31,9 +36,11 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public virtual void Activate() {
             _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", VelocityMultiplier);
+            gameObject.SetActive(true);
         }
         public virtual void Deactivate() {
             _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", 1f);
+            gameObject.SetActive(false);
         }
         public abstract void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
         
@@ -43,16 +50,26 @@ namespace ExoplanetStudios.ExtractionShooter
         public virtual void StopSecondaryAction() { }
 
         public virtual void Reload() { }
-        
-        public virtual void UpdateModifier() { }
 
         public Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * _cameraTransform.localPosition.y + playerState.Position;
         public Vector3 GetLookDirection(NetworkTransformState playerState) => Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * Vector3.forward;
     }
-    public abstract class ItemModifier : ScriptableObject
+    public abstract class ItemModifier : MonoBehaviour
     {
         protected abstract int Id { get; }
         [TextArea()] public string Description;
+        protected ItemObject _itemObject;
+
+        public virtual void Initialize(ItemObject itemObject)
+        {
+            _itemObject = itemObject;
+        }
+        public virtual void Activate() {
+            gameObject.SetActive(true);
+        }
+        public virtual void Deactivate() {
+            gameObject.SetActive(false);
+        }
     }
     public struct Item : INetworkSerializable, System.IEquatable<Item>
     {

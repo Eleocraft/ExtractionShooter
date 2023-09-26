@@ -3,7 +3,6 @@ using Unity.Netcode;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    [CreateAssetMenu(fileName = "New Wheellock Weapon", menuName = "CustomObjects/Weapons/Wheellock")]
     public class Wheellock : ADSWeapon
     {
         [Header("Time")]
@@ -22,15 +21,11 @@ namespace ExoplanetStudios.ExtractionShooter
         
 
         private float _cooldown;
-
-        [HideInInspector] public AudioSource[] GunAudioSource;
         private bool _shot;
-        private ItemModifierTag[] _modifierObjects;
+        
 
-        private Transform _firstShotSource;
-        [HideInInspector] public Transform SecondShotSource;
-        private const string FIRST_SHOT_SOURCE_NAME = "FirstShotSource";
-        private const string SECOND_SHOT_SOURCE_NAME = "SecondShotSource";
+        [SerializeField] private AudioSource FirstShotSource;
+        public AudioSource SecondShotSource;
 
         public override int MagSize => 2;
         public override float ReloadTime => BulletsLoaded == 1 ? FirstShotReloadTime : SecondShotReloadTime;
@@ -42,13 +37,6 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void Activate()
         {
             base.Activate();
-
-            _modifierObjects = _weaponObject.transform.GetComponentsInChildren<ItemModifierTag>();
-
-            _firstShotSource = _weaponObject.transform.Find(FIRST_SHOT_SOURCE_NAME);
-            SecondShotSource = _weaponObject.transform.Find(SECOND_SHOT_SOURCE_NAME);
-            
-            GunAudioSource = _weaponObject.GetComponentsInChildren<AudioSource>();
         }
         public override void Deactivate()
         {
@@ -56,15 +44,6 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _cooldown = 0;
             _shot = false;
-        }
-        public override void UpdateModifier()
-        {
-            base.UpdateModifier();
-
-            foreach (ItemModifierTag tag in _modifierObjects)
-                tag.gameObject.SetActive(false);
-            
-            _modifierObjects[ActiveModifier].gameObject.SetActive(true);
         }
         public override void StopPrimaryAction()
         {
@@ -100,8 +79,8 @@ namespace ExoplanetStudios.ExtractionShooter
                 float spray = weaponInputState.SecondaryAction ? FirstShotSprayADS : FirstShotSpray;
 
                 Vector3 direction = GetShootDirection(playerState, spray, MovementError);
-                Projectile.SpawnProjectile(FirstShotInfo, _firstShotSource.position, GetCameraPosition(playerState), direction, OwnerId, weaponInputState.TickDiff);
-                GunAudioSource[0].PlayOneShot(FirstShotAudio);
+                Projectile.SpawnProjectile(FirstShotInfo, FirstShotSource.transform.position, GetCameraPosition(playerState), direction, OwnerId, weaponInputState.TickDiff);
+                FirstShotSource.PlayOneShot(FirstShotAudio);
                 
                 BulletsLoaded--;
                 _recoil += Recoil;
@@ -109,7 +88,7 @@ namespace ExoplanetStudios.ExtractionShooter
             // All glitches
             void SecondShot()
             {
-                ((WheellockItemModifier)Modifiers[ActiveModifier]).SecondShot(weaponInputState, playerState, this);
+                ((WheellockItemModifier)Modifiers[ActiveModifier]).SecondShot(weaponInputState, playerState);
 
                 BulletsLoaded--;
                 _recoil += Recoil;
@@ -122,6 +101,6 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] protected ProjectileInfo Info;
         [SerializeField] protected float Spray;
         [SerializeField] protected float SprayADS;
-        public abstract void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, Wheellock wheellock);
+        public abstract void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
     }
 }

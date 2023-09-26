@@ -10,9 +10,6 @@ namespace ExoplanetStudios.ExtractionShooter
 
         private void Awake()
         {
-#if UNITY_EDITOR
-            GetItems();
-#endif
             Items = new();
             for (int i = 0; i < ItemObjects.Count; i++)
             {
@@ -25,24 +22,5 @@ namespace ExoplanetStudios.ExtractionShooter
                 Items.Add(ItemObjects[i].ItemID, ItemObjects[i]);
             }
         }
-        public void OnValidate()
-        {
-            for (int i = 0; i < ItemObjects.Count; i++)
-                if (ItemObjects[i] == null)
-                    ItemObjects.RemoveAt(i);
-        }
-#if UNITY_EDITOR
-        [ContextMenu("Update")]
-        public void GetItems()
-        {
-            ItemObjects ??= new();
-
-            foreach (ItemObject i in Utility.FindAssetsByType<ItemObject>())
-                if (!ItemObjects.Contains(i))
-                    ItemObjects.Add(i);
-                    
-            OnValidate();
-        }
-#endif
     }
 }

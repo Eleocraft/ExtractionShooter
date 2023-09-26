@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1621250797848934531}
   - component: {fileID: 3253703797559991764}
   - component: {fileID: 1821727133350424103}
-  - component: {fileID: 1398800109560999757}
+  - component: {fileID: 8135567759849383130}
   m_Layer: 0
   m_Name: WheellockAccurateMod
   m_TagString: Untagged
@@ -84,7 +84,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1398800109560999757
+--- !u!114 &8135567759849383130
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,9 +93,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1661400482409510467}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bc4b8dd5fa59204196686ac5362f3a5, type: 3}
+  m_Script: {fileID: 11500000, guid: ce7634bbfa3b84c4f8c5b650536b5ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Description: 
+  Audio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
+  Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
+  Spray: 0.125
+  SprayADS: 0
 --- !u!1 &2464964861517824035
 GameObject:
   m_ObjectHideFlags: 0
@@ -107,7 +112,7 @@ GameObject:
   - component: {fileID: 7974350088707328771}
   - component: {fileID: 7511839185580059340}
   - component: {fileID: 2333523271532759377}
-  - component: {fileID: 7324906638197032541}
+  - component: {fileID: 6737452807408252757}
   m_Layer: 0
   m_Name: WheellockShockMod
   m_TagString: Untagged
@@ -182,7 +187,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7324906638197032541
+--- !u!114 &6737452807408252757
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -191,9 +196,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2464964861517824035}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bc4b8dd5fa59204196686ac5362f3a5, type: 3}
+  m_Script: {fileID: 11500000, guid: 8e8bb7542c51cd4419c40b72404ff745, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Description: 
+  Audio: {fileID: 8300000, guid: 061d9650a1057794196c8601704b86bb, type: 3}
+  Info: {fileID: 11400000, guid: c785ac9420052194ab8fe3a2cc79082e, type: 2}
+  Spray: 3
+  SprayADS: 2
 --- !u!1 &3726804448589417541
 GameObject:
   m_ObjectHideFlags: 0
@@ -203,6 +213,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2652430611434333674}
+  - component: {fileID: -6109561824666100642}
   m_Layer: 0
   m_Name: Wheellock
   m_TagString: Untagged
@@ -225,13 +236,53 @@ Transform:
   m_Children:
   - {fileID: 234883690391767503}
   - {fileID: 2973837614633352852}
+  - {fileID: 3930142106226329516}
   - {fileID: 7974350088707328771}
   - {fileID: 1621250797848934531}
   - {fileID: 1299217069690146014}
-  - {fileID: 588185075658697547}
   - {fileID: 8279628349406562590}
+  - {fileID: 588185075658697547}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-6109561824666100642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3726804448589417541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a91481c85a810114daee984fcd2c4de9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OwnerId: 0
+  ItemID: wheellock
+  Icon: {fileID: 21300000, guid: 5dc434a61f55c9146bb11b2ee78310d7, type: 3}
+  ActiveModifier: 0
+  Ammunition: 0
+  Modifiers:
+  - {fileID: 1589434173265233337}
+  - {fileID: 6737452807408252757}
+  - {fileID: 8135567759849383130}
+  - {fileID: 3737567712012261814}
+  VelocityMultiplier: 0.7
+  Seed: 34522
+  RecoilDecreaseSpeed: 15
+  ADSFOV: 60
+  TransitTime: 0.2
+  ADSVelocityMul: 0.8
+  Cooldown: 0.15
+  FirstShotReloadTime: 0.7
+  SecondShotReloadTime: 1
+  Recoil: 4
+  MovementError: 3
+  FirstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
+  FirstShotSpray: 0.125
+  FirstShotSprayADS: 0
+  FirstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
+  FirstShotSource: {fileID: 5631305245388966321}
+  SecondShotSource: {fileID: 786929327340619882}
 --- !u!1 &6096426859387171752
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,7 +294,7 @@ GameObject:
   - component: {fileID: 1299217069690146014}
   - component: {fileID: 1713241567386314755}
   - component: {fileID: 8155635375710565998}
-  - component: {fileID: 5508821797575250689}
+  - component: {fileID: 3737567712012261814}
   m_Layer: 0
   m_Name: WheellockShotgunMod
   m_TagString: Untagged
@@ -316,7 +367,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &5508821797575250689
+--- !u!114 &3737567712012261814
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -325,9 +376,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 6096426859387171752}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bc4b8dd5fa59204196686ac5362f3a5, type: 3}
+  m_Script: {fileID: 11500000, guid: 07e7e41792dcbfa4588466c0638e1904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Description: 
+  Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
+  Info: {fileID: 11400000, guid: 657b6ccd717dbb44f8a6e7c4e054b8ee, type: 2}
+  Spray: 5
+  SprayADS: 5
+  ShotgunProjectileAmount: 8
 --- !u!1 &6625780269913558116
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,6 +641,55 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &7297963519079716903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3930142106226329516}
+  - component: {fileID: 1589434173265233337}
+  m_Layer: 0
+  m_Name: WheellockDefaultMod
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &3930142106226329516
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7297963519079716903}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2652430611434333674}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1589434173265233337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7297963519079716903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5328cd67e943e77439a70f097a3e9e89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Description: 
+  Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
+  Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
+  Spray: 3
+  SprayADS: 2
 --- !u!1 &8071750452910211748
 GameObject:
   m_ObjectHideFlags: 0

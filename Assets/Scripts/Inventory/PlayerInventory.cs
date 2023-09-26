@@ -14,6 +14,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private Color UnSelectedColor;
         [SerializeField] private Color SelectedColor;
         private FirstPersonController _firstPersonController;
+        private Transform _itemParent;
         private InputMaster _controls;
         private Dictionary<ItemSlot, ItemObject> _itemObjects = new();
         private Dictionary<ItemSlot, Image> _itemDisplays; // OwnerOnly
@@ -28,6 +29,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private void Start()
         {
             _controls = GI.Controls;
+            _itemParent = _firstPersonController.PlayerModel.WeaponTransform;
             
             if (IsOwner)
             {
@@ -142,11 +144,11 @@ namespace ExoplanetStudios.ExtractionShooter
                     if (ActiveSlot.Value == slot)
                         _itemObjects[slot].Deactivate();
                         
-                    Destroy(_itemObjects[slot]);
+                    Destroy(_itemObjects[slot].gameObject);
                     _itemObjects.Remove(slot);
                 }
                 
-                _itemObjects.Add(slot, Instantiate(ItemDatabase.Items[itemId]));
+                _itemObjects.Add(slot, Instantiate(ItemDatabase.Items[itemId], _itemParent));
                 _itemObjects[slot].Initialize(OwnerClientId, IsOwner, _firstPersonController);
                 
                 if (IsOwner)

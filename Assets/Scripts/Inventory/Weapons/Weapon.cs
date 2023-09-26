@@ -5,15 +5,10 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public abstract class Weapon : ItemObject
     {
-        [SerializeField] private GameObject WeaponPrefab;
         [SerializeField] private int Seed;
         [SerializeField] private float RecoilDecreaseSpeed = 1;
         
         private System.Random _rng;
-
-        protected Transform _weaponParent;
-
-        protected GameObject _weaponObject;
         public abstract int MagSize { get; }
         public abstract float ReloadTime { get; }
         protected int BulletsLoaded {
@@ -32,7 +27,6 @@ namespace ExoplanetStudios.ExtractionShooter
             
             base.Initialize(ownerId, isOwner, controller);
 
-            _weaponParent = controller.PlayerModel.WeaponTransform;
             BulletsLoaded = MagSize;
             
             if (_rng == null)
@@ -41,12 +35,11 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void Activate() {
             base.Activate();
 
-            _weaponObject = Instantiate(WeaponPrefab, _weaponParent);
             if (_isOwner)
             {
                 MagazineDisplay.Activate();
                 MagazineDisplay.SetMagazineInfo(BulletsLoaded, MagSize);
-                _weaponObject.SetLayerAllChildren(LayerMask.NameToLayer("First Person"));
+                gameObject.SetLayerAllChildren(LayerMask.NameToLayer("First Person"));
             }
         }
         public override void Deactivate() {
@@ -57,7 +50,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _reloadTimer = 0;
             _recoil = 0;
-            Destroy(_weaponObject);
+            transform.localRotation = Quaternion.identity; // Temp
         }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
@@ -72,7 +65,7 @@ namespace ExoplanetStudios.ExtractionShooter
             if (_reloadTimer > 0)
             {
                 _reloadTimer -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
-                _weaponObject.transform.localRotation = Quaternion.AngleAxis(Mathf.Clamp01(_reloadTimer / ReloadTime) * 360, Vector3.right); // Temp
+                transform.localRotation = Quaternion.AngleAxis(Mathf.Clamp01(_reloadTimer / ReloadTime) * 360, Vector3.right); // Temp
                 if (_reloadTimer <= 0)
                     BulletsLoaded = MagSize;
             }

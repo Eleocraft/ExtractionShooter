@@ -3,7 +3,6 @@ using Unity.Netcode;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    [CreateAssetMenu(fileName = "New Auto Weapon", menuName = "CustomObjects/Weapons/Auto")]
     public class AutomaticWeapon : ADSWeapon
     {
         [SerializeField] private ProjectileInfo projectileInfo;
@@ -18,11 +17,14 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float MaxRecoil;
         [SerializeField] private float RelativeRecoil;
 
+        [Header("WeaponObject")]
+        [SerializeField] private Transform ShotSource;
+
         private float _cooldown;
         private float _relativeSpray;
 
         private float _sprayDecreaseSpeed;
-        private Transform _shotSource;
+        
         
         private float _sprayIncreaseByShot;
         public override int MagSize => MagazineSize;
@@ -38,8 +40,6 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void Activate()
         {
             base.Activate();
-
-            _shotSource = _weaponObject.transform.Find("ShotSource");
         }
         public override void Deactivate()
         {
@@ -61,7 +61,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 float spray = weaponInputState.SecondaryAction ? ADSSpray.Evaluate(_relativeSpray) : Spray.Evaluate(_relativeSpray);
                 Vector3 direction = GetShootDirection(playerState, spray, MovementError);
 
-                Projectile.SpawnProjectile(projectileInfo, _shotSource.position, GetCameraPosition(playerState), direction, OwnerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(projectileInfo, ShotSource.position, GetCameraPosition(playerState), direction, OwnerId, weaponInputState.TickDiff);
                 _cooldown += Cooldown;
                 BulletsLoaded--;
                 _relativeSpray += _sprayIncreaseByShot;

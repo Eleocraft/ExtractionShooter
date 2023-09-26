@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
@@ -9,9 +10,10 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private GlobalInputs GI;
         [SerializeField] private Camera Cam;
-        [SerializeField] private GameObject PlusIconPrefab;
+        [SerializeField] private Button PlusIconPrefab;
         [SerializeField] private GameObject Panel;
         [SerializeField] private TMP_Text Description;
+        [SerializeField] private GameObject DescriptionPanel;
         private List<GameObject> _plusIcons = new();
         private List<ItemModifier> _modifiers;
         private bool _active;
@@ -19,25 +21,28 @@ namespace ExoplanetStudios.ExtractionShooter
         private PlayerInventory _inventory;
         private void Start() {
             GI.Controls.Inventory.ModificationManager.performed += ToggleMenu;
-            _inventory = NetworkManager.LocalClient.PlayerObject.GetComponent<PlayerInventory>();
         }
         private void Update() {
             if (!_active) return;
 
             for (int i = 0; i < _modifiers.Count; i++)
-            {
-                //_plusIcons[i].transform.position = Cam.WorldToScreenPoint();
-            }
+                _plusIcons[i].transform.position = Cam.WorldToScreenPoint(_modifiers[i].transform.position);
         }
         private void ToggleMenu(UnityEngine.InputSystem.InputAction.CallbackContext ctx) {
-
+            
+            _inventory = NetworkManager.LocalClient.PlayerObject.GetComponent<PlayerInventory>();
             _active = !_active;
             Panel.SetActive(_active);
             if (_active)
             {
                 _modifiers = _inventory.ActiveItemObject.Modifiers;
-                foreach (ItemModifier itemModifier in _modifiers)
-                    _plusIcons.Add(Instantiate(PlusIconPrefab, Panel.transform));
+                for (int i = 0; i < _modifiers.Count; i++)
+                {
+                    Button plusIcon = Instantiate(PlusIconPrefab, Panel.transform);
+                    plusIcon.onClick.AddListener(() => ActivateModifier(i));
+                    _plusIcons.Add(plusIcon.gameObject);
+                    
+                }
             }
             else
             {
@@ -46,6 +51,12 @@ namespace ExoplanetStudios.ExtractionShooter
                 _plusIcons = new();
                 _modifiers = new();
             }
+        }
+        private void ActivateModifier(int ID)
+        {
+            _activeMod = ID;
+            DescriptionPanel.SetActive(true);
+            Description.text = _modifiers[_activeMod].Description;
         }
         public void Apply() {
             _inventory.SetModifier(_activeMod);

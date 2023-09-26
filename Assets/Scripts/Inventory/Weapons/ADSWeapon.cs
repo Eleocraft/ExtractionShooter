@@ -19,18 +19,14 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             base.Initialize(ownerId, isOwner, controller);
 
+            _weaponDefaultPos = transform.localPosition;
+            _weaponADSPos = transform.parent.Find(ADS_POS_NAME).localPosition;
+
             if (isOwner)
             {
                 _camera = GameObject.FindGameObjectWithTag(PlayerInterpolation.PLAYER_CAM_TAG).GetComponent<CinemachineVirtualCamera>();
                 _defaultFOV = _camera.m_Lens.FieldOfView;
             }
-        }
-        public override void Activate()
-        {
-            base.Activate();
-
-            _weaponDefaultPos = _weaponObject.transform.localPosition;
-            _weaponADSPos = _weaponObject.transform.parent.Find(ADS_POS_NAME).localPosition;
         }
         public override void Deactivate()
         {
@@ -74,7 +70,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
             float relativeTimer = _adsState / TransitTime;
 
-            _weaponObject.transform.localPosition = Vector3.Lerp(_weaponDefaultPos, _weaponADSPos, relativeTimer);
+            transform.localPosition = Vector3.Lerp(_weaponDefaultPos, _weaponADSPos, relativeTimer);
 
             // FOV
             if (_camera != null)

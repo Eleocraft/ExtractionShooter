@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5348575863375272171}
   - component: {fileID: 4180612661834392571}
   - component: {fileID: 2163647114231653679}
+  - component: {fileID: 848988837338907566}
   m_Layer: 0
   m_Name: NetworkedGameController
   m_TagString: Untagged
@@ -26,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8151846511772013370}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -65,4 +66,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f75758e37cf7f54b94fae80b32e660f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: {fileID: 0}
+  textPrefab: {fileID: 4307239567830303549, guid: d8d5cda9e595c3a42898c625e109b12e,
+    type: 3}
+  Parent: {fileID: 0}
+--- !u!114 &848988837338907566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8151846511772013370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f312436f8f79394298eed070908bbc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
+  Cam: {fileID: 0}
+  PlusIconPrefab: {fileID: 581376636745333832, guid: 595981cf67073ac4aa8b1bd263f922e0,
+    type: 3}
+  Panel: {fileID: 0}
+  Description: {fileID: 0}
+  DescriptionPanel: {fileID: 0}
