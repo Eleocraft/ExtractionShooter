@@ -5,7 +5,7 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class StartHost : MonoBehaviour
     {
-        void Awake()
+        void Start()
         {
             if (!MainMenuController.UsedMainMenu)
                 NetworkManager.Singleton.StartHost();

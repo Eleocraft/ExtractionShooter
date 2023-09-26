@@ -70,7 +70,8 @@ namespace ExoplanetStudios.ExtractionShooter
 
             float relativeTimer = _adsState / TransitTime;
 
-            transform.localPosition = Vector3.Lerp(_weaponDefaultPos, _weaponADSPos, relativeTimer);
+            if (relativeTimer > 0)
+                transform.localPosition = Vector3.Lerp(_weaponDefaultPos, _weaponADSPos, relativeTimer);
 
             // FOV
             if (_camera != null)

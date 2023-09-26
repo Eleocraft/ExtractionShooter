@@ -119,8 +119,12 @@ namespace ExoplanetStudios.ExtractionShooter
         
         public void SetModifier(int modifier)
         {
-            if (!IsServer) return;
-
+            SetModifierServerRpc(modifier);
+        }
+        [ServerRpc]
+        public void SetModifierServerRpc(int modifier)
+        {
+            // More logic to prove validity
             SetItem(new(ActiveSlot.Value, _itemObjects[ActiveSlot.Value].ItemID, modifier, _itemObjects[ActiveSlot.Value].Ammunition));
         }
         public void SetItem(Item item)

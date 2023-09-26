@@ -28,8 +28,8 @@ Transform:
   m_GameObject: {fileID: 1661400482409510467}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.02, z: 0.497}
-  m_LocalScale: {x: 0.06, y: 0.06, z: 0.12}
+  m_LocalPosition: {x: 0, y: 0.02, z: 0.5573}
+  m_LocalScale: {x: 0.085, y: 0.085, z: 0.17}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2652430611434333674}
@@ -96,7 +96,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce7634bbfa3b84c4f8c5b650536b5ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Description: 
+  Title: Accuracy Mod
+  Description: According to video game science, longer barrel = more accuracy. Why
+    the barrel was so short to begin with you ask? Well we needed something to sell
+    to you didn't we?
   Audio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
   Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Spray: 0.125
@@ -129,7 +132,7 @@ Transform:
   m_GameObject: {fileID: 2464964861517824035}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.0228, z: 0.4317}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -199,7 +202,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e8bb7542c51cd4419c40b72404ff745, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Description: 
+  Title: Shock mod
+  Description: Someone told us that it was to hard to hit enemies, because they were
+    moving so fast. After a couple of long brainstorming sessions on how to fix this
+    problem we came up with some blue wire that somehow slows down hit enemies. No
+    idea why this works.
   Audio: {fileID: 8300000, guid: 061d9650a1057794196c8601704b86bb, type: 3}
   Info: {fileID: 11400000, guid: c785ac9420052194ab8fe3a2cc79082e, type: 2}
   Spray: 3
@@ -311,8 +318,8 @@ Transform:
   m_GameObject: {fileID: 6096426859387171752}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.02, z: 0.497}
-  m_LocalScale: {x: 0.06, y: -0.03, z: 0.12}
+  m_LocalPosition: {x: 0, y: 0.01, z: 0.285}
+  m_LocalScale: {x: 0.12, y: 0.06, z: 0.12}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2652430611434333674}
@@ -379,7 +386,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07e7e41792dcbfa4588466c0638e1904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Description: 
+  Title: Shotgun Mod
+  Description: Someone had the idea to replace the second bullet with some gravel,
+    because it's cheaper. Further testing showed that this modification makes hitting
+    enemies easier, so here you go
   Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
   Info: {fileID: 11400000, guid: 657b6ccd717dbb44f8a6e7c4e054b8ee, type: 2}
   Spray: 5
@@ -685,7 +695,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5328cd67e943e77439a70f097a3e9e89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Description: 
+  Title: Disable Mods
+  Description: Just the Good'ol default wheellock
   Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
   Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Spray: 3

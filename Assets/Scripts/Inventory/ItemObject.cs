@@ -11,13 +11,23 @@ namespace ExoplanetStudios.ExtractionShooter
         protected bool _isOwner;
         [ReadOnly] public string ItemID;
         public Sprite Icon;
-        [HideInInspector] public int ActiveModifier;
         [HideInInspector] public int Ammunition;
-        [Header("Modifiers")]
-        public List<ItemModifier> Modifiers;
         public float VelocityMultiplier;
-        
         protected Transform _cameraTransform;
+        [Header("Modifiers")]
+        private int _activeModifier;
+        public List<ItemModifier> Modifiers;
+        public int ActiveModifier {
+            get => _activeModifier;
+            set {
+                if (Modifiers.Count > 0) {
+                    Modifiers[_activeModifier].Deactivate();
+                    Modifiers[value].Activate();
+                }
+                _activeModifier = value;
+            }
+        }
+        
         public virtual void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             
             gameObject.SetActive(false);
@@ -57,7 +67,8 @@ namespace ExoplanetStudios.ExtractionShooter
     public abstract class ItemModifier : MonoBehaviour
     {
         protected abstract int Id { get; }
-        [TextArea()] public string Description;
+        public string Title;
+        [TextArea] public string Description;
         protected ItemObject _itemObject;
 
         public virtual void Initialize(ItemObject itemObject)

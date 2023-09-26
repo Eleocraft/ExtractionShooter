@@ -344,15 +344,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "ModificationManager",
-                    "type": "Button",
-                    "id": "05258c3f-f268-4a10-9384-072172563a93",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -399,17 +390,6 @@
                     "action": "UtilitySlot",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "1c404248-1002-4219-8092-3579d84df911",
-                    "path": "<Keyboard>/tab",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ModificationManager",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 }
             ]
         },
@@ -425,6 +405,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ModificationManager",
+                    "type": "Button",
+                    "id": "617ea4ff-e145-4840-addc-d797a05fc955",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -436,6 +425,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Escape",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "065a1bfd-73e8-44f1-a2e3-c8c6c5b614c6",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ModificationManager",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

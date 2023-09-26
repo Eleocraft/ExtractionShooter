@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4180612661834392571}
   - component: {fileID: 2163647114231653679}
   - component: {fileID: 848988837338907566}
+  - component: {fileID: 4995063636805672543}
   m_Layer: 0
   m_Name: NetworkedGameController
   m_TagString: Untagged
@@ -87,4 +88,20 @@ MonoBehaviour:
     type: 3}
   Panel: {fileID: 0}
   Description: {fileID: 0}
+  Title: {fileID: 0}
   DescriptionPanel: {fileID: 0}
+--- !u!114 &4995063636805672543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8151846511772013370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 093838877a8c9ce48be127f43a19fb2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Display: {fileID: 0}
+  RemainingBulletsDisplay: {fileID: 0}
+  MaxBulletsDisplay: {fileID: 0}

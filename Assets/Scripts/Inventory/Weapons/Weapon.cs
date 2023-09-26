@@ -14,8 +14,8 @@ namespace ExoplanetStudios.ExtractionShooter
         protected int BulletsLoaded {
             get => Ammunition;
             set {
-                if (_isOwner)
-                    MagazineDisplay.SetMagazineInfo(value, MagSize);
+                    
+                MagazineDisplay.SetMagazineInfo(OwnerId, value, MagSize);
                 Ammunition = value;
             }
         }
@@ -35,18 +35,15 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void Activate() {
             base.Activate();
 
+            MagazineDisplay.SetMagazineInfo(OwnerId, BulletsLoaded, MagSize, true);
+
             if (_isOwner)
-            {
-                MagazineDisplay.Activate();
-                MagazineDisplay.SetMagazineInfo(BulletsLoaded, MagSize);
                 gameObject.SetLayerAllChildren(LayerMask.NameToLayer("First Person"));
-            }
         }
         public override void Deactivate() {
             base.Deactivate();
             
-            if (_isOwner)
-                MagazineDisplay.Deactivate();
+            MagazineDisplay.SetMagazineInfo(OwnerId, 0, 0, false);
 
             _reloadTimer = 0;
             _recoil = 0;

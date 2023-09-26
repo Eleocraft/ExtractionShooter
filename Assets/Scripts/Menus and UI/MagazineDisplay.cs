@@ -1,26 +1,33 @@
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class MagazineDisplay : MonoSingleton<MagazineDisplay>
+    public class MagazineDisplay : NetworkSingleton<MagazineDisplay>
     {
-        [SerializeField] private TMP_Text Text;
-        private void Start()
+        [SerializeField] private GameObject Display;
+        [SerializeField] private TMP_Text RemainingBulletsDisplay;
+        [SerializeField] private TMP_Text MaxBulletsDisplay;
+
+        [ClientRpc]
+        private void UpdateDisplayClientRpc(ulong id, int bulletsLeft, int magSize, bool active)
         {
-            Text.gameObject.SetActive(false);
+            Instance.RemainingBulletsDisplay.text = bulletsLeft.ToString();
+            Instance.MaxBulletsDisplay.text = magSize.ToString();
+            Display.SetActive(active);
         }
-        public static void SetMagazineInfo(int bullets, int magSize)
+        public static void SetMagazineInfo(ulong ownerId, int bullets, int magSize, bool active)
         {
-            Instance.Text.text = $"{bullets} / {magSize}";
+            if (!Instance.IsServer) return;
+
+            Instance.UpdateDisplayClientRpc(ownerId, bullets, magSize, active);
         }
-        public static void Deactivate()
+        public static void SetMagazineInfo(ulong ownerId, int bullets, int magSize)
         {
-            Instance.Text.gameObject.SetActive(false);
-        }
-        public static void Activate()
-        {
-            Instance.Text.gameObject.SetActive(true);
+            if (!Instance.IsServer) return;
+
+            Instance.UpdateDisplayClientRpc(ownerId, bullets, magSize, Instance.Display.activeSelf);
         }
     }
 }

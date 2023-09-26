@@ -25,9 +25,15 @@ namespace ExoplanetStudios
                 locker.RemoveLock(lockObj);
 
             if (Active)
+            {
                 controls.Player.Enable();
+                controls.Inventory.Enable();
+            }
             else
+            {
                 controls.Player.Disable();
+                controls.Inventory.Disable();
+            }
         }
     }
 }
