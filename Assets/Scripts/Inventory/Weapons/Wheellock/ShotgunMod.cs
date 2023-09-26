@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ExoplanetStudios.ExtractionShooter
 {
     [CreateAssetMenu(fileName = "New Wheellock Modifier", menuName = "CustomObjects/Weapons/Wheellock/Shotgun")]
-    public class ShotgunModifier : Wheellock.WheellockItemModifier
+    public class ShotgunModifier : WheellockItemModifier
     {
         protected override int Id => 3;
         [SerializeField] private int ShotgunProjectileAmount;

@@ -344,6 +344,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ModificationManager",
+                    "type": "Button",
+                    "id": "05258c3f-f268-4a10-9384-072172563a93",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -388,6 +397,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "UtilitySlot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1c404248-1002-4219-8092-3579d84df911",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ModificationManager",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

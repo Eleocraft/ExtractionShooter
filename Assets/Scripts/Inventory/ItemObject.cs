@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -13,7 +14,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [HideInInspector] public int ActiveModifier;
         [HideInInspector] public int Ammunition;
         [Header("Modifiers")]
-        [SerializeField] protected ItemModifier[] Modifiers;
+        public List<ItemModifier> Modifiers;
         public float VelocityMultiplier;
         
         protected Transform _cameraTransform;
@@ -42,15 +43,16 @@ namespace ExoplanetStudios.ExtractionShooter
         public virtual void StopSecondaryAction() { }
 
         public virtual void Reload() { }
+        
+        public virtual void UpdateModifier() { }
 
         public Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * _cameraTransform.localPosition.y + playerState.Position;
         public Vector3 GetLookDirection(NetworkTransformState playerState) => Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * Vector3.forward;
-
-        public abstract class ItemModifier : ScriptableObject
-        {
-            protected abstract int Id { get; }
-            [TextArea()] public string Description;
-        }
+    }
+    public abstract class ItemModifier : ScriptableObject
+    {
+        protected abstract int Id { get; }
+        [TextArea()] public string Description;
     }
     public struct Item : INetworkSerializable, System.IEquatable<Item>
     {

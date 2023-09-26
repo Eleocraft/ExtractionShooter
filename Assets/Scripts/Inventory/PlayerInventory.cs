@@ -115,11 +115,11 @@ namespace ExoplanetStudios.ExtractionShooter
             }
         }
         
-        public void SetModifier(ItemSlot itemSlot, int modifier)
+        public void SetModifier(int modifier)
         {
             if (!IsServer) return;
 
-            SetItem(new(itemSlot, _itemObjects[itemSlot].ItemID, modifier, _itemObjects[itemSlot].Ammunition));
+            SetItem(new(ActiveSlot.Value, _itemObjects[ActiveSlot.Value].ItemID, modifier, _itemObjects[ActiveSlot.Value].Ammunition));
         }
         public void SetItem(Item item)
         {
@@ -162,7 +162,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [Command]
         public static void SetWeaponModifier(List<string> args)
         {
-            NetworkManager.Singleton.ConnectedClients[ulong.Parse(args[0])].PlayerObject.GetComponent<PlayerInventory>().SetModifier(Enum.Parse<ItemSlot>(args[1]), int.Parse(args[2]));
+            NetworkManager.Singleton.ConnectedClients[ulong.Parse(args[0])].PlayerObject.GetComponent<PlayerInventory>().SetModifier(int.Parse(args[2]));
         }
     }
 }

@@ -366,6 +366,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ModificationManager"",
+                    ""type"": ""Button"",
+                    ""id"": ""05258c3f-f268-4a10-9384-072172563a93"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -410,6 +419,17 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""UtilitySlot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1c404248-1002-4219-8092-3579d84df911"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ModificationManager"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -551,6 +571,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Inventory_SecondaryWeaponSlot = m_Inventory.FindAction("SecondaryWeaponSlot", throwIfNotFound: true);
         m_Inventory_UtilitySlot = m_Inventory.FindAction("UtilitySlot", throwIfNotFound: true);
         m_Inventory_Unequip = m_Inventory.FindAction("Unequip", throwIfNotFound: true);
+        m_Inventory_ModificationManager = m_Inventory.FindAction("ModificationManager", throwIfNotFound: true);
         // Menus
         m_Menus = asset.FindActionMap("Menus", throwIfNotFound: true);
         m_Menus_Escape = m_Menus.FindAction("Escape", throwIfNotFound: true);
@@ -780,6 +801,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Inventory_SecondaryWeaponSlot;
     private readonly InputAction m_Inventory_UtilitySlot;
     private readonly InputAction m_Inventory_Unequip;
+    private readonly InputAction m_Inventory_ModificationManager;
     public struct InventoryActions
     {
         private @InputMaster m_Wrapper;
@@ -788,6 +810,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @SecondaryWeaponSlot => m_Wrapper.m_Inventory_SecondaryWeaponSlot;
         public InputAction @UtilitySlot => m_Wrapper.m_Inventory_UtilitySlot;
         public InputAction @Unequip => m_Wrapper.m_Inventory_Unequip;
+        public InputAction @ModificationManager => m_Wrapper.m_Inventory_ModificationManager;
         public InputActionMap Get() { return m_Wrapper.m_Inventory; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -809,6 +832,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Unequip.started += instance.OnUnequip;
             @Unequip.performed += instance.OnUnequip;
             @Unequip.canceled += instance.OnUnequip;
+            @ModificationManager.started += instance.OnModificationManager;
+            @ModificationManager.performed += instance.OnModificationManager;
+            @ModificationManager.canceled += instance.OnModificationManager;
         }
 
         private void UnregisterCallbacks(IInventoryActions instance)
@@ -825,6 +851,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Unequip.started -= instance.OnUnequip;
             @Unequip.performed -= instance.OnUnequip;
             @Unequip.canceled -= instance.OnUnequip;
+            @ModificationManager.started -= instance.OnModificationManager;
+            @ModificationManager.performed -= instance.OnModificationManager;
+            @ModificationManager.canceled -= instance.OnModificationManager;
         }
 
         public void RemoveCallbacks(IInventoryActions instance)
@@ -981,6 +1010,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnSecondaryWeaponSlot(InputAction.CallbackContext context);
         void OnUtilitySlot(InputAction.CallbackContext context);
         void OnUnequip(InputAction.CallbackContext context);
+        void OnModificationManager(InputAction.CallbackContext context);
     }
     public interface IMenusActions
     {

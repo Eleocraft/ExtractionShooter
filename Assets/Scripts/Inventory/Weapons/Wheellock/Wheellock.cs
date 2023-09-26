@@ -25,6 +25,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
         [HideInInspector] public AudioSource[] GunAudioSource;
         private bool _shot;
+        private ItemModifierTag[] _modifierObjects;
 
         private Transform _firstShotSource;
         [HideInInspector] public Transform SecondShotSource;
@@ -42,6 +43,8 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             base.Activate();
 
+            _modifierObjects = _weaponObject.transform.GetComponentsInChildren<ItemModifierTag>();
+
             _firstShotSource = _weaponObject.transform.Find(FIRST_SHOT_SOURCE_NAME);
             SecondShotSource = _weaponObject.transform.Find(SECOND_SHOT_SOURCE_NAME);
             
@@ -53,6 +56,15 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _cooldown = 0;
             _shot = false;
+        }
+        public override void UpdateModifier()
+        {
+            base.UpdateModifier();
+
+            foreach (ItemModifierTag tag in _modifierObjects)
+                tag.gameObject.SetActive(false);
+            
+            _modifierObjects[ActiveModifier].gameObject.SetActive(true);
         }
         public override void StopPrimaryAction()
         {
@@ -103,13 +115,13 @@ namespace ExoplanetStudios.ExtractionShooter
                 _recoil += Recoil;
             }
         }
-        public abstract class WheellockItemModifier : ItemModifier
-        {
-            [SerializeField] protected AudioClip Audio;
-            [SerializeField] protected ProjectileInfo Info;
-            [SerializeField] protected float Spray;
-            [SerializeField] protected float SprayADS;
-            public abstract void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, Wheellock wheellock);
-        }
+    }
+    public abstract class WheellockItemModifier : ItemModifier
+    {
+        [SerializeField] protected AudioClip Audio;
+        [SerializeField] protected ProjectileInfo Info;
+        [SerializeField] protected float Spray;
+        [SerializeField] protected float SprayADS;
+        public abstract void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, Wheellock wheellock);
     }
 }

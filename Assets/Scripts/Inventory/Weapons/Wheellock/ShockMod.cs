@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ExoplanetStudios.ExtractionShooter
 {
     [CreateAssetMenu(fileName = "New Wheellock Modifier", menuName = "CustomObjects/Weapons/Wheellock/ShockMod")]
-    public class ShockModifier : Wheellock.WheellockItemModifier
+    public class ShockModifier : WheellockItemModifier
     {
         protected override int Id => 1;
         public override void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, Wheellock wheellock)
