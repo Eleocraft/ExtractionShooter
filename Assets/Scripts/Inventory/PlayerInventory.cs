@@ -25,27 +25,25 @@ namespace ExoplanetStudios.ExtractionShooter
         private void Awake()
         {
             _firstPersonController = GetComponent<FirstPersonController>();
+            _itemParent = _firstPersonController.PlayerModel.WeaponTransform;
+
+            _itemDisplays = new();
+            foreach (ItemSlot slot in Utility.GetEnumValues<ItemSlot>())
+            {
+                if (slot == ItemSlot.None) continue;
+                    
+                _itemDisplays.Add(slot, InventoryInterface.Instance.InventorySlots[slot].GetComponent<Image>());
+            }
         }
         private void Start()
         {
             _controls = GI.Controls;
-            _itemParent = _firstPersonController.PlayerModel.WeaponTransform;
-            
             if (IsOwner)
             {
                 _controls.Inventory.MainWeaponSlot.performed += ChangeToMainWeaponSlot;
                 _controls.Inventory.SecondaryWeaponSlot.performed += ChangeToSecondaryWeaponSlot;
                 _controls.Inventory.UtilitySlot.performed += ChangeToUtilitySlot;
                 _controls.Inventory.Unequip.performed += Unequip;
-
-                _itemDisplays = new();
-                foreach (ItemSlot slot in Utility.GetEnumValues<ItemSlot>())
-                {
-                    if (slot == ItemSlot.None) continue;
-                    
-                    Image slotDisplay = GameObject.FindGameObjectWithTag(slot.ToString()).GetComponent<Image>();
-                    _itemDisplays.Add(slot, slotDisplay);
-                }
             }
             if (IsServer)
             {

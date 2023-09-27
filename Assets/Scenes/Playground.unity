@@ -1919,6 +1919,7 @@ GameObject:
   - component: {fileID: 507968757}
   - component: {fileID: 507968758}
   - component: {fileID: 507968759}
+  - component: {fileID: 507968760}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -2080,6 +2081,32 @@ MonoBehaviour:
   - {fileID: -6109561824666100642, guid: b120790e657f1cb4480e058063a4d548, type: 3}
   - {fileID: 7278670340561045285, guid: ada40baacb48c2444b17b44876cfc118, type: 3}
   - {fileID: 1581246151511008135, guid: 88810c67e7004754e98e3f3650d40b9b, type: 3}
+--- !u!114 &507968760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507968748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70bce8fa036d70f448ca34b768e88040, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InventorySlots:
+    values:
+    - name: 
+      key: 0
+      value: {fileID: 0}
+    - name: MainSlot
+      key: 1
+      value: {fileID: 1756364348}
+    - name: SecondarySlot
+      key: 2
+      value: {fileID: 1698186131}
+    - name: Utility
+      key: 3
+      value: {fileID: 496450672}
 --- !u!1 &515480884
 GameObject:
   m_ObjectHideFlags: 0

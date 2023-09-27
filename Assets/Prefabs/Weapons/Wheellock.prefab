@@ -101,7 +101,7 @@ MonoBehaviour:
     the barrel was so short to begin with you ask? Well we needed something to sell
     to you didn't we?
   Icon: {fileID: 21300000, guid: 68bbf35bac3d674489c72bd96c233b01, type: 3}
-  Audio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
+  Audio: {fileID: 8300000, guid: 582bd6a756326ae49b59ac58c8cb62ad, type: 3}
   Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Spray: 0.125
   SprayADS: 0
@@ -392,7 +392,7 @@ MonoBehaviour:
     because it's cheaper. Further testing showed that this modification makes hitting
     enemies easier, so here you go
   Icon: {fileID: 21300000, guid: 2027f4c4bae09ee499665a74e553b8e3, type: 3}
-  Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
+  Audio: {fileID: 8300000, guid: 582bd6a756326ae49b59ac58c8cb62ad, type: 3}
   Info: {fileID: 11400000, guid: 657b6ccd717dbb44f8a6e7c4e054b8ee, type: 2}
   Spray: 5
   SprayADS: 5
