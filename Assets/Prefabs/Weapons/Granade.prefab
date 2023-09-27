@@ -49,10 +49,9 @@ MonoBehaviour:
   OwnerId: 0
   ItemID: granade
   Icon: {fileID: 21300000, guid: 8dbccf9ada24bff40925178dadbba85a, type: 3}
-  ActiveModifier: 0
   Ammunition: 0
-  Modifiers: []
   VelocityMultiplier: 1
+  Modifiers: []
   throwableInfo: {fileID: 11400000, guid: 9349f9d46be4c1345a5eb00a37f84825, type: 2}
   Cooldown: 4
   ThrowVelocity: 30
@@ -148,7 +147,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6922793697723135513, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
+  - {fileID: 2100000, guid: c612a11fa3f42ca4398abe683614bf35, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

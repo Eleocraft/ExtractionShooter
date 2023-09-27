@@ -56,6 +56,7 @@ namespace ExoplanetStudios.ExtractionShooter
                     Button plusIcon = Instantiate(PlusIconPrefab, Panel.transform);
                     int ID = i;
                     plusIcon.onClick.AddListener(() => ActivateModifier(ID));
+                    plusIcon.GetComponentsInChildren<Image>()[1].sprite = _modifiers[i].Icon;
                     _plusIcons.Add(plusIcon.gameObject);
                 }
                 _inventory.ActiveItemObject.Deactivate();
@@ -67,6 +68,7 @@ namespace ExoplanetStudios.ExtractionShooter
             }
             else
             {
+                DescriptionPanel.SetActive(false);
                 EscQueue.Remove(ToggleMenu);
                 InputStateMachine.ChangeInputState(true, this);
                 CursorStateMachine.ChangeCursorState(true, this);

@@ -69,6 +69,7 @@ namespace ExoplanetStudios.ExtractionShooter
         protected abstract int Id { get; }
         public string Title;
         [TextArea] public string Description;
+        public Sprite Icon;
         protected ItemObject _itemObject;
 
         public virtual void Initialize(ItemObject itemObject)

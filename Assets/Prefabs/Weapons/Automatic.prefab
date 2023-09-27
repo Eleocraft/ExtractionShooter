@@ -49,10 +49,9 @@ MonoBehaviour:
   OwnerId: 0
   ItemID: automatic
   Icon: {fileID: 21300000, guid: e7b7ef9eb016d43418eee826967619dc, type: 3}
-  ActiveModifier: 0
   Ammunition: 0
-  Modifiers: []
   VelocityMultiplier: 0.7
+  Modifiers: []
   Seed: 363456
   RecoilDecreaseSpeed: 15
   ADSFOV: 50
@@ -170,7 +169,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6478536213147159724, guid: 505262c85d7b3df4898d4524e08cb9ef, type: 3}
+  - {fileID: 2100000, guid: 62c7e0854bcef1a448b52217d135ba6b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

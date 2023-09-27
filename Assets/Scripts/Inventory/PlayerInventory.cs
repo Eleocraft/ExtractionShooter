@@ -51,7 +51,7 @@ namespace ExoplanetStudios.ExtractionShooter
             {
                 NetworkManager.OnClientConnectedCallback += OnClientConnected;
 
-                SetItem(new(ItemSlot.MainSlot, "automatic"));
+                SetItem(new(ItemSlot.MainSlot, "rifle"));
                 SetItem(new(ItemSlot.SecondarySlot, "wheellock"));
                 SetItem(new(ItemSlot.Utility, "granade"));
             }

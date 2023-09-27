@@ -1861,7 +1861,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -200}
-  m_SizeDelta: {x: 300, y: 300}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &496450674
 MonoBehaviour:
@@ -2079,6 +2079,7 @@ MonoBehaviour:
   - {fileID: 705538296120141295, guid: fe6f74dc10442b44b8b4767ca94882e9, type: 3}
   - {fileID: -6109561824666100642, guid: b120790e657f1cb4480e058063a4d548, type: 3}
   - {fileID: 7278670340561045285, guid: ada40baacb48c2444b17b44876cfc118, type: 3}
+  - {fileID: 1581246151511008135, guid: 88810c67e7004754e98e3f3650d40b9b, type: 3}
 --- !u!1 &515480884
 GameObject:
   m_ObjectHideFlags: 0
@@ -2954,7 +2955,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &928750963
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4580,7 +4581,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -100}
-  m_SizeDelta: {x: 300, y: 300}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1698186133
 MonoBehaviour:
@@ -4655,7 +4656,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 300}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1756364350
 MonoBehaviour:
@@ -5527,7 +5528,7 @@ PrefabInstance:
         type: 3}
       propertyPath: Cam
       value: 
-      objectReference: {fileID: 8944336656349189699}
+      objectReference: {fileID: 1126429949}
     - target: {fileID: 848988837338907566, guid: 3219a13aa8c7856429282393bf807b18,
         type: 3}
       propertyPath: Panel

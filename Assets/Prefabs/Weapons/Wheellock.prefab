@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 3780671244086486322, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
+  - {fileID: 2100000, guid: 62c7e0854bcef1a448b52217d135ba6b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -100,6 +100,7 @@ MonoBehaviour:
   Description: According to video game science, longer barrel = more accuracy. Why
     the barrel was so short to begin with you ask? Well we needed something to sell
     to you didn't we?
+  Icon: {fileID: 21300000, guid: 68bbf35bac3d674489c72bd96c233b01, type: 3}
   Audio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
   Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Spray: 0.125
@@ -166,9 +167,9 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1886820026795636259, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
-  - {fileID: -3522955778539423533, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
-  - {fileID: -2813467912831258332, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
+  - {fileID: 2100000, guid: 24418142db86a0c45848e7b9276d8f46, type: 2}
+  - {fileID: 2100000, guid: 24418142db86a0c45848e7b9276d8f46, type: 2}
+  - {fileID: 2100000, guid: 8244bf952a8f88d40bd0bc740b0587c6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -207,6 +208,7 @@ MonoBehaviour:
     moving so fast. After a couple of long brainstorming sessions on how to fix this
     problem we came up with some blue wire that somehow slows down hit enemies. No
     idea why this works.
+  Icon: {fileID: 21300000, guid: 63e1611d8c0e6cf40a64eda03b4af351, type: 3}
   Audio: {fileID: 8300000, guid: 061d9650a1057794196c8601704b86bb, type: 3}
   Info: {fileID: 11400000, guid: c785ac9420052194ab8fe3a2cc79082e, type: 2}
   Spray: 3
@@ -266,14 +268,13 @@ MonoBehaviour:
   OwnerId: 0
   ItemID: wheellock
   Icon: {fileID: 21300000, guid: 5dc434a61f55c9146bb11b2ee78310d7, type: 3}
-  ActiveModifier: 0
   Ammunition: 0
+  VelocityMultiplier: 0.7
   Modifiers:
   - {fileID: 1589434173265233337}
   - {fileID: 6737452807408252757}
   - {fileID: 8135567759849383130}
   - {fileID: 3737567712012261814}
-  VelocityMultiplier: 0.7
   Seed: 34522
   RecoilDecreaseSpeed: 15
   ADSFOV: 60
@@ -285,8 +286,8 @@ MonoBehaviour:
   Recoil: 4
   MovementError: 3
   FirstShotInfo: {fileID: 11400000, guid: 580cf102b65c73b4b80f4a568125296a, type: 2}
-  FirstShotSpray: 0.125
-  FirstShotSprayADS: 0
+  FirstShotSpray: 0.2
+  FirstShotSprayADS: 0.1
   FirstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
   FirstShotSource: {fileID: 5631305245388966321}
   SecondShotSource: {fileID: 786929327340619882}
@@ -352,7 +353,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 3780671244086486322, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
+  - {fileID: 2100000, guid: 62c7e0854bcef1a448b52217d135ba6b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -390,6 +391,7 @@ MonoBehaviour:
   Description: Someone had the idea to replace the second bullet with some gravel,
     because it's cheaper. Further testing showed that this modification makes hitting
     enemies easier, so here you go
+  Icon: {fileID: 21300000, guid: 2027f4c4bae09ee499665a74e553b8e3, type: 3}
   Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
   Info: {fileID: 11400000, guid: 657b6ccd717dbb44f8a6e7c4e054b8ee, type: 2}
   Spray: 5
@@ -697,6 +699,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Title: Disable Mods
   Description: Just the Good'ol default wheellock
+  Icon: {fileID: 21300000, guid: 5dc434a61f55c9146bb11b2ee78310d7, type: 3}
   Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
   Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Spray: 3
@@ -762,12 +765,9 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -876546973899608171, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
-  - {fileID: -3846018093981099296, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
-  - {fileID: -6478536213147159724, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
-  - {fileID: 4874126678125670354, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
-  - {fileID: -8274133419916619345, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
-  - {fileID: -6629797300637803691, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
+  - {fileID: 2100000, guid: 05851ab07a22f9641b0396e0b0ff0ef6, type: 2}
+  - {fileID: 2100000, guid: c612a11fa3f42ca4398abe683614bf35, type: 2}
+  - {fileID: 2100000, guid: 62c7e0854bcef1a448b52217d135ba6b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

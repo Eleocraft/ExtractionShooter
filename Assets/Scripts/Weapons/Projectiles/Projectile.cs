@@ -33,7 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _sqrMaxDistance = info.MaxDistance * info.MaxDistance;
             _sqrMinVelocity = info.MinVelocity * info.MinVelocity;
 
-            _displayObject.OnInitialisation(graphicsSource, _velocity);
+            _displayObject.OnInitialisation(graphicsSource, _velocity, graphicsSource - _spawnPosition);
 
             NetworkManager.Singleton.NetworkTickSystem.Tick += Tick;
             PlayerBulletHitboxManager.AddBullet(_tickDiff);

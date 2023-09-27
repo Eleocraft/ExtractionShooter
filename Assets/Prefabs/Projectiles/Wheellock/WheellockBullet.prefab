@@ -84,8 +84,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.027561188
-        value: 0.031053543
+        time: 0.027561545
+        value: 0.053687908
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -93,8 +93,8 @@ LineRenderer:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.8416307
-        value: 0.10737285
+        time: 0.8385949
+        value: 0.11384534
         inSlope: 0.15340714
         outSlope: 0.15340714
         tangentMode: 0
@@ -102,8 +102,8 @@ LineRenderer:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.95978236
-        value: 0.14091177
+        time: 0.9567466
+        value: 0.14738426
         inSlope: -0.027633194
         outSlope: -0.027633194
         tangentMode: 0
@@ -124,9 +124,9 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.6226415, g: 0.6226415, b: 0.6226415, a: 0}
-      key1: {r: 0.6698113, g: 0.5894637, b: 0.42589888, a: 0.39215687}
-      key2: {r: 1, g: 0.6091012, b: 0, a: 0.78431374}
+      key0: {r: 0.6226415, g: 0.6226415, b: 0.6226415, a: 0.5882353}
+      key1: {r: 0.6698113, g: 0.5894637, b: 0.42589888, a: 1}
+      key2: {r: 1, g: 0.6091012, b: 0, a: 1}
       key3: {r: 0, g: 0, b: 0, a: 1}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
@@ -141,9 +141,9 @@ LineRenderer:
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 9252
-      atime2: 47224
-      atime3: 58211
+      atime1: 65535
+      atime2: 16769
+      atime3: 43562
       atime4: 0
       atime5: 0
       atime6: 0
@@ -151,11 +151,11 @@ LineRenderer:
       m_Mode: 0
       m_ColorSpace: 0
       m_NumColorKeys: 3
-      m_NumAlphaKeys: 4
+      m_NumAlphaKeys: 2
     numCornerVertices: 5
     numCapVertices: 3
     alignment: 0
-    textureMode: 0
+    textureMode: 1
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0

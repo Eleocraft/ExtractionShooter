@@ -29,15 +29,6 @@ namespace ExoplanetStudios.ExtractionShooter
 
         public override int MagSize => 2;
         public override float ReloadTime => BulletsLoaded == 1 ? FirstShotReloadTime : SecondShotReloadTime;
-
-        public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller)
-        {
-            base.Initialize(ownerId, isOwner, controller);
-        }
-        public override void Activate()
-        {
-            base.Activate();
-        }
         public override void Deactivate()
         {
             base.Deactivate();
