@@ -34,7 +34,7 @@ namespace ExoplanetStudios.ExtractionShooter
             if (!_active) return;
 
             for (int i = 0; i < _modifiers.Count; i++)
-                _plusIcons[i].transform.position = Cam.WorldToScreenPoint(_modifiers[i].transform.position);
+                _plusIcons[i].transform.position = Cam.WorldToScreenPoint(_modifiers[i].Position);
         }
         private void ToggleMenuInput(UnityEngine.InputSystem.InputAction.CallbackContext ctx) => ToggleMenu();
         private void ToggleMenu() {

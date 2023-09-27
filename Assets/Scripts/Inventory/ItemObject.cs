@@ -66,7 +66,7 @@ namespace ExoplanetStudios.ExtractionShooter
     }
     public abstract class ItemModifier : MonoBehaviour
     {
-        protected abstract int Id { get; }
+        public virtual Vector3 Position => transform.position;
         public string Title;
         [TextArea] public string Description;
         public Sprite Icon;

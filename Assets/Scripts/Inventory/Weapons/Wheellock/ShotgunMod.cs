@@ -4,7 +4,6 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class ShotgunModifier : WheellockItemModifier
     {
-        protected override int Id => 3;
         [SerializeField] private int ShotgunProjectileAmount;
         public override void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {

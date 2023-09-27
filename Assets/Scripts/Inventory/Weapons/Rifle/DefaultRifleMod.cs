@@ -4,10 +4,9 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class DefaultRifleMod : RifleItemModifier
     {
-        protected override int Id => 0;
         public override int MagSize => 1;
 
-        public override void Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             Rifle rifle = _itemObject as Rifle;
 
@@ -15,6 +14,8 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 direction = rifle.GetShootDirection(playerState, spray, rifle.MovementError);
             Projectile.SpawnProjectile(Info, rifle.ShotSource.transform.position, rifle.GetCameraPosition(playerState), direction, rifle.OwnerId, weaponInputState.TickDiff);
             rifle.ShotSource.PlayOneShot(Audio);
+            
+            return true;
         }
     }
 }

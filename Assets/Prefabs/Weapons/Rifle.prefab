@@ -1,5 +1,111 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &346602907375394882
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6880114564222292596}
+  - component: {fileID: 5315650378756764965}
+  - component: {fileID: 936841454771630108}
+  - component: {fileID: 5986262979923744801}
+  m_Layer: 0
+  m_Name: AutoloaderMod
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &6880114564222292596
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346602907375394882}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2652430611434333674}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &5315650378756764965
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346602907375394882}
+  m_Mesh: {fileID: -8275601262807743952, guid: 9346bcbb108298d47b8ec69d748b0500, type: 3}
+--- !u!114 &936841454771630108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346602907375394882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc6158d16f1293245b8a7eb89b1d8257, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Title: Autoloader
+  Description: Moar bullets
+  Icon: {fileID: 21300000, guid: e726065b16534774d95ba31e5feb8478, type: 3}
+  Audio: {fileID: 8300000, guid: cda9d5b5efd826a45a50550f924c1ff6, type: 3}
+  Info: {fileID: 11400000, guid: 4bea404660201ce49be417cb69ee1b56, type: 2}
+  Spray: 0.125
+  SprayADS: 0
+  MagazineSize: 6
+  Cooldown: 0.3
+--- !u!23 &5986262979923744801
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346602907375394882}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 62c7e0854bcef1a448b52217d135ba6b, type: 2}
+  - {fileID: 2100000, guid: 3a27d661acc5ed34890d8f28b9b43eac, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &3726804448589417541
 GameObject:
   m_ObjectHideFlags: 0
@@ -32,6 +138,7 @@ Transform:
   m_Children:
   - {fileID: 234883690391767503}
   - {fileID: 3930142106226329516}
+  - {fileID: 6880114564222292596}
   - {fileID: 8279628349406562590}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -54,8 +161,9 @@ MonoBehaviour:
   VelocityMultiplier: 0.7
   Modifiers:
   - {fileID: 1344526449207537515}
+  - {fileID: 936841454771630108}
   Seed: 435543
-  RecoilDecreaseSpeed: 5
+  RecoilDecreaseSpeed: 10
   ADSFOV: 50
   TransitTime: 0.3
   ADSVelocityMul: 0.7

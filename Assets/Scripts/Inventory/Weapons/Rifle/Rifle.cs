@@ -33,16 +33,14 @@ namespace ExoplanetStudios.ExtractionShooter
             // first shot shooting
             if (weaponInputState.PrimaryAction && !InADSTransit && !_shot && !IsReloading)
             {
-                if (BulletsLoaded > 0)
+                if (BulletsLoaded > 0 && ((RifleItemModifier)Modifiers[ActiveModifier]).Shot(weaponInputState, playerState))
                 {
-                    ((RifleItemModifier)Modifiers[ActiveModifier]).Shot(weaponInputState, playerState);
-                    
                     BulletsLoaded--;
                     _recoil += Recoil;
                 }
-                
                 _shot = true;
             }
+            ((RifleItemModifier)Modifiers[ActiveModifier]).UpdateItem();
         }
     }
     public abstract class RifleItemModifier : ItemModifier
@@ -52,6 +50,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] protected float Spray;
         [SerializeField] protected float SprayADS;
         public abstract int MagSize { get; }
-        public abstract void Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
+        public abstract bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
+        public virtual void UpdateItem() { }
     }
 }
