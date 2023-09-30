@@ -62,7 +62,7 @@ namespace ExoplanetStudios.ExtractionShooter
             if (_reloadTimer > 0)
             {
                 _reloadTimer -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
-                transform.localRotation = Quaternion.AngleAxis(Mathf.Clamp01(_reloadTimer / ReloadTime) * 360, Vector3.right); // Temp
+                transform.localRotation = Quaternion.AngleAxis(Mathf.Clamp01(_reloadTimer / ReloadTime) * 360, Vector3.forward); // Temp
                 if (_reloadTimer <= 0)
                     BulletsLoaded = MagSize;
             }

@@ -5,6 +5,7 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class AutomaticWeapon : ADSWeapon
     {
+        protected override float ADSFOV => 50;
         [SerializeField] private ProjectileInfo projectileInfo;
         [SerializeField] private float Cooldown;
         [SerializeField] [MinMaxRange(0, 5)] private RangeSlider Spray;

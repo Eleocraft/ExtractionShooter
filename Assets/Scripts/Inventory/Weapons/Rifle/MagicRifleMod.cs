@@ -5,6 +5,7 @@ namespace ExoplanetStudios.ExtractionShooter
     public class MagicRifleMod : RifleItemModifier
     {
         public override int MagSize => 1;
+        public override bool CanADS => false;
 
         public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {

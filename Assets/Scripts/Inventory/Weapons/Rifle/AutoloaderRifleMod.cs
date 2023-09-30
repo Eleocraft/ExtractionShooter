@@ -7,8 +7,6 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         public override int MagSize => MagazineSize;
 
-        public override Vector3 Position => transform.position + transform.forward * 0.1f;
-
         [SerializeField] private int MagazineSize;
         [SerializeField] private float Cooldown;
 

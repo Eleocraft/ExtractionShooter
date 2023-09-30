@@ -5,6 +5,8 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class Wheellock : ADSWeapon
     {
+        [SerializeField] private float AdsFov;
+        protected override float ADSFOV => AdsFov;
         [Header("Time")]
         [SerializeField] private float Cooldown;
         [Header("Reload")]

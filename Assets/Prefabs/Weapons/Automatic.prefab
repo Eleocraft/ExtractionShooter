@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 3726804448589417541}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.349, y: -0.217, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -54,7 +54,6 @@ MonoBehaviour:
   Modifiers: []
   Seed: 363456
   RecoilDecreaseSpeed: 15
-  ADSFOV: 50
   TransitTime: 0.4
   ADSVelocityMul: 0.7
   projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}

@@ -1991,7 +1991,7 @@ MonoBehaviour:
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
     Address: 127.0.0.1
-    Port: 7777
+    Port: 42697
     ServerListenAddress: 0.0.0.0
   DebugSimulator:
     PacketDelayMS: 0

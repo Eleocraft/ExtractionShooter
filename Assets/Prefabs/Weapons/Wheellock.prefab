@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &955520895811595590
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2890720363164047058}
+  m_Layer: 0
+  m_Name: IconPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2890720363164047058
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955520895811595590}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.11, z: 0.4635}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3930142106226329516}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1661400482409510467
 GameObject:
   m_ObjectHideFlags: 0
@@ -31,7 +62,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.02, z: 0.5573}
   m_LocalScale: {x: 0.085, y: 0.085, z: 0.17}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 1053693287431557083}
   m_Father: {fileID: 2652430611434333674}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3253703797559991764
@@ -101,10 +133,73 @@ MonoBehaviour:
     the barrel was so short to begin with you ask? Well we needed something to sell
     to you didn't we?
   Icon: {fileID: 21300000, guid: 68bbf35bac3d674489c72bd96c233b01, type: 3}
+  IconPos: {fileID: 1053693287431557083}
   Audio: {fileID: 8300000, guid: 582bd6a756326ae49b59ac58c8cb62ad, type: 3}
   Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Spray: 0.125
   SprayADS: 0
+--- !u!1 &1952718105949104415
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5865853487428250060}
+  m_Layer: 0
+  m_Name: IconPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5865853487428250060
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952718105949104415}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -2, z: 2.69}
+  m_LocalScale: {x: 8.333334, y: 16.666668, z: 8.333334}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1299217069690146014}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2441676384121753683
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1053693287431557083}
+  m_Layer: 0
+  m_Name: IconPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1053693287431557083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2441676384121753683}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.3, z: 2.606}
+  m_LocalScale: {x: 11.764706, y: 11.764706, z: 5.882353}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1621250797848934531}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2464964861517824035
 GameObject:
   m_ObjectHideFlags: 0
@@ -133,10 +228,11 @@ Transform:
   m_GameObject: {fileID: 2464964861517824035}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0228, z: 0.4317}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8923931417021740328}
   m_Father: {fileID: 2652430611434333674}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7511839185580059340
@@ -209,6 +305,7 @@ MonoBehaviour:
     problem we came up with some blue wire that somehow slows down hit enemies. No
     idea why this works.
   Icon: {fileID: 21300000, guid: 63e1611d8c0e6cf40a64eda03b4af351, type: 3}
+  IconPos: {fileID: 8923931417021740328}
   Audio: {fileID: 8300000, guid: 061d9650a1057794196c8601704b86bb, type: 3}
   Info: {fileID: 11400000, guid: c785ac9420052194ab8fe3a2cc79082e, type: 2}
   Spray: 3
@@ -239,7 +336,7 @@ Transform:
   m_GameObject: {fileID: 3726804448589417541}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.349, y: -0.217, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -277,9 +374,9 @@ MonoBehaviour:
   - {fileID: 3737567712012261814}
   Seed: 34522
   RecoilDecreaseSpeed: 15
-  ADSFOV: 60
   TransitTime: 0.2
   ADSVelocityMul: 0.8
+  AdsFov: 60
   Cooldown: 0.15
   FirstShotReloadTime: 0.7
   SecondShotReloadTime: 1
@@ -291,6 +388,37 @@ MonoBehaviour:
   FirstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
   FirstShotSource: {fileID: 5631305245388966321}
   SecondShotSource: {fileID: 786929327340619882}
+--- !u!1 &3770309668415528237
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8923931417021740328}
+  m_Layer: 0
+  m_Name: IconPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8923931417021740328
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3770309668415528237}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.103, z: 0.892}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7974350088707328771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6096426859387171752
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,7 +450,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.01, z: 0.285}
   m_LocalScale: {x: 0.12, y: 0.06, z: 0.12}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5865853487428250060}
   m_Father: {fileID: 2652430611434333674}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1713241567386314755
@@ -392,6 +521,7 @@ MonoBehaviour:
     because it's cheaper. Further testing showed that this modification makes hitting
     enemies easier, so here you go
   Icon: {fileID: 21300000, guid: 2027f4c4bae09ee499665a74e553b8e3, type: 3}
+  IconPos: {fileID: 5865853487428250060}
   Audio: {fileID: 8300000, guid: 582bd6a756326ae49b59ac58c8cb62ad, type: 3}
   Info: {fileID: 11400000, guid: 657b6ccd717dbb44f8a6e7c4e054b8ee, type: 2}
   Spray: 5
@@ -669,7 +799,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3930142106226329516
 Transform:
   m_ObjectHideFlags: 0
@@ -682,7 +812,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2890720363164047058}
   m_Father: {fileID: 2652430611434333674}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1589434173265233337
@@ -700,6 +831,7 @@ MonoBehaviour:
   Title: Disable Mods
   Description: Just the Good'ol default wheellock
   Icon: {fileID: 21300000, guid: 5dc434a61f55c9146bb11b2ee78310d7, type: 3}
+  IconPos: {fileID: 2890720363164047058}
   Audio: {fileID: 8300000, guid: cd2d8a6d01f5cb24d992cd92b3e95608, type: 3}
   Info: {fileID: 11400000, guid: 6805000bd8f592f43b55c8c2bd8f4c2d, type: 2}
   Spray: 3
@@ -850,7 +982,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 4874126678125670354, guid: 13fa912dc6cbd004eb630c39d7c82a80, type: 3}
+  - {fileID: 2100000, guid: c612a11fa3f42ca4398abe683614bf35, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

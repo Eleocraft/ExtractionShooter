@@ -1,10 +1,11 @@
 using UnityEngine;
-using Unity.Netcode;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
     public class Rifle : ADSWeapon
     {
+        protected override float ADSFOV => ((RifleItemModifier)Modifiers[ActiveModifier]).ADSFov;
+        protected override bool CanADS => ((RifleItemModifier)Modifiers[ActiveModifier]).CanADS;
         public AudioSource ShotSource;
         [Header("Recoil")]
         [SerializeField] private float Recoil;
@@ -14,6 +15,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public override int MagSize => ((RifleItemModifier)Modifiers[ActiveModifier]).MagSize;
 
         public override float ReloadTime => ShotReloadTime;
+        
         private bool _shot;
         public override void Deactivate()
         {
@@ -49,7 +51,10 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] protected ProjectileInfo Info;
         [SerializeField] protected float Spray;
         [SerializeField] protected float SprayADS;
+        public float ADSFov;
         public abstract int MagSize { get; }
+        public virtual bool CanADS => true;
+        
         public abstract bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
         public virtual void UpdateItem() { }
     }

@@ -13,7 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override void EndProjectile()
         {
-            GetComponent<FadeController>().StartTimer(DecayTime, FadeTime);
+            GetComponent<FadeController>().StartTimer(DecayTime, FadeTime, () => Destroy(gameObject));
         }
     }
 }

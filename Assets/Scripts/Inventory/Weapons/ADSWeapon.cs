@@ -6,7 +6,6 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public abstract class ADSWeapon : Weapon
     {
-        [SerializeField] private float ADSFOV;
         [SerializeField] private float TransitTime;
         [SerializeField] private float ADSVelocityMul;
         private CinemachineVirtualCamera _camera;
@@ -15,12 +14,13 @@ namespace ExoplanetStudios.ExtractionShooter
         private float _defaultFOV;
         private float _adsState;
         protected bool InADSTransit => _adsState > 0 && _adsState < TransitTime;
-        private const string ADS_POS_NAME = "WeaponADSPosition";
+        protected abstract float ADSFOV { get; }
+        protected virtual bool CanADS => true;
         public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             base.Initialize(ownerId, isOwner, controller);
 
             _weaponDefaultPos = transform.localPosition;
-            _weaponADSPos = transform.parent.Find(ADS_POS_NAME).localPosition;
+            _weaponADSPos = transform.parent.localPosition;
 
             if (isOwner)
             {
@@ -50,6 +50,11 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
+            if (!CanADS)
+            {
+                transform.localPosition = _weaponDefaultPos;
+                return;
+            }
 
             if (weaponInputState.SecondaryAction && !IsReloading)
             {
