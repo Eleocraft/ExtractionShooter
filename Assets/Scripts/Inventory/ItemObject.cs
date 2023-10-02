@@ -33,7 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
             gameObject.SetActive(false);
 
             foreach(ItemModifier modifier in Modifiers)
-                modifier.Initialize(this);
+                modifier.Initialize(this, controller);
 
             _cameraTransform = controller.PlayerModel.CameraSocket;
             _firstPersonController = controller;
@@ -73,7 +73,7 @@ namespace ExoplanetStudios.ExtractionShooter
         protected ItemObject _itemObject;
         [SerializeField] private Transform IconPos;
 
-        public virtual void Initialize(ItemObject itemObject)
+        public virtual void Initialize(ItemObject itemObject, FirstPersonController player)
         {
             _itemObject = itemObject;
         }

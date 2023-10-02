@@ -6,7 +6,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         protected override float ADSFOV => ((RifleItemModifier)Modifiers[ActiveModifier]).ADSFov;
         protected override bool CanADS => ((RifleItemModifier)Modifiers[ActiveModifier]).CanADS;
-        public AudioSource ShotSource;
+        public Transform ShotSource;
         [Header("Recoil")]
         [SerializeField] private float Recoil;
         public float MovementError;
@@ -15,7 +15,8 @@ namespace ExoplanetStudios.ExtractionShooter
         public override int MagSize => ((RifleItemModifier)Modifiers[ActiveModifier]).MagSize;
 
         public override float ReloadTime => ShotReloadTime;
-        
+        protected override Vector3 ADSPos => ((RifleItemModifier)Modifiers[ActiveModifier]).ADSPos;
+
         private bool _shot;
         public override void Deactivate()
         {
@@ -42,7 +43,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
                 _shot = true;
             }
-            ((RifleItemModifier)Modifiers[ActiveModifier]).UpdateItem();
+            ((RifleItemModifier)Modifiers[ActiveModifier]).UpdateItem(weaponInputState.SecondaryAction || InADSTransit);
         }
     }
     public abstract class RifleItemModifier : ItemModifier
@@ -54,8 +55,9 @@ namespace ExoplanetStudios.ExtractionShooter
         public float ADSFov;
         public abstract int MagSize { get; }
         public virtual bool CanADS => true;
+        public virtual Vector3 ADSPos => new Vector3(0, -0.05f, 0.3f);
         
         public abstract bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
-        public virtual void UpdateItem() { }
+        public virtual void UpdateItem(bool ADS) { }
     }
 }

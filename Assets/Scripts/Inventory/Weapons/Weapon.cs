@@ -7,6 +7,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private int Seed;
         [SerializeField] private float RecoilDecreaseSpeed = 1;
+        [SerializeField] private AudioClip ReloadSound;
         
         private System.Random _rng;
         public abstract int MagSize { get; }
@@ -36,9 +37,6 @@ namespace ExoplanetStudios.ExtractionShooter
             base.Activate();
 
             MagazineDisplay.SetMagazineInfo(OwnerId, BulletsLoaded, MagSize, true);
-
-            if (_isOwner)
-                gameObject.SetLayerAllChildren(LayerMask.NameToLayer("First Person"));
         }
         public override void Deactivate() {
             base.Deactivate();
@@ -73,6 +71,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 return;
             
             _reloadTimer = ReloadTime;
+            SFXSource.Source.PlayOneShot(ReloadSound);
         }
 
         public Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)

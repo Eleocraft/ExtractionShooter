@@ -55,7 +55,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		[SerializeField] private float BottomClamp = -90.0f;
 
 		[Header("Inputs")]
-		[SerializeField] private GlobalInputs GI;
+		public GlobalInputs GI;
 		[Header("Test")]
 		[SerializeField] private bool Walk;
 

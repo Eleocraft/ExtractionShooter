@@ -6,15 +6,15 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         public override int MagSize => 1;
         public override bool CanADS => false;
+        [SerializeField] private MagicProjectile Projectile;
 
         public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             Rifle rifle = _itemObject as Rifle;
 
-            float spray = weaponInputState.SecondaryAction ? SprayADS : Spray;
-            Vector3 direction = rifle.GetShootDirection(playerState, spray, rifle.MovementError);
-            Projectile.SpawnProjectile(Info, rifle.ShotSource.transform.position, rifle.GetCameraPosition(playerState), direction, rifle.OwnerId, weaponInputState.TickDiff);
-            rifle.ShotSource.PlayOneShot(Audio);
+            Vector3 direction = rifle.GetLookDirection(playerState);
+            Instantiate(Projectile, rifle.GetCameraPosition(playerState), Quaternion.identity).OnInitialisation(direction, rifle.OwnerId, weaponInputState.TickDiff);
+            SFXSource.Source.PlayOneShot(Audio);
             
             return true;
         }

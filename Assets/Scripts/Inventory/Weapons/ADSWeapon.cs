@@ -9,18 +9,17 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float TransitTime;
         [SerializeField] private float ADSVelocityMul;
         private CinemachineVirtualCamera _camera;
-        private Vector3 _weaponADSPos;
         private Vector3 _weaponDefaultPos;
         private float _defaultFOV;
         private float _adsState;
         protected bool InADSTransit => _adsState > 0 && _adsState < TransitTime;
         protected abstract float ADSFOV { get; }
         protected virtual bool CanADS => true;
+        protected abstract Vector3 ADSPos { get; }
         public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             base.Initialize(ownerId, isOwner, controller);
 
             _weaponDefaultPos = transform.localPosition;
-            _weaponADSPos = transform.parent.localPosition;
 
             if (isOwner)
             {
@@ -50,13 +49,8 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
-            if (!CanADS)
-            {
-                transform.localPosition = _weaponDefaultPos;
-                return;
-            }
-
-            if (weaponInputState.SecondaryAction && !IsReloading)
+            
+            if (CanADS && weaponInputState.SecondaryAction && !IsReloading)
             {
                 if (_adsState <= 0)
                     StartADS();
@@ -76,7 +70,7 @@ namespace ExoplanetStudios.ExtractionShooter
             float relativeTimer = _adsState / TransitTime;
 
             if (relativeTimer > 0)
-                transform.localPosition = Vector3.Lerp(_weaponDefaultPos, _weaponADSPos, relativeTimer);
+                transform.localPosition = Vector3.Lerp(_weaponDefaultPos, transform.parent.localPosition + ADSPos, relativeTimer);
 
             // FOV
             if (_camera != null)

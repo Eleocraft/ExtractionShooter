@@ -6,6 +6,8 @@ namespace ExoplanetStudios.ExtractionShooter
     public class Wheellock : ADSWeapon
     {
         [SerializeField] private float AdsFov;
+        [SerializeField] private Vector3 AdsPos;
+        protected override Vector3 ADSPos => AdsPos;
         protected override float ADSFOV => AdsFov;
         [Header("Time")]
         [SerializeField] private float Cooldown;
@@ -26,8 +28,8 @@ namespace ExoplanetStudios.ExtractionShooter
         private bool _shot;
         
 
-        [SerializeField] private AudioSource FirstShotSource;
-        public AudioSource SecondShotSource;
+        [SerializeField] private Transform FirstShotSource;
+        public Transform SecondShotSource;
 
         public override int MagSize => 2;
         public override float ReloadTime => BulletsLoaded == 1 ? FirstShotReloadTime : SecondShotReloadTime;
@@ -72,8 +74,8 @@ namespace ExoplanetStudios.ExtractionShooter
                 float spray = weaponInputState.SecondaryAction ? FirstShotSprayADS : FirstShotSpray;
 
                 Vector3 direction = GetShootDirection(playerState, spray, MovementError);
-                Projectile.SpawnProjectile(FirstShotInfo, FirstShotSource.transform.position, GetCameraPosition(playerState), direction, OwnerId, weaponInputState.TickDiff);
-                FirstShotSource.PlayOneShot(FirstShotAudio);
+                Projectile.SpawnProjectile(FirstShotInfo, FirstShotSource.position, GetCameraPosition(playerState), direction, OwnerId, weaponInputState.TickDiff);
+                SFXSource.Source.PlayOneShot(FirstShotAudio);
                 
                 BulletsLoaded--;
                 _recoil += Recoil;

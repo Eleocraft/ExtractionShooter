@@ -10,22 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c07420cc09fb4c409ba3c4fcdd04df7, type: 3}
-  m_Name: RifleProjectile
+  m_Name: RifleProjectileAutoload
   m_EditorClassIdentifier: 
   Damages:
     values:
     - name: Default
       key: 0
-      value: 80
+      value: 60
     - name: Headshot
       key: 1
-      value: 160
+      value: 150
   SlowTime: 0.2
   SlowMultiplier: 0.8
-  MaxVelocity: 230
+  MaxVelocity: 200
   Drag: 0.5
-  Dropoff: 5
-  PenetrationForce: 0.3
+  Dropoff: 6
+  PenetrationForce: 0.2664
   MaxDistance: 600
   MinVelocity: 100
   Prefab: {fileID: 6847435988720863931, guid: af6380736c43889408b3cf9227a77235, type: 3}

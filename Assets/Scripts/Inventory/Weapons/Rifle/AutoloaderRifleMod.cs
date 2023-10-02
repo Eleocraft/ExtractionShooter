@@ -9,28 +9,34 @@ namespace ExoplanetStudios.ExtractionShooter
 
         [SerializeField] private int MagazineSize;
         [SerializeField] private float Cooldown;
+        [SerializeField] private float SprayIncreasePerBullet;
+        [SerializeField] private float SprayDecreaseSpeed;
 
         private float _cooldown;
-
+        private float _relativeSpray;
         public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             if (_cooldown > 0) return false;
 
             Rifle rifle = _itemObject as Rifle;
 
-            float spray = weaponInputState.SecondaryAction ? SprayADS : Spray;
+            float spray = _relativeSpray * (weaponInputState.SecondaryAction ? SprayADS : Spray);
             Vector3 direction = rifle.GetShootDirection(playerState, spray, rifle.MovementError);
-            Projectile.SpawnProjectile(Info, rifle.ShotSource.transform.position, rifle.GetCameraPosition(playerState), direction, rifle.OwnerId, weaponInputState.TickDiff);
-            rifle.ShotSource.PlayOneShot(Audio);
+            Projectile.SpawnProjectile(Info, rifle.ShotSource.position, rifle.GetCameraPosition(playerState), direction, rifle.OwnerId, weaponInputState.TickDiff);
+            SFXSource.Source.PlayOneShot(Audio);
 
             _cooldown = Cooldown;
+            _relativeSpray += SprayIncreasePerBullet;
             return true;
         }
-        public override void UpdateItem()
+        public override void UpdateItem(bool ADS)
         {
             base.Activate();
             if (_cooldown > 0)
                 _cooldown -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+            else if (_relativeSpray > 0)
+                _relativeSpray -= NetworkManager.Singleton.LocalTime.FixedDeltaTime * SprayDecreaseSpeed;
+            _relativeSpray = Mathf.Clamp01(_relativeSpray);
         }
     }
 }

@@ -10,8 +10,8 @@ namespace ExoplanetStudios.ExtractionShooter
             
             float spray = weaponInputState.SecondaryAction ? SprayADS : Spray;
             Vector3 direction = wheellock.GetShootDirection(playerState, spray, wheellock.MovementError);
-            Projectile.SpawnProjectile(Info, wheellock.SecondShotSource.transform.position, wheellock.GetCameraPosition(playerState), direction, wheellock.OwnerId, weaponInputState.TickDiff);
-            wheellock.SecondShotSource.PlayOneShot(Audio);
+            Projectile.SpawnProjectile(Info, wheellock.SecondShotSource.position, wheellock.GetCameraPosition(playerState), direction, wheellock.OwnerId, weaponInputState.TickDiff);
+            SFXSource.Source.PlayOneShot(Audio);
         }
     }
 }

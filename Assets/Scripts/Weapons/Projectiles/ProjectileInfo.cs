@@ -33,6 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public float GetDamage(DamageType damageType, float projectileVelocity)
         {
+            Damages.Update();
             return Damages[damageType] * (projectileVelocity / MaxVelocity);
         }
     }

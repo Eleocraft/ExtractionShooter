@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2890720363164047058}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: IconPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 955520895811595590}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.11, z: 0.4635}
+  m_LocalPosition: {x: 0, y: 0.003, z: 0.029}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 3253703797559991764}
   - component: {fileID: 1821727133350424103}
   - component: {fileID: 8135567759849383130}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: WheellockAccurateMod
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5865853487428250060}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: IconPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,8 +163,8 @@ Transform:
   m_GameObject: {fileID: 1952718105949104415}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2, z: 2.69}
-  m_LocalScale: {x: 8.333334, y: 16.666668, z: 8.333334}
+  m_LocalPosition: {x: 0, y: 0.36, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1299217069690146014}
@@ -178,7 +178,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1053693287431557083}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: IconPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,8 +194,8 @@ Transform:
   m_GameObject: {fileID: 2441676384121753683}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.3, z: 2.606}
-  m_LocalScale: {x: 11.764706, y: 11.764706, z: 5.882353}
+  m_LocalPosition: {x: 0, y: 0.4, z: 0.11}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1621250797848934531}
@@ -212,7 +212,7 @@ GameObject:
   - component: {fileID: 7511839185580059340}
   - component: {fileID: 2333523271532759377}
   - component: {fileID: 6737452807408252757}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: WheellockShockMod
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -320,7 +320,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2652430611434333674}
   - component: {fileID: -6109561824666100642}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wheellock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -336,7 +336,7 @@ Transform:
   m_GameObject: {fileID: 3726804448589417541}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.349, y: -0.217, z: 0}
+  m_LocalPosition: {x: 0.551, y: -0.317, z: 0.664}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -374,9 +374,11 @@ MonoBehaviour:
   - {fileID: 3737567712012261814}
   Seed: 34522
   RecoilDecreaseSpeed: 15
+  ReloadSound: {fileID: 8300000, guid: 2837834708a16284f83d45d86e245318, type: 3}
   TransitTime: 0.2
   ADSVelocityMul: 0.8
   AdsFov: 60
+  AdsPos: {x: 0, y: -0.13, z: 0.4}
   Cooldown: 0.15
   FirstShotReloadTime: 0.7
   SecondShotReloadTime: 1
@@ -386,8 +388,8 @@ MonoBehaviour:
   FirstShotSpray: 0.2
   FirstShotSprayADS: 0.1
   FirstShotAudio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
-  FirstShotSource: {fileID: 5631305245388966321}
-  SecondShotSource: {fileID: 786929327340619882}
+  FirstShotSource: {fileID: 8279628349406562590}
+  SecondShotSource: {fileID: 588185075658697547}
 --- !u!1 &3770309668415528237
 GameObject:
   m_ObjectHideFlags: 0
@@ -397,7 +399,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8923931417021740328}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: IconPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -413,7 +415,7 @@ Transform:
   m_GameObject: {fileID: 3770309668415528237}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.103, z: 0.892}
+  m_LocalPosition: {x: 0, y: 0.046, z: 0.497}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -431,7 +433,7 @@ GameObject:
   - component: {fileID: 1713241567386314755}
   - component: {fileID: 8155635375710565998}
   - component: {fileID: 3737567712012261814}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: WheellockShotgunMod
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -536,8 +538,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 588185075658697547}
-  - component: {fileID: 786929327340619882}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SecondShotSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -553,108 +554,12 @@ Transform:
   m_GameObject: {fileID: 6625780269913558116}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0198, z: 0.4401}
+  m_LocalPosition: {x: 0, y: 0.044, z: 0.4401}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2652430611434333674}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &786929327340619882
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6625780269913558116}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 0
-  m_Volume: 0.4
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &6767277863443983431
 GameObject:
   m_ObjectHideFlags: 0
@@ -664,8 +569,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8279628349406562590}
-  - component: {fileID: 5631305245388966321}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: FirstShotSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -681,108 +585,12 @@ Transform:
   m_GameObject: {fileID: 6767277863443983431}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.0146, z: 0.4042}
+  m_LocalPosition: {x: 0, y: 0.008, z: 0.455}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2652430611434333674}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &5631305245388966321
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6767277863443983431}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 0
-  m_Volume: 0.4
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &7297963519079716903
 GameObject:
   m_ObjectHideFlags: 0
@@ -793,7 +601,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3930142106226329516}
   - component: {fileID: 1589434173265233337}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: WheellockDefaultMod
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -847,7 +655,7 @@ GameObject:
   - component: {fileID: 234883690391767503}
   - component: {fileID: 394015584499428350}
   - component: {fileID: 3933718345331880722}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -932,7 +740,7 @@ GameObject:
   - component: {fileID: 2973837614633352852}
   - component: {fileID: 3901956273251196544}
   - component: {fileID: 2087169744927313415}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}

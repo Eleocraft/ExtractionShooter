@@ -13,9 +13,9 @@ namespace ExoplanetStudios.ExtractionShooter
             for (int i = 0; i < ShotgunProjectileAmount; i++)
             {
                 Vector3 direction = wheellock.GetShootDirection(playerState, spray, wheellock.MovementError);
-                Projectile.SpawnProjectile(Info, wheellock.SecondShotSource.transform.position, wheellock.GetCameraPosition(playerState), direction, wheellock.OwnerId, weaponInputState.TickDiff);
+                Projectile.SpawnProjectile(Info, wheellock.SecondShotSource.position, wheellock.GetCameraPosition(playerState), direction, wheellock.OwnerId, weaponInputState.TickDiff);
             }
-            wheellock.SecondShotSource.PlayOneShot(Audio);
+            SFXSource.Source.PlayOneShot(Audio);
         }
     }
 }

@@ -289,6 +289,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Scroll"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""c71dc99b-f5a0-4792-879b-58a01d110fc3"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -322,6 +331,17 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""SecondaryAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fe48c5c4-fc66-4285-bba8-e3202c554008"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -565,6 +585,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Mouse_Look = m_Mouse.FindAction("Look", throwIfNotFound: true);
         m_Mouse_PrimaryAction = m_Mouse.FindAction("PrimaryAction", throwIfNotFound: true);
         m_Mouse_SecondaryAction = m_Mouse.FindAction("SecondaryAction", throwIfNotFound: true);
+        m_Mouse_Scroll = m_Mouse.FindAction("Scroll", throwIfNotFound: true);
         // Inventory
         m_Inventory = asset.FindActionMap("Inventory", throwIfNotFound: true);
         m_Inventory_MainWeaponSlot = m_Inventory.FindAction("MainWeaponSlot", throwIfNotFound: true);
@@ -738,6 +759,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Mouse_Look;
     private readonly InputAction m_Mouse_PrimaryAction;
     private readonly InputAction m_Mouse_SecondaryAction;
+    private readonly InputAction m_Mouse_Scroll;
     public struct MouseActions
     {
         private @InputMaster m_Wrapper;
@@ -745,6 +767,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_Mouse_Look;
         public InputAction @PrimaryAction => m_Wrapper.m_Mouse_PrimaryAction;
         public InputAction @SecondaryAction => m_Wrapper.m_Mouse_SecondaryAction;
+        public InputAction @Scroll => m_Wrapper.m_Mouse_Scroll;
         public InputActionMap Get() { return m_Wrapper.m_Mouse; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -763,6 +786,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @SecondaryAction.started += instance.OnSecondaryAction;
             @SecondaryAction.performed += instance.OnSecondaryAction;
             @SecondaryAction.canceled += instance.OnSecondaryAction;
+            @Scroll.started += instance.OnScroll;
+            @Scroll.performed += instance.OnScroll;
+            @Scroll.canceled += instance.OnScroll;
         }
 
         private void UnregisterCallbacks(IMouseActions instance)
@@ -776,6 +802,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @SecondaryAction.started -= instance.OnSecondaryAction;
             @SecondaryAction.performed -= instance.OnSecondaryAction;
             @SecondaryAction.canceled -= instance.OnSecondaryAction;
+            @Scroll.started -= instance.OnScroll;
+            @Scroll.performed -= instance.OnScroll;
+            @Scroll.canceled -= instance.OnScroll;
         }
 
         public void RemoveCallbacks(IMouseActions instance)
@@ -1003,6 +1032,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnPrimaryAction(InputAction.CallbackContext context);
         void OnSecondaryAction(InputAction.CallbackContext context);
+        void OnScroll(InputAction.CallbackContext context);
     }
     public interface IInventoryActions
     {

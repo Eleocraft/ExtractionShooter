@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2652430611434333674}
   - component: {fileID: 7278670340561045285}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Automatic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 3726804448589417541}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.349, y: -0.217, z: 0}
+  m_LocalPosition: {x: 0.391, y: -0.434, z: 0.411}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -54,8 +54,10 @@ MonoBehaviour:
   Modifiers: []
   Seed: 363456
   RecoilDecreaseSpeed: 15
+  ReloadSound: {fileID: 0}
   TransitTime: 0.4
   ADSVelocityMul: 0.7
+  ADSPos: {x: 0, y: -0.05, z: 0.4}
   projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}
   Cooldown: 0.1
   Spray:
@@ -85,7 +87,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7744301048124730087}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,7 +120,7 @@ GameObject:
   - component: {fileID: 234883690391767503}
   - component: {fileID: 394015584499428350}
   - component: {fileID: 3933718345331880722}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: body
   m_TagString: Untagged
   m_Icon: {fileID: 0}

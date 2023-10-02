@@ -13,6 +13,8 @@ namespace ExoplanetStudios.ExtractionShooter
         [ClientRpc]
         private void UpdateDisplayClientRpc(ulong id, int bulletsLeft, int magSize, bool active)
         {
+            if (NetworkManager.LocalClientId != id) return;
+            
             Instance.RemainingBulletsDisplay.text = bulletsLeft.ToString();
             Instance.MaxBulletsDisplay.text = magSize.ToString();
             Display.SetActive(active);
