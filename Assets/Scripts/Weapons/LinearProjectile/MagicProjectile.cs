@@ -4,30 +4,27 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class MagicProjectile : MonoBehaviour
     {
-        private Vector3 _direction;
         [SerializeField] private float Speed;
         [SerializeField] private float SizeIncreaseSpeed;
         [SerializeField] private float Lifetime;
+        [SerializeField] private float Fadetime;
         [SerializeField] private float Damage;
         private ulong _ownerID;
         private int _tickDiff;
         public void OnInitialisation(Vector3 direction, ulong ownerID, int tickDiff)
         {
-            _direction = direction;
             _ownerID = ownerID;
             _tickDiff = tickDiff;
+            GetComponent<Rigidbody>().velocity = direction * Speed;
+            GetComponent<FadeController>().StartTimer(Lifetime, Fadetime, () => Destroy(gameObject));
         }
-        private void FixedUpdate()
+        private void Update()
         {
-            transform.position += _direction * Speed * Time.fixedDeltaTime;
-            transform.localScale += Vector3.one * SizeIncreaseSpeed * Time.fixedDeltaTime;
-            Lifetime -= Time.fixedDeltaTime;
-            if (Lifetime < 0)
-                Destroy(gameObject);
+            transform.localScale += Vector3.one * SizeIncreaseSpeed * Time.deltaTime;
         }
         private void OnTriggerEnter(Collider col)
         {
-            if (col.gameObject.TryGetComponent(out IDamagable damagable))
+            if (col.attachedRigidbody?.TryGetComponent(out IDamagable damagable) == true)
                 damagable.Damage(Damage, _ownerID, _tickDiff);
         }
     }
