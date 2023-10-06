@@ -16,7 +16,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private void OpenInviteList(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
         {
             // SteamFriends.OpenGameInviteOverlay(MainMenuController.MainLobby.Value.Id);
-            MainMenuController.MainLobby.Value.InviteFriend(76561199105991568);
+            MainMenuController.MainLobby.Value.InviteFriend(76561198419275033);
         }
     }
 }
