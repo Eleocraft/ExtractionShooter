@@ -45,6 +45,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _reloadTimer = 0;
             _recoil = 0;
+            _firstPersonController.PlayerModel.SetRecoil(0);
             transform.localRotation = Quaternion.identity; // Temp
         }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
@@ -55,7 +56,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 if (_recoil < 0)
                     _recoil = 0;
             }
-            _firstPersonController.SetCameraRecoil(_recoil);
+            _firstPersonController.PlayerModel.SetRecoil(_recoil);
 
             if (_reloadTimer > 0)
             {

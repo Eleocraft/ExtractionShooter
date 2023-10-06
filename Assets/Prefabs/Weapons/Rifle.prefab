@@ -816,6 +816,7 @@ MonoBehaviour:
     sliderMin: 1
     sliderMax: 20
   ZoomSpeed: 0.001
+  GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
 --- !u!33 &3573195653015792913
 MeshFilter:
   m_ObjectHideFlags: 0

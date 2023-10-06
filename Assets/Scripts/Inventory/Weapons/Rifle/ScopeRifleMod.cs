@@ -9,8 +9,8 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private GameObject ScopeDisplay;
         [SerializeField] [MinMaxRange(1, 20)] RangeSlider ScopeFOV;
         [SerializeField] private float ZoomSpeed;
+        [SerializeField] private GlobalInputs GI;
         private float _zoom = 1;
-        private InputMaster _controls;
         private bool _ads;
         public override Vector3 ADSPos => new Vector3(0, -0.05f, 0.25f);
         private bool _adsBlocked;
@@ -19,17 +19,17 @@ namespace ExoplanetStudios.ExtractionShooter
         public override void Initialize(ItemObject itemObject, FirstPersonController player)
         {
             base.Initialize(itemObject, player);
-            _controls = player.GI.Controls;
+            Cam.enabled = false;
         }
         public override void Activate()
         {
             base.Activate();
-            _controls.Mouse.Scroll.performed += ChangeZoom;
+            GI.Controls.Mouse.Scroll.performed += ChangeZoom;
         }
         public override void Deactivate()
         {
             base.Deactivate();
-            _controls.Mouse.Scroll.performed += ChangeZoom;
+            GI.Controls.Mouse.Scroll.performed += ChangeZoom;
         }
         private void ChangeZoom(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
         {

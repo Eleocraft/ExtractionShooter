@@ -16,6 +16,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		private InterpolationState _lerpEndInterpolationState;
         private float _currentTickDeltaTime;        
         private bool _isOwner;
+        private float _recoil;
 
         private const string CAMERA_POS_NAME = "CameraPos";
 		public const string PLAYER_CAM_TAG = "PlayerCam";
@@ -62,14 +63,18 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (!_isOwner)
 			    Rotate(Utility.Vector2RotateLerp(_lerpStartInterpolationState.LookRotation, _lerpEndInterpolationState.LookRotation, relativeDeltaTime));
 		}
-        public void Rotate(Vector2 lookRotation, float cameraRecoil = 0)
+        public void Rotate(Vector2 lookRotation)
 		{
 			// Update camera target pitch
-			CameraSocket.localRotation = Quaternion.Euler(lookRotation.x - cameraRecoil, 0.0f, 0.0f);
+			CameraSocket.localRotation = Quaternion.Euler(lookRotation.x - _recoil, 0.0f, 0.0f);
 
 			// rotate the player left and right
 			transform.rotation = Quaternion.Euler(0, lookRotation.y, 0);
 		}
+        public void SetRecoil(float recoil)
+        {
+            _recoil = recoil;
+        }
         private struct InterpolationState
         {
             public readonly Vector3 Position;

@@ -12,6 +12,7 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private TMP_InputField IpInputField;
     [SerializeField] private string mainSceneName;
     public static bool UsedMainMenu;
+    public static Lobby? MainLobby;
     void Start()
     {
         UsedMainMenu = true;
@@ -21,10 +22,11 @@ public class MainMenuController : MonoBehaviour
     {
         SteamFriends.OnGameLobbyJoinRequested -= OnGameLobbyJoinRequested;
     }
-    public void StartHost()
+    public async void StartHost()
     {
         NetworkManager.Singleton.StartHost();
         NetworkManager.Singleton.SceneManager.LoadScene(mainSceneName, LoadSceneMode.Single);
+        MainLobby = await SteamMatchmaking.CreateLobbyAsync(5);
     }
     private void OnGameLobbyJoinRequested(Lobby lobby, SteamId steamId)
     {

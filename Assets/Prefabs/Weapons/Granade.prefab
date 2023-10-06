@@ -53,7 +53,7 @@ MonoBehaviour:
   VelocityMultiplier: 1
   Modifiers: []
   throwableInfo: {fileID: 11400000, guid: 9349f9d46be4c1345a5eb00a37f84825, type: 2}
-  Cooldown: 4
+  Cooldown: 1
   ThrowVelocity: 30
 --- !u!1 &7900332743363662709
 GameObject:

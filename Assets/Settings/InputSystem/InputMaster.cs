@@ -456,6 +456,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Invite"",
+                    ""type"": ""Button"",
+                    ""id"": ""77ef540a-c422-4b0c-b797-ae2904e9fce1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -478,6 +487,17 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ModificationManager"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""295f166a-d08c-4534-8f48-e9e406974097"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Invite"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -596,6 +616,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Menus = asset.FindActionMap("Menus", throwIfNotFound: true);
         m_Menus_Escape = m_Menus.FindAction("Escape", throwIfNotFound: true);
         m_Menus_ModificationManager = m_Menus.FindAction("ModificationManager", throwIfNotFound: true);
+        m_Menus_Invite = m_Menus.FindAction("Invite", throwIfNotFound: true);
         // Debug
         m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
         m_Debug_Open = m_Debug.FindAction("Open", throwIfNotFound: true);
@@ -898,12 +919,14 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private List<IMenusActions> m_MenusActionsCallbackInterfaces = new List<IMenusActions>();
     private readonly InputAction m_Menus_Escape;
     private readonly InputAction m_Menus_ModificationManager;
+    private readonly InputAction m_Menus_Invite;
     public struct MenusActions
     {
         private @InputMaster m_Wrapper;
         public MenusActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
         public InputAction @Escape => m_Wrapper.m_Menus_Escape;
         public InputAction @ModificationManager => m_Wrapper.m_Menus_ModificationManager;
+        public InputAction @Invite => m_Wrapper.m_Menus_Invite;
         public InputActionMap Get() { return m_Wrapper.m_Menus; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -919,6 +942,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @ModificationManager.started += instance.OnModificationManager;
             @ModificationManager.performed += instance.OnModificationManager;
             @ModificationManager.canceled += instance.OnModificationManager;
+            @Invite.started += instance.OnInvite;
+            @Invite.performed += instance.OnInvite;
+            @Invite.canceled += instance.OnInvite;
         }
 
         private void UnregisterCallbacks(IMenusActions instance)
@@ -929,6 +955,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @ModificationManager.started -= instance.OnModificationManager;
             @ModificationManager.performed -= instance.OnModificationManager;
             @ModificationManager.canceled -= instance.OnModificationManager;
+            @Invite.started -= instance.OnInvite;
+            @Invite.performed -= instance.OnInvite;
+            @Invite.canceled -= instance.OnInvite;
         }
 
         public void RemoveCallbacks(IMenusActions instance)
@@ -1045,6 +1074,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     {
         void OnEscape(InputAction.CallbackContext context);
         void OnModificationManager(InputAction.CallbackContext context);
+        void OnInvite(InputAction.CallbackContext context);
     }
     public interface IDebugActions
     {

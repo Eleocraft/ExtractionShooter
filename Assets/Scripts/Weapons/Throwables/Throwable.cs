@@ -13,6 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         ThrowableInfo _info;
         private int _tickDiff;
         private ulong _ownerId;
+        private const float HIT_ERROR = 0.01f;
         private void Initialize(ThrowableInfo info, Vector3 veloctiy, ulong ownerId, int tickDiff)
         {
             // Graphics
@@ -50,7 +51,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
             if (Physics.Raycast(transform.position, movement, out RaycastHit hit, movement.magnitude, ProjectileHitLayer.TrowableHit))
             {
-                transform.position = hit.point;
+                transform.position = hit.point + hit.normal * HIT_ERROR;
                 _velocity = Vector3.Reflect(_velocity, hit.normal) * _info.Bouncyness;
 
                 if (_velocity.sqrMagnitude < _sqrMinVelocity)

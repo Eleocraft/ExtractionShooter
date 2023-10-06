@@ -55,7 +55,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		[SerializeField] private float BottomClamp = -90.0f;
 
 		[Header("Inputs")]
-		public GlobalInputs GI;
+		[SerializeField] private GlobalInputs GI;
 		[Header("Test")]
 		[SerializeField] private bool Walk;
 
@@ -63,7 +63,6 @@ namespace ExoplanetStudios.ExtractionShooter
 
 		// player
 		private Dictionary<string, float> _velocityMultipliers = new();
-		private float _cameraRecoil;
 		private float _jumpVelocity;
 		private bool _jump; // Owner only
 		private Vector2 _lookDelta; // Owner only
@@ -162,7 +161,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 		private void Tick()
 		{
-			_cameraRecoil = 0;
 			if (IsOwner || IsServer)
 				StoreVelocityMultiplierBuffer();
 			
@@ -356,7 +354,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				// if this is the owner the lookrotation should be calculated locally
 				ReadRotationDelta();
-				PlayerModel.Rotate(GetLookRotation(_lookDelta), _cameraRecoil);
+				PlayerModel.Rotate(GetLookRotation(_lookDelta));
 			}
 		}
 		private void ReadRotationDelta()
@@ -471,10 +469,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			if (_velocityMultipliers.ContainsKey(id))
 				_velocityMultipliers.Remove(id);
-		}
-		public void SetCameraRecoil(float amount)
-		{
-			_cameraRecoil = amount;
 		}
 	}
 }
