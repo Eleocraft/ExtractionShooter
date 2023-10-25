@@ -54,10 +54,9 @@ MonoBehaviour:
   Modifiers: []
   Seed: 363456
   RecoilDecreaseSpeed: 15
-  ReloadSound: {fileID: 0}
+  ReloadSound: {fileID: 8300000, guid: 7a1de215bc0990045b7ab6b8970241de, type: 3}
   TransitTime: 0.4
   ADSVelocityMul: 0.7
-  ADSPos: {x: 0, y: -0.05, z: 0.4}
   projectileInfo: {fileID: 11400000, guid: 8337bd4613f9efb44b8f699cc32972a9, type: 2}
   Cooldown: 0.1
   Spray:

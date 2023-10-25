@@ -13,6 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private float _defaultFOV;
         private float _adsState;
         protected bool InADSTransit => _adsState > 0 && _adsState < TransitTime;
+        protected bool InADS => _adsState >= TransitTime;
         protected abstract float ADSFOV { get; }
         protected virtual bool CanADS => true;
         protected abstract Vector3 ADSPos { get; }
