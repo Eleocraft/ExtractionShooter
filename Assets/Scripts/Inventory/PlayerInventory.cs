@@ -26,20 +26,20 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             _firstPersonController = GetComponent<FirstPersonController>();
             _itemParent = _firstPersonController.PlayerModel.WeaponTransform;
-
-            _itemDisplays = new();
-            foreach (ItemSlot slot in Utility.GetEnumValues<ItemSlot>())
-            {
-                if (slot == ItemSlot.None) continue;
-                    
-                _itemDisplays.Add(slot, InventoryInterface.Instance.InventorySlots[slot].GetComponent<Image>());
-            }
         }
         private void Start()
         {
-            _controls = GI.Controls;
             if (IsOwner)
             {
+                _itemDisplays = new();
+                foreach (ItemSlot slot in Utility.GetEnumValues<ItemSlot>())
+                {
+                    if (slot == ItemSlot.None) continue;
+                        
+                    _itemDisplays.Add(slot, InventoryInterface.Instance.InventorySlots[slot].GetComponent<Image>());
+                }
+                _controls = GI.Controls;
+
                 _controls.Inventory.MainWeaponSlot.performed += ChangeToMainWeaponSlot;
                 _controls.Inventory.SecondaryWeaponSlot.performed += ChangeToSecondaryWeaponSlot;
                 _controls.Inventory.UtilitySlot.performed += ChangeToUtilitySlot;

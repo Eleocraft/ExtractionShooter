@@ -31,6 +31,12 @@ namespace ExoplanetStudios.ExtractionShooter
         public virtual void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller) {
             
             gameObject.SetActive(false);
+            if (!isOwner)
+            {
+                foreach(Transform tr in GetComponentsInChildren<Transform>(true)) {
+                    tr.gameObject.layer = LayerMask.NameToLayer("Default");
+                }
+            }
 
             foreach(ItemModifier modifier in Modifiers)
                 modifier.Initialize(this, controller);

@@ -10,6 +10,8 @@ namespace ExoplanetStudios.ExtractionShooter
 
         private void Awake()
         {
+            DontDestroyOnLoad(this);
+            
             Items = new();
             for (int i = 0; i < ItemObjects.Count; i++)
             {

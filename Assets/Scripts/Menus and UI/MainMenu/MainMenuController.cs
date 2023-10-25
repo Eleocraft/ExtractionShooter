@@ -79,6 +79,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (!MainLobby.HasValue) return;
 
+            InvitePanel.SetActive(true);
             foreach(Friend friend in SteamFriends.GetFriends()) {
                 _friendList.Add(Instantiate(FriendCard, FriendParent));
                 _friendList.Last().Initialize(friend.Name, () => InviteFriend(friend.Id));
@@ -86,6 +87,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public void CloseInviteList()
         {
+            InvitePanel.SetActive(false);
             foreach(Friendcard card in _friendList) {
                 Destroy(card.gameObject);
             }
@@ -117,7 +119,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void OnGameLobbyJoinRequested(Lobby lobby, SteamId steamId)
         {
-            Console.Print(steamId.Value.ToString());
+            Debug.Log(steamId.Value.ToString());
             NetworkManager.Singleton.GetComponent<FacepunchTransport>().targetSteamId = steamId;
             NetworkManager.Singleton.StartClient();
             MainPanel.SetActive(false);
@@ -131,11 +133,9 @@ namespace ExoplanetStudios.ExtractionShooter
                 Back();
                 return;
             }
-    
             lobby.SetFriendsOnly();
             lobby.SetData("name", "Extraction Shooter lobby");
             lobby.SetJoinable(true);
-            Debug.Log("Lobby Created");
         }
         public void StartGame()
         {
