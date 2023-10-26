@@ -31,26 +31,21 @@ namespace ExoplanetStudios.ExtractionShooter
     
         public static bool UsedMainMenu;
         public static Lobby? MainLobby;
-        private Dictionary<ulong, Playercard> _joinedPlayers = new();
+        private List<Playercard> _playerCards = new();
         private List<Friendcard> _friendList = new();
         private SteamId _receivedInviteId;
+        private float UpdateTimer;
+        private const float UPDATE_TIME = 3f;
         void Start()
         {
             UsedMainMenu = true;
             SteamMatchmaking.OnLobbyInvite += OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;
-            NetworkManager.Singleton.OnClientConnectedCallback += OnClientJoin;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientLeave;
         }
         void OnDestroy()
         {
             SteamMatchmaking.OnLobbyInvite -= OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
-
-            if (NetworkManager.Singleton != null) {
-                NetworkManager.Singleton.OnClientConnectedCallback -= OnClientJoin;
-                NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientLeave;
-            }
         }
         public async void StartHost()
         {
@@ -66,9 +61,9 @@ namespace ExoplanetStudios.ExtractionShooter
             ClientPanel.SetActive(false);
             NetworkManager.Singleton.Shutdown();
 
-            foreach (Playercard card in _joinedPlayers.Values)
+            foreach (Playercard card in _playerCards)
                 Destroy(card.gameObject);
-            _joinedPlayers = new();
+            _playerCards = new();
         }
         public void Quit()
         {
@@ -101,24 +96,26 @@ namespace ExoplanetStudios.ExtractionShooter
             CloseInviteList();
             MainLobby.Value.InviteFriend(steamId);
         }
-        public void OnClientJoin(ulong id)
+        private void Update()
         {
-            if (!MainLobby.HasValue) { // If the lobby hasn't been fully created, try again after 1 second
-                this.Invoke(() => OnClientJoin(id), 1);
-                return;
-            }
+            if (!MainLobby.HasValue) return;
 
-            _joinedPlayers.Add(id, Instantiate(CardPrefab, CardParent));
-            int i = 0;
-            foreach(Friend friend in MainLobby.Value.Members) { // Update all namecards
-                _joinedPlayers.ElementAt(i).Value.SetName(friend.Name);
-                i++;
+            if (UpdateTimer < 0)
+            {
+                UpdateTimer = UPDATE_TIME;
+                UpdatePlayerCards();
             }
+            UpdateTimer -= Time.deltaTime;
         }
-        public void OnClientLeave(ulong id)
+        public void UpdatePlayerCards()
         {
-            Destroy(_joinedPlayers[id].gameObject);
-            _joinedPlayers.Remove(id);
+            foreach (Playercard card in _playerCards)
+                Destroy(card.gameObject);
+            _playerCards = new();
+            foreach(Friend friend in MainLobby.Value.Members) { // Update all namecards
+                _playerCards.Add(Instantiate(CardPrefab, CardParent));
+                _playerCards.Last().SetName(friend.Name);
+            }
         }
         private void OnGameLobbyJoinRequested(Friend friend, Lobby lobby)
         {
@@ -127,6 +124,7 @@ namespace ExoplanetStudios.ExtractionShooter
             AcceptPanel.SetActive(true);
             AcceptPanelName.text = friend.Name;
             _receivedInviteId = friend.Id;
+            MainLobby = lobby;
         }
         public void AcceptInvite()
         {
@@ -142,6 +140,7 @@ namespace ExoplanetStudios.ExtractionShooter
             ClientPanel.SetActive(true);
         }
         private void OnLobbyCreated(Result result, Lobby lobby)
+            
         {
             if(result != Result.OK)
             {
@@ -150,8 +149,8 @@ namespace ExoplanetStudios.ExtractionShooter
                 return;
             }
             lobby.SetFriendsOnly();
-            lobby.SetData("name", "Extraction Shooter lobby");
             lobby.SetJoinable(true);
+            lobby.SetData("name", "Extraction Shooter lobby");
         }
         public void StartGame()
         {

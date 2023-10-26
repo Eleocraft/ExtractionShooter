@@ -21,13 +21,13 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public static void SetMagazineInfo(ulong ownerId, int bullets, int magSize, bool active)
         {
-            if (!Instance.IsServer) return;
+            if (!Instantiated() || !Instance.IsServer) return;
 
             Instance.UpdateDisplayClientRpc(ownerId, bullets, magSize, active);
         }
         public static void SetMagazineInfo(ulong ownerId, int bullets, int magSize)
         {
-            if (!Instance.IsServer) return;
+            if (!Instantiated() || !Instance.IsServer) return;
 
             Instance.UpdateDisplayClientRpc(ownerId, bullets, magSize, Instance.Display.activeSelf);
         }

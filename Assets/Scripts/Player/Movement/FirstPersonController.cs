@@ -235,7 +235,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// update _serverTransformState and _lastSaveInput/_lastSaveTransform
 			_serverTransformState.Value = _currentTransformState;
 
-			_lastSaveInput = _bufferedInputStates[inputStates.LastTick];
+			_lastSaveInput = _bufferedInputStates[lastTickToExecute];
 			_lastSaveTransform = _currentTransformState;
 		}
 		private void StoreBuffer(NetworkInputState inputState, NetworkTransformState transformState)
@@ -283,7 +283,7 @@ namespace ExoplanetStudios.ExtractionShooter
 				else
 					Debug.Log("state received from server to old");
 			}
-			else if (!IsServer)
+			else if (!IsServer && PlayerModel != null)
 			{
 				_currentTransformState = receivedState;
 				transform.position = _currentTransformState.Position;
@@ -305,13 +305,20 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 		private float GetVelocityMultiplier(int tick)
 		{
+			try { // temp for debugging
+				float test = _bufferedVelocityMultipliers[NetworkManager.LocalTime.Tick - tick];
+			} catch(Exception) {
+				Debug.Log(NetworkManager.LocalTime.Tick - tick + "   TickDiff");
+			}
 			return _bufferedVelocityMultipliers[NetworkManager.LocalTime.Tick - tick];
 		}
 		private void ExecuteInput(NetworkInputState inputState)
 		{
 			if (inputState == null)
 				return;
-			
+
+			if (!IsOwner)
+				Debug.Log(inputState.Tick);
 			// lookRotation
 			Vector2 lookRotation = GetLookRotation(inputState.LookDelta);
 
@@ -382,7 +389,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			float verticalVelocity = CalculateGravity(inputState.Jump, grounded);
 			
 			// set target speed based on if slowWalk or crouch is pressed + what the velocity multiplier is (items + effects ect.)
-			float targetSpeed = (crouch ? CrouchSpeed : inputState.SlowWalk ? WalkSpeed : RunSpeed) * velocityMultiplier;
+			float targetSpeed = (crouch ? CrouchSpeed : inputState.SlowWalk ? WalkSpeed : RunSpeed)* velocityMultiplier;
 
 			// target speed is 0 if no key is pressed
 			if (inputState.MovementInput == Vector2.zero) targetSpeed = 0.0f;
