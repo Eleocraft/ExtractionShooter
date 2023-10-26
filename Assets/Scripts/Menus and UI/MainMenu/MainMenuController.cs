@@ -19,6 +19,8 @@ namespace ExoplanetStudios.ExtractionShooter
         [Header("InviteList")]
         [SerializeField] private Friendcard FriendCard;
         [SerializeField] private Transform FriendParent;
+        [SerializeField] private GameObject AcceptPanel;
+        [SerializeField] private TMP_Text AcceptPanelName;
         
         [Header("Panels")]
         [SerializeField] private GameObject MainPanel;
@@ -31,17 +33,18 @@ namespace ExoplanetStudios.ExtractionShooter
         public static Lobby? MainLobby;
         private Dictionary<ulong, Playercard> _joinedPlayers = new();
         private List<Friendcard> _friendList = new();
+        private SteamId _receivedInviteId;
         void Start()
         {
             UsedMainMenu = true;
-            SteamFriends.OnGameLobbyJoinRequested += OnGameLobbyJoinRequested;
+            SteamMatchmaking.OnLobbyInvite += OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientJoin;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientLeave;
         }
         void OnDestroy()
         {
-            SteamFriends.OnGameLobbyJoinRequested -= OnGameLobbyJoinRequested;
+            SteamMatchmaking.OnLobbyInvite -= OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
 
             if (NetworkManager.Singleton != null) {
@@ -117,10 +120,23 @@ namespace ExoplanetStudios.ExtractionShooter
             Destroy(_joinedPlayers[id].gameObject);
             _joinedPlayers.Remove(id);
         }
-        private void OnGameLobbyJoinRequested(Lobby lobby, SteamId steamId)
+        private void OnGameLobbyJoinRequested(Friend friend, Lobby lobby)
         {
-            Debug.Log(steamId.Value.ToString());
-            NetworkManager.Singleton.GetComponent<FacepunchTransport>().targetSteamId = steamId;
+            if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient) return;
+            
+            AcceptPanel.SetActive(true);
+            AcceptPanelName.text = friend.Name;
+            _receivedInviteId = friend.Id;
+        }
+        public void AcceptInvite()
+        {
+            AcceptPanel.SetActive(false);
+            JoinLobby();
+        }
+        public void DeclineInvite() => AcceptPanel.SetActive(false);
+        private void JoinLobby()
+        {
+            NetworkManager.Singleton.GetComponent<FacepunchTransport>().targetSteamId = _receivedInviteId;
             NetworkManager.Singleton.StartClient();
             MainPanel.SetActive(false);
             ClientPanel.SetActive(true);
