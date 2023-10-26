@@ -184,7 +184,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				if (_currentTransformState.Tick < NetworkManager.LocalTime.Tick - 1) // missed a tick
 				{
-					NetworkInputState inputState = new NetworkInputState(_lastSaveInput, NetworkManager.LocalTime.Tick - 1);
+					NetworkInputState inputState = (NetworkInputState)_lastSaveInput.GetStateWithTick(NetworkManager.LocalTime.Tick - 1);
 					ExecuteInput(inputState);
 					StoreBuffer(inputState, _currentTransformState);
 
@@ -192,7 +192,6 @@ namespace ExoplanetStudios.ExtractionShooter
 					
 					if (NetworkManager.LocalTime.Tick - _lastSaveInput.Tick < INPUT_TICKS_SEND) // might be corrected in next package
 						_serverTransformState.Value.Predicted = true;
-					
 				}
 
 				// If _bufferedInputStates contains current tick
@@ -219,6 +218,10 @@ namespace ExoplanetStudios.ExtractionShooter
 			if (inputStates.LastTick <= _lastSaveInput.Tick)
 				return; // Received states to old
 
+			foreach (NetworkInputState state in inputStates.States) {
+				if (state.Tick > _lastSaveInput.Tick && state.MovementInput != _lastSaveInput.MovementInput)
+					Debug.Log(state.Tick);
+			}
 			// add all input states after _lastSaveInput to _bufferedInputStates
 			_bufferedInputStates.Insert(inputStates, _lastSaveInput.Tick);
 
@@ -236,8 +239,8 @@ namespace ExoplanetStudios.ExtractionShooter
 			// update _serverTransformState and _lastSaveInput/_lastSaveTransform
 			_serverTransformState.Value = _currentTransformState;
 
-			_lastSaveInput = _bufferedInputStates[Mathf.Max(lastTickToExecute, _lastSaveInput.Tick)];
-			_lastSaveTransform = _currentTransformState;
+			_lastSaveInput = _bufferedInputStates[Mathf.Max(inputStates.LastTick, _lastSaveInput.Tick)];
+			_lastSaveTransform = _bufferedTransformStates[Mathf.Max(inputStates.LastTick, _lastSaveInput.Tick)];
 		}
 		private void StoreBuffer(NetworkInputState inputState, NetworkTransformState transformState)
 		{
@@ -284,7 +287,7 @@ namespace ExoplanetStudios.ExtractionShooter
 				else
 					Debug.Log("state received from server to old");
 			}
-			else if (!IsServer && PlayerModel != null)
+			else if (!IsServer)
 			{
 				_currentTransformState = receivedState;
 				transform.position = _currentTransformState.Position;
@@ -315,9 +318,8 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			if (inputState == null)
 				return;
-
-			if (!IsOwner)
-				Debug.Log(inputState.Tick);
+			//if (!IsOwner)
+				//Debug.Log(inputState.MovementInput);
 			// lookRotation
 			Vector2 lookRotation = GetLookRotation(inputState.LookDelta);
 
@@ -388,7 +390,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			float verticalVelocity = CalculateGravity(inputState.Jump, grounded);
 			
 			// set target speed based on if slowWalk or crouch is pressed + what the velocity multiplier is (items + effects ect.)
-			float targetSpeed = (crouch ? CrouchSpeed : inputState.SlowWalk ? WalkSpeed : RunSpeed)* velocityMultiplier;
+			float targetSpeed = (crouch ? CrouchSpeed : inputState.SlowWalk ? WalkSpeed : RunSpeed) * velocityMultiplier;
 
 			// target speed is 0 if no key is pressed
 			if (inputState.MovementInput == Vector2.zero) targetSpeed = 0.0f;

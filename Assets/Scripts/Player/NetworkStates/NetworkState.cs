@@ -83,24 +83,19 @@ namespace ExoplanetStudios.ExtractionShooter
             foreach (T state in newNetworkStateList.States)
                 if (state.Tick > insertAfterTick)
                     Add(state);
-
-            RemoveOutdated();
         }
         private void RemoveOutdated()
         {
             bool hasEndState = false; // make sure there is always info for the oldest ticks
-            for (int i = 0; i < States.Count; i++)
+            for (int i = States.Count-1; i >= 0; i--)
             {
                 if (_lastReceivedTick - _ticksSaved < States[i].Tick)
-                    continue;
+                    return;
                 
                 if (!hasEndState)
                     hasEndState = true;
                 else
-                {
-                    States.RemoveAt(i);
-                    i--;
-                }
+                    States.RemoveAt(i+1);
             }
         }
         public bool Contains(int tick) => _lastReceivedTick >= tick && tick >= Mathf.Max(_lastReceivedTick - _ticksSaved, States[States.Count-1].Tick);
