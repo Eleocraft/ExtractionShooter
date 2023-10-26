@@ -192,6 +192,7 @@ namespace ExoplanetStudios.ExtractionShooter
 					
 					if (NetworkManager.LocalTime.Tick - _lastSaveInput.Tick < INPUT_TICKS_SEND) // might be corrected in next package
 						_serverTransformState.Value.Predicted = true;
+					
 				}
 
 				// If _bufferedInputStates contains current tick
@@ -235,7 +236,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// update _serverTransformState and _lastSaveInput/_lastSaveTransform
 			_serverTransformState.Value = _currentTransformState;
 
-			_lastSaveInput = _bufferedInputStates[lastTickToExecute];
+			_lastSaveInput = _bufferedInputStates[Mathf.Max(lastTickToExecute, _lastSaveInput.Tick)];
 			_lastSaveTransform = _currentTransformState;
 		}
 		private void StoreBuffer(NetworkInputState inputState, NetworkTransformState transformState)
@@ -305,11 +306,9 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 		private float GetVelocityMultiplier(int tick)
 		{
-			try { // temp for debugging
-				float test = _bufferedVelocityMultipliers[NetworkManager.LocalTime.Tick - tick];
-			} catch(Exception) {
-				Debug.Log(NetworkManager.LocalTime.Tick - tick + "   TickDiff");
-			}
+			if (NetworkManager.LocalTime.Tick - tick >= _bufferedVelocityMultipliers.Count)
+				return 1;
+			
 			return _bufferedVelocityMultipliers[NetworkManager.LocalTime.Tick - tick];
 		}
 		private void ExecuteInput(NetworkInputState inputState)

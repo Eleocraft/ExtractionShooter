@@ -28,6 +28,10 @@ namespace ExoplanetStudios.ExtractionShooter
             foreach (MeshRenderer renderer in GetComponentsInChildren<MeshRenderer>()) // Set owner invisible
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
         }
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
         public void SetInterpolationStates(Vector2 lookRotation, NetworkTransformState newState)
         {
             SetStartInterpolationState(lookRotation);

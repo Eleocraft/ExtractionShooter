@@ -31,8 +31,9 @@ namespace ExoplanetStudios.ExtractionShooter
             foreach (ItemSlot slot in Utility.GetEnumValues<ItemSlot>())
             {
                 if (slot == ItemSlot.None) continue;
-                
-                _itemDisplays.Add(slot, InventoryInterface.Instance.InventorySlots[slot].GetComponent<Image>());
+
+                if (InventoryInterface.Instantiated())
+                    _itemDisplays.Add(slot, InventoryInterface.Instance.InventorySlots[slot].GetComponent<Image>());
             }
 
         }
