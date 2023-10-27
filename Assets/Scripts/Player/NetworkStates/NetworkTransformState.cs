@@ -9,7 +9,6 @@ namespace ExoplanetStudios.ExtractionShooter
         public Vector2 LookRotation;
         public Vector3 Velocity;
         public float CrouchAmount;
-        public bool Predicted;
 
         public NetworkTransformState() {}
         public NetworkTransformState(int tick)
@@ -21,7 +20,6 @@ namespace ExoplanetStudios.ExtractionShooter
             Position = oldState.Position;
             LookRotation = oldState.LookRotation;
             Velocity = oldState.Velocity;
-            Predicted = oldState.Predicted;
             CrouchAmount = oldState.CrouchAmount;
             
             Tick = tick;
@@ -45,7 +43,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 reader.ReadValueSafe(out LookRotation);
                 reader.ReadValueSafe(out Velocity);
                 reader.ReadValueSafe(out CrouchAmount);
-                reader.ReadValueSafe(out Predicted);
             }
             else
             {
@@ -55,7 +52,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(LookRotation);
                 writer.WriteValueSafe(Velocity);
                 writer.WriteValueSafe(CrouchAmount);
-                writer.WriteValueSafe(Predicted);
             }
         }
         public static bool operator==(NetworkTransformState s1, NetworkTransformState s2)
@@ -78,7 +74,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 return false;
 
             if (Position == otherState.Position && LookRotation == otherState.LookRotation &&
-                Velocity == otherState.Velocity && CrouchAmount == otherState.CrouchAmount && Predicted == otherState.Predicted)
+                Velocity == otherState.Velocity && CrouchAmount == otherState.CrouchAmount)
                 return true;
 
             return false;

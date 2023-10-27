@@ -17,13 +17,14 @@ namespace ExoplanetStudios
         }
         private void Start()
         {
-            GI.Controls.Menus.Escape.performed += Dequeue;
+            GI.Controls.Menus.Escape.performed += DequeueButton;
         }
         private void OnDestroy()
         {
-            GI.Controls.Menus.Escape.performed -= Dequeue;
+            GI.Controls.Menus.Escape.performed -= DequeueButton;
         }
-        private static void Dequeue(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
+        private void DequeueButton(UnityEngine.InputSystem.InputAction.CallbackContext ctx) => Dequeue();
+        public void Dequeue()
         {
             if (escQueue.Count > 0)
                 escQueue.Last()?.Invoke();
