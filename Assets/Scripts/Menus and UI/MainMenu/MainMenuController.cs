@@ -32,6 +32,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public static bool UsedMainMenu;
         public static Lobby? MainLobby;
         private Dictionary<ulong, Playercard> _playerCards = new();
+        private Dictionary<ulong, string> _players = new();
         private List<Friendcard> _friendList = new();
         private SteamId _receivedInviteId;
         void Start()
@@ -67,6 +68,7 @@ namespace ExoplanetStudios.ExtractionShooter
             foreach (Playercard card in _playerCards.Values)
                 Destroy(card.gameObject);
             _playerCards = new();
+            _players = new();
             MainLobby = null;
         }
         public void Quit()
@@ -112,11 +114,10 @@ namespace ExoplanetStudios.ExtractionShooter
         [ServerRpc(RequireOwnership = false)]
         private void AddNameServerRpc(ulong id, string name)
         {
-            Playercard card = Instantiate(CardPrefab, CardParent);
-            card.SetName(name);
-            _playerCards.Add(id, card);
-            foreach (KeyValuePair<ulong, Playercard> current in _playerCards)
-                AddNameClientRpc(current.Key, current.Value.Name);
+            _players.Add(id, name);
+            Scoreboard.SetNames(_players);
+            foreach (KeyValuePair<ulong, string> current in _players)
+                AddNameClientRpc(current.Key, name);
         }
         [ClientRpc]
         private void AddNameClientRpc(ulong id, string name)
@@ -126,23 +127,32 @@ namespace ExoplanetStudios.ExtractionShooter
             Playercard card = Instantiate(CardPrefab, CardParent);
             card.SetName(name);
             _playerCards.Add(id, card);
+
+            if (IsServer) return;
+
+            _players.Add(id, name);
+            Scoreboard.SetNames(_players);
         }
         
         private void OnServerLeave(ulong id)
         {
-            if (!_playerCards.ContainsKey(id)) return;
+            if (_players.ContainsKey(id))
+                _players.Remove(id);
                 
-            Destroy(_playerCards[id].gameObject);
-            _playerCards.Remove(id);
             RemoveNameClientRpc(id);
+            Scoreboard.SetNames(_players);
         }
         [ClientRpc]
         private void RemoveNameClientRpc(ulong id)
         {
-            if (!_playerCards.ContainsKey(id)) return;
-
-            Destroy(_playerCards[id].gameObject);
-            _playerCards.Remove(id);
+            if (_players.ContainsKey(id))
+                _players.Remove(id);
+            if (_playerCards.ContainsKey(id))
+            {
+                Destroy(_playerCards[id].gameObject);
+                _playerCards.Remove(id);
+            }
+            Scoreboard.SetNames(_players);
         }
         public void AcceptInvite()
         {

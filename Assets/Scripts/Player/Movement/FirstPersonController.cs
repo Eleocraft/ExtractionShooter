@@ -131,11 +131,11 @@ namespace ExoplanetStudios.ExtractionShooter
 
 			// Buffers
 			_bufferedTransformStates = new(BUFFER_SIZE);
-			_bufferedTransformStates.Add(_lastSaveTransform);
+			_bufferedTransformStates.Add(new NetworkTransformState(NetworkManager.LocalTime.Tick));
 			if (IsOwner || IsServer)
 			{
 				_bufferedInputStates = new(BUFFER_SIZE);
-				_bufferedInputStates.Add(_lastSaveInput);
+				_bufferedInputStates.Add(new NetworkInputState(NetworkManager.LocalTime.Tick));
 				_bufferedVelocityMultipliers = new();
 			}
 		}
