@@ -52,21 +52,21 @@ namespace ExoplanetStudios.ExtractionShooter
 
             for (int i = 0; i < States.Count; i++)
             {
-                if (States[i].Tick <= newState.Tick)
-                {
-                    if (States[i].Tick == newState.Tick)
-                        States[i] = newState;
-                    else if (States[i] != newState)
-                        States.Insert(i, newState);
-                        
-                    if (_lastReceivedTick < newState.Tick)
-                    {
-                        _lastReceivedTick = newState.Tick;
-                        RemoveOutdated();
-                    }
+                if (States[i].Tick > newState.Tick)
+                    continue;
 
-                    return;
+                if (States[i].Tick == newState.Tick)
+                    States[i] = newState;
+                else if (States[i] != newState)
+                    States.Insert(i, newState);
+                        
+                if (_lastReceivedTick < newState.Tick)
+                {
+                    _lastReceivedTick = newState.Tick;
+                    RemoveOutdated();
                 }
+
+                return;
             }
             States.Add(newState);
             if (_lastReceivedTick < newState.Tick)

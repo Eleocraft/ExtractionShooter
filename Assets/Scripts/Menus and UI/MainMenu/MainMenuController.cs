@@ -31,21 +31,23 @@ namespace ExoplanetStudios.ExtractionShooter
     
         public static bool UsedMainMenu;
         public static Lobby? MainLobby;
-        private List<Playercard> _playerCards = new();
+        private Dictionary<ulong, Playercard> _playerCards = new();
         private List<Friendcard> _friendList = new();
         private SteamId _receivedInviteId;
-        private float UpdateTimer;
-        private const float UPDATE_TIME = 3f;
         void Start()
         {
             UsedMainMenu = true;
             SteamMatchmaking.OnLobbyInvite += OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnServerLeave;
         }
         void OnDestroy()
         {
             SteamMatchmaking.OnLobbyInvite -= OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
+
+            if (NetworkManager.Singleton != null)
+                NetworkManager.Singleton.OnClientDisconnectCallback -= OnServerLeave;
         }
         public async void StartHost()
         {
@@ -61,9 +63,10 @@ namespace ExoplanetStudios.ExtractionShooter
             ClientPanel.SetActive(false);
             NetworkManager.Singleton.Shutdown();
 
-            foreach (Playercard card in _playerCards)
+            foreach (Playercard card in _playerCards.Values)
                 Destroy(card.gameObject);
             _playerCards = new();
+            MainLobby = null;
         }
         public void Quit()
         {
@@ -96,27 +99,6 @@ namespace ExoplanetStudios.ExtractionShooter
             CloseInviteList();
             MainLobby.Value.InviteFriend(steamId);
         }
-        private void Update()
-        {
-            if (!MainLobby.HasValue) return;
-
-            if (UpdateTimer < 0)
-            {
-                UpdateTimer = UPDATE_TIME;
-                UpdatePlayerCards();
-            }
-            UpdateTimer -= Time.deltaTime;
-        }
-        public void UpdatePlayerCards()
-        {
-            foreach (Playercard card in _playerCards)
-                Destroy(card.gameObject);
-            _playerCards = new();
-            foreach(Friend friend in MainLobby.Value.Members) { // Update all namecards
-                _playerCards.Add(Instantiate(CardPrefab, CardParent));
-                _playerCards.Last().SetName(friend.Name);
-            }
-        }
         private void OnGameLobbyJoinRequested(Friend friend, Lobby lobby)
         {
             if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient) return;
@@ -125,6 +107,41 @@ namespace ExoplanetStudios.ExtractionShooter
             AcceptPanelName.text = friend.Name;
             _receivedInviteId = friend.Id;
             MainLobby = lobby;
+        }
+        [ServerRpc]
+        private void AddNameServerRpc(ulong id, string name)
+        {
+            Playercard card = Instantiate(CardPrefab, CardParent);
+            card.SetName(name);
+            _playerCards.Add(id, card);
+            foreach (KeyValuePair<ulong, Playercard> current in _playerCards)
+                AddNameClientRpc(current.Key, current.Value.Name);
+        }
+        [ClientRpc]
+        private void AddNameClientRpc(ulong id, string name)
+        {
+            if (_playerCards.ContainsKey(id)) return;
+
+            Playercard card = Instantiate(CardPrefab, CardParent);
+            card.SetName(name);
+            _playerCards.Add(id, card);
+        }
+        
+        private void OnServerLeave(ulong id)
+        {
+            if (!_playerCards.ContainsKey(id)) return;
+                
+            Destroy(_playerCards[id].gameObject);
+            _playerCards.Remove(id);
+            RemoveNameClientRpc(id);
+        }
+        [ClientRpc]
+        private void RemoveNameClientRpc(ulong id)
+        {
+            if (!_playerCards.ContainsKey(id)) return;
+
+            Destroy(_playerCards[id].gameObject);
+            _playerCards.Remove(id);
         }
         public void AcceptInvite()
         {
@@ -138,6 +155,7 @@ namespace ExoplanetStudios.ExtractionShooter
             NetworkManager.Singleton.StartClient();
             MainPanel.SetActive(false);
             ClientPanel.SetActive(true);
+            AddNameServerRpc(NetworkManager.Singleton.LocalClientId, SteamClient.Name);
         }
         private void OnLobbyCreated(Result result, Lobby lobby)
             

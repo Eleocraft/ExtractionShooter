@@ -10,5 +10,6 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             NameText.text = name;
         }
+        public string Name => NameText.text;
     }
 }
