@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using UnityEngine.UI;
+using UnityEngineInternal;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -9,6 +10,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [SerializeField] private GameObject pauseMenu;
         [SerializeField] private Slider sensSlider;
+        [SerializeField] private GlobalInputs GI;
         private FirstPersonController controller;
         private void Start()
         {
@@ -28,6 +30,7 @@ namespace ExoplanetStudios.ExtractionShooter
             NetworkManager.Singleton.Shutdown();
             Destroy(NetworkManager.Singleton.gameObject);
             SceneManager.LoadScene(0);
+            GI.Reset();
         }
         public void SetSens()
         {

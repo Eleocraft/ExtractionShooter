@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -10,7 +11,8 @@ namespace ExoplanetStudios.ExtractionShooter
 
         private void Awake()
         {
-            DontDestroyOnLoad(this);
+            if (SceneManager.GetActiveScene().buildIndex == 0)
+                DontDestroyOnLoad(this);
             
             Items = new();
             for (int i = 0; i < ItemObjects.Count; i++)

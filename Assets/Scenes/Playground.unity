@@ -2275,6 +2275,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseMenu: {fileID: 333605972}
   sensSlider: {fileID: 731809053}
+  GI: {fileID: 11400000, guid: dfd0bd25ce706f1449e12330cdf300c6, type: 2}
 --- !u!114 &507968752
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -12,10 +12,13 @@ public class GlobalInputs : ScriptableObject
             {
                 _controls = new();
                 _controls.Enable();
-                //Cursor.lockState = CursorLockMode.Locked;
             }
             
             return _controls;
         }
+    }
+    public void Reset()
+    {
+        _controls = null;
     }
 }
