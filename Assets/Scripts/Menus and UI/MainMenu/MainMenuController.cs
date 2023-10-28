@@ -109,7 +109,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _receivedInviteId = friend.Id;
             MainLobby = lobby;
         }
-        [ServerRpc]
+        [ServerRpc(RequireOwnership = false)]
         private void AddNameServerRpc(ulong id, string name)
         {
             Playercard card = Instantiate(CardPrefab, CardParent);
@@ -156,7 +156,7 @@ namespace ExoplanetStudios.ExtractionShooter
             NetworkManager.StartClient();
             MainPanel.SetActive(false);
             ClientPanel.SetActive(true);
-            AddNameServerRpc(NetworkManager.LocalClientId, SteamClient.Name);
+            this.Invoke(() => AddNameServerRpc(NetworkManager.LocalClientId, SteamClient.Name), 1f);
         }
         private void OnLobbyCreated(Result result, Lobby lobby)
         {
