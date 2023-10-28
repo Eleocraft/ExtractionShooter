@@ -8,6 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private int Seed;
         [SerializeField] private float RecoilDecreaseSpeed = 1;
         [SerializeField] private AudioClip ReloadSound;
+        public AudioSource audioSource;
         
         private System.Random _rng;
         public abstract int MagSize { get; }
@@ -72,7 +73,10 @@ namespace ExoplanetStudios.ExtractionShooter
                 return;
             
             _reloadTimer = ReloadTime;
-            SFXSource.Source.PlayOneShot(ReloadSound);
+            if (_isOwner)
+                SFXSource.Source.PlayOneShot(ReloadSound);
+            else
+                audioSource.PlayOneShot(ReloadSound);
         }
 
         public Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)

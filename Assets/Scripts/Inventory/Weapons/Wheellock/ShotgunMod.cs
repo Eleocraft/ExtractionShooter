@@ -5,7 +5,7 @@ namespace ExoplanetStudios.ExtractionShooter
     public class ShotgunModifier : WheellockItemModifier
     {
         [SerializeField] private int ShotgunProjectileAmount;
-        public override void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner)
         {
             Wheellock wheellock = _itemObject as Wheellock;
 
@@ -15,7 +15,10 @@ namespace ExoplanetStudios.ExtractionShooter
                 Vector3 direction = wheellock.GetShootDirection(playerState, spray, 0);
                 Projectile.SpawnProjectile(Info, wheellock.SecondShotSource.position, wheellock.GetCameraPosition(playerState), direction, wheellock.OwnerId, weaponInputState.TickDiff);
             }
-            SFXSource.Source.PlayOneShot(Audio);
+            if (isOwner)
+                SFXSource.Source.PlayOneShot(Audio);
+            else
+                wheellock.audioSource.PlayOneShot(Audio);
         }
     }
 }

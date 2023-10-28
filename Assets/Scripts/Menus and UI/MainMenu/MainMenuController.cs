@@ -117,7 +117,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _players.Add(id, name);
             Scoreboard.SetNames(_players);
             foreach (KeyValuePair<ulong, string> current in _players)
-                AddNameClientRpc(current.Key, name);
+                AddNameClientRpc(current.Key, current.Value);
         }
         [ClientRpc]
         private void AddNameClientRpc(ulong id, string name)
@@ -138,7 +138,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (_players.ContainsKey(id))
                 _players.Remove(id);
-                
+
             RemoveNameClientRpc(id);
             Scoreboard.SetNames(_players);
         }

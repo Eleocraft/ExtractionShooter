@@ -7,6 +7,7 @@ namespace ExoplanetStudios.ExtractionShooter
         protected override float ADSFOV => ((RifleItemModifier)Modifiers[ActiveModifier]).ADSFov;
         protected override bool CanADS => ((RifleItemModifier)Modifiers[ActiveModifier]).CanADS;
         public Transform ShotSource;
+        [SerializeField] private GameObject ScopePP;
         [Header("Recoil")]
         [SerializeField] private float Recoil;
         public float MovementError;
@@ -18,6 +19,13 @@ namespace ExoplanetStudios.ExtractionShooter
         protected override Vector3 ADSPos => ((RifleItemModifier)Modifiers[ActiveModifier]).ADSPos;
 
         private bool _shot;
+        public override void Initialize(ulong ownerId, bool isOwner, FirstPersonController controller)
+        {
+            base.Initialize(ownerId, isOwner, controller);
+
+            if (!isOwner)
+                Destroy(ScopePP.gameObject);
+        }
         public override void Deactivate()
         {
             base.Deactivate();
@@ -36,7 +44,7 @@ namespace ExoplanetStudios.ExtractionShooter
             // first shot shooting
             if (weaponInputState.PrimaryAction && !InADSTransit && !_shot && !IsReloading)
             {
-                if (BulletsLoaded > 0 && ((RifleItemModifier)Modifiers[ActiveModifier]).Shot(weaponInputState, playerState))
+                if (BulletsLoaded > 0 && ((RifleItemModifier)Modifiers[ActiveModifier]).Shot(weaponInputState, playerState, _isOwner))
                 {
                     BulletsLoaded--;
                     _recoil += Recoil;
@@ -57,7 +65,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public virtual bool CanADS => true;
         public virtual Vector3 ADSPos => new Vector3(0, -0.05f, 0.3f);
         
-        public abstract bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
+        public abstract bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner);
         public virtual void UpdateItem(bool ADS) { }
     }
 }

@@ -75,7 +75,10 @@ namespace ExoplanetStudios.ExtractionShooter
 
                 Vector3 direction = GetShootDirection(playerState, spray, MovementError);
                 Projectile.SpawnProjectile(FirstShotInfo, FirstShotSource.position, GetCameraPosition(playerState), direction, OwnerId, weaponInputState.TickDiff);
-                SFXSource.Source.PlayOneShot(FirstShotAudio);
+                if (_isOwner)
+                    SFXSource.Source.PlayOneShot(FirstShotAudio);
+                else
+                    audioSource.PlayOneShot(FirstShotAudio);
                 
                 BulletsLoaded--;
                 _recoil += Recoil;
@@ -83,7 +86,7 @@ namespace ExoplanetStudios.ExtractionShooter
             // All glitches
             void SecondShot()
             {
-                ((WheellockItemModifier)Modifiers[ActiveModifier]).SecondShot(weaponInputState, playerState);
+                ((WheellockItemModifier)Modifiers[ActiveModifier]).SecondShot(weaponInputState, playerState, _isOwner);
 
                 BulletsLoaded--;
                 _recoil += Recoil;
@@ -96,6 +99,6 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] protected ProjectileInfo Info;
         [SerializeField] protected float Spray;
         [SerializeField] protected float SprayADS;
-        public abstract void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
+        public abstract void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner);
     }
 }

@@ -10,7 +10,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private ScoreboardItem Prefab;
         [SerializeField] private Transform ScoreboardParent;
         private static Dictionary<ulong, string> _names;
-        private static Dictionary<ulong, ScoreboardItem> _scoreboardItems;
+        private static Dictionary<ulong, ScoreboardItem> _scoreboardItems = new();
         private void Start()
         {
             foreach(KeyValuePair<ulong, string> player in _names)
@@ -30,7 +30,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (_scoreboardItems.ContainsKey(killer))
                 _scoreboardItems[killer].AddKill();
-                
+
             if (_scoreboardItems.ContainsKey(killed))
                 _scoreboardItems[killed].AddDeath();
         }

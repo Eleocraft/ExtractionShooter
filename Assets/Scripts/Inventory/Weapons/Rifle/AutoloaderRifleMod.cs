@@ -14,7 +14,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
         private float _cooldown;
         private float _relativeSpray;
-        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner)
         {
             if (_cooldown > 0) return false;
 
@@ -23,7 +23,10 @@ namespace ExoplanetStudios.ExtractionShooter
             float spray = _relativeSpray * (weaponInputState.SecondaryAction ? SprayADS : Spray);
             Vector3 direction = rifle.GetShootDirection(playerState, spray, rifle.MovementError);
             Projectile.SpawnProjectile(Info, rifle.ShotSource.position, rifle.GetCameraPosition(playerState), direction, rifle.OwnerId, weaponInputState.TickDiff);
-            SFXSource.Source.PlayOneShot(Audio);
+            if (isOwner)
+                SFXSource.Source.PlayOneShot(Audio);
+            else
+                rifle.audioSource.PlayOneShot(Audio);
 
             _cooldown = Cooldown;
             _relativeSpray += SprayIncreasePerBullet;

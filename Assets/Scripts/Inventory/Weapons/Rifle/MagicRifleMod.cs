@@ -8,13 +8,16 @@ namespace ExoplanetStudios.ExtractionShooter
         public override bool CanADS => false;
         [SerializeField] private MagicProjectile Projectile;
 
-        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner)
         {
             Rifle rifle = _itemObject as Rifle;
 
             Vector3 direction = rifle.GetLookDirection(playerState);
             Instantiate(Projectile, rifle.GetCameraPosition(playerState), Quaternion.identity).OnInitialisation(direction, rifle.OwnerId, weaponInputState.TickDiff);
-            SFXSource.Source.PlayOneShot(Audio);
+            if (isOwner)
+                SFXSource.Source.PlayOneShot(Audio);
+            else
+                rifle.audioSource.PlayOneShot(Audio);
             
             return true;
         }

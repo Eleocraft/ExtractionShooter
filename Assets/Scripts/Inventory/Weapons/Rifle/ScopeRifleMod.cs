@@ -40,14 +40,17 @@ namespace ExoplanetStudios.ExtractionShooter
             Cam.fieldOfView = ScopeFOV.Evaluate(_zoom);
         }
 
-        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner)
         {
             Rifle rifle = _itemObject as Rifle;
 
             float spray = weaponInputState.SecondaryAction ? SprayADS : Spray;
             Vector3 direction = rifle.GetShootDirection(playerState, spray, rifle.MovementError);
             Projectile.SpawnProjectile(Info, rifle.ShotSource.position, rifle.GetCameraPosition(playerState), direction, rifle.OwnerId, weaponInputState.TickDiff);
-            SFXSource.Source.PlayOneShot(Audio);
+            if (isOwner)
+                SFXSource.Source.PlayOneShot(Audio);
+            else
+                rifle.audioSource.PlayOneShot(Audio);
             _adsBlocked = true;
             
             return true;
