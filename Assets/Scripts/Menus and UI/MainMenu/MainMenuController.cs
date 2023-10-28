@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class MainMenuController : MonoBehaviour
+    public class MainMenuController : NetworkBehaviour
     {
         [SerializeField] private string MainSceneName;
         [Header("PlayerCards")]
@@ -39,29 +39,30 @@ namespace ExoplanetStudios.ExtractionShooter
             UsedMainMenu = true;
             SteamMatchmaking.OnLobbyInvite += OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnServerLeave;
+            NetworkManager.OnClientDisconnectCallback += OnServerLeave;
         }
-        void OnDestroy()
+        public override void OnDestroy()
         {
             SteamMatchmaking.OnLobbyInvite -= OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
 
-            if (NetworkManager.Singleton != null)
-                NetworkManager.Singleton.OnClientDisconnectCallback -= OnServerLeave;
+            if (NetworkManager != null)
+                NetworkManager.OnClientDisconnectCallback -= OnServerLeave;
         }
         public async void StartHost()
         {
-            NetworkManager.Singleton.StartHost();
+            NetworkManager.StartHost();
             MainLobby = await SteamMatchmaking.CreateLobbyAsync(5);
             MainPanel.SetActive(false);
             HostPanel.SetActive(true);
+            AddNameServerRpc(NetworkManager.LocalClientId, SteamClient.Name);
         }
         public void Back()
         {
             MainPanel.SetActive(true);
             HostPanel.SetActive(false);
             ClientPanel.SetActive(false);
-            NetworkManager.Singleton.Shutdown();
+            NetworkManager.Shutdown();
 
             foreach (Playercard card in _playerCards.Values)
                 Destroy(card.gameObject);
@@ -101,7 +102,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void OnGameLobbyJoinRequested(Friend friend, Lobby lobby)
         {
-            if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient) return;
+            if (MainLobby.HasValue) return;
             
             AcceptPanel.SetActive(true);
             AcceptPanelName.text = friend.Name;
@@ -151,14 +152,13 @@ namespace ExoplanetStudios.ExtractionShooter
         public void DeclineInvite() => AcceptPanel.SetActive(false);
         private void JoinLobby()
         {
-            NetworkManager.Singleton.GetComponent<FacepunchTransport>().targetSteamId = _receivedInviteId;
-            NetworkManager.Singleton.StartClient();
+            NetworkManager.GetComponent<FacepunchTransport>().targetSteamId = _receivedInviteId;
+            NetworkManager.StartClient();
             MainPanel.SetActive(false);
             ClientPanel.SetActive(true);
-            AddNameServerRpc(NetworkManager.Singleton.LocalClientId, SteamClient.Name);
+            AddNameServerRpc(NetworkManager.LocalClientId, SteamClient.Name);
         }
         private void OnLobbyCreated(Result result, Lobby lobby)
-            
         {
             if(result != Result.OK)
             {
@@ -172,8 +172,8 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public void StartGame()
         {
-            if (!NetworkManager.Singleton.IsServer) return;
-            NetworkManager.Singleton.SceneManager.LoadScene(MainSceneName, LoadSceneMode.Single);
+            if (!NetworkManager.IsServer) return;
+            NetworkManager.SceneManager.LoadScene(MainSceneName, LoadSceneMode.Single);
         }
     }
 }
