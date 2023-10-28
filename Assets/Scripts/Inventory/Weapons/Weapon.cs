@@ -50,7 +50,6 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
-            Debug.Log(weaponInputState.PrimaryAction);
             if (_recoil > 0)
             {
                 _recoil -= NetworkManager.Singleton.LocalTime.FixedDeltaTime * RecoilDecreaseSpeed;

@@ -52,8 +52,8 @@ namespace ExoplanetStudios.ExtractionShooter
         public async void StartHost()
         {
             NetworkManager.StartHost();
-            MainLobby = await SteamMatchmaking.CreateLobbyAsync(5);
             MainPanel.SetActive(false);
+            MainLobby = await SteamMatchmaking.CreateLobbyAsync(5);
             HostPanel.SetActive(true);
             AddNameServerRpc(NetworkManager.LocalClientId, SteamClient.Name);
         }
@@ -156,7 +156,7 @@ namespace ExoplanetStudios.ExtractionShooter
             NetworkManager.StartClient();
             MainPanel.SetActive(false);
             ClientPanel.SetActive(true);
-            this.Invoke(() => AddNameServerRpc(NetworkManager.LocalClientId, SteamClient.Name), 1f);
+            this.Invoke(() => AddNameServerRpc(NetworkManager.LocalClientId, SteamClient.Name), 2f);
         }
         private void OnLobbyCreated(Result result, Lobby lobby)
         {

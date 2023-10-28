@@ -47,7 +47,7 @@ namespace ExoplanetStudios.ExtractionShooter
             {
                 NetworkWeaponInputState newWeaponInputState = GetNetworkInputState();
                 // Execute Input
-                ExecuteInput(newWeaponInputState);
+                ExecuteInput(newWeaponInputState, transformState);
                 if (IsHost)
                     _serverWeaponInputState.Value = newWeaponInputState;
                 else
@@ -55,19 +55,26 @@ namespace ExoplanetStudios.ExtractionShooter
             }
             else if (IsServer && _receivedActions.ContainsKey(NetworkManager.LocalTime.Tick))
             {
-                ExecuteInput(_receivedActions[NetworkManager.LocalTime.Tick]);
+                for (int tick = _currentWeaponInputState.Tick + 1; tick <= NetworkManager.LocalTime.Tick; tick++)
+                    if (_firstPersonController.GetState(tick, out NetworkTransformState playerState))
+                        ExecuteInput(_receivedActions[NetworkManager.LocalTime.Tick], playerState);
+                        
                 _receivedActions.Remove(NetworkManager.LocalTime.Tick);
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
-            // Update weapon
-            _playerInventory.ActiveItemObject?.UpdateItem(_currentWeaponInputState, transformState);
         }
         [ServerRpc]
         private void OnInputServerRpc(NetworkWeaponInputState state)
         {
-            if (state.Tick == NetworkManager.LocalTime.Tick)
+            if (state.Tick < _currentWeaponInputState.Tick)
+                return; // Newer tick already received
+
+            if (state.Tick <= NetworkManager.LocalTime.Tick)
             {
-                ExecuteInput(state);
+                for (int tick = _currentWeaponInputState.Tick + 1; tick <= state.Tick; tick++)
+                    if (_firstPersonController.GetState(tick, out NetworkTransformState playerState))
+                        ExecuteInput(state, playerState);
+
                 _serverWeaponInputState.Value = _currentWeaponInputState;
             }
             else if (state.Tick > NetworkManager.LocalTime.Tick && !_receivedActions.ContainsKey(state.Tick))
@@ -77,7 +84,8 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (IsServer || IsOwner) return;
 
-            ExecuteInput((NetworkWeaponInputState)state.GetStateWithTick(state.Tick));
+            if (_firstPersonController.GetState(state.Tick, out NetworkTransformState playerState))
+                ExecuteInput((NetworkWeaponInputState)state.GetStateWithTick(state.Tick), playerState);
         }
         private NetworkWeaponInputState GetNetworkInputState()
         {
@@ -85,7 +93,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _controls.Mouse.SecondaryAction.IsPressed(), _controls.Player.Reload.IsPressed(),
                 NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
         }
-        private void ExecuteInput(NetworkWeaponInputState weaponInputState)
+        private void ExecuteInput(NetworkWeaponInputState weaponInputState, NetworkTransformState transformState)
         {
             if (weaponInputState.PrimaryAction != _currentWeaponInputState.PrimaryAction)
             {
@@ -107,6 +115,8 @@ namespace ExoplanetStudios.ExtractionShooter
                 _playerInventory.ActiveItemObject?.Reload();
 
             _currentWeaponInputState = weaponInputState;
+            // Update weapon
+            _playerInventory.ActiveItemObject?.UpdateItem(_currentWeaponInputState, transformState);
         }
     }
 }
