@@ -8,6 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public bool SecondaryAction;
         public bool ReloadAction;
         public int ServerTickOnCreation;
+        public int TickDiff;
         public NetworkWeaponInputState() {}
         public NetworkWeaponInputState(NetworkWeaponInputState oldState, int tick)
         {
@@ -27,7 +28,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Tick = tick;
         }
         public override NetworkState GetStateWithTick(int tick) => new NetworkWeaponInputState(this, tick);
-        public int TickDiff => NetworkManager.Singleton.LocalTime.Tick - ServerTickOnCreation;
+        public int SetTickDiff() => TickDiff = NetworkManager.Singleton.ServerTime.Tick - ServerTickOnCreation;
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)
