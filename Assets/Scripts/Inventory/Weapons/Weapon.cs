@@ -59,6 +59,9 @@ namespace ExoplanetStudios.ExtractionShooter
             }
             _firstPersonController.PlayerModel.SetRecoil(_recoil);
 
+            if (weaponInputState.ReloadAction)
+                Reload();
+                
             if (_reloadTimer > 0)
             {
                 _reloadTimer -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
@@ -68,7 +71,7 @@ namespace ExoplanetStudios.ExtractionShooter
             }
         }
 
-        public override void Reload() {
+        private void Reload() {
             if (BulletsLoaded == MagSize || IsReloading)
                 return;
             

@@ -40,14 +40,12 @@ namespace ExoplanetStudios.ExtractionShooter
             _cooldown = 0;
             _shot = false;
         }
-        public override void StopPrimaryAction()
-        {
-            _shot = false;
-        }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
 
+            if (_shot && !weaponInputState.PrimaryAction)
+                _shot = false;
             // Cooldown
             if (_cooldown > 0)
                 _cooldown -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;

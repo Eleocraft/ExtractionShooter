@@ -47,7 +47,9 @@ namespace ExoplanetStudios.ExtractionShooter
             {
                 NetworkWeaponInputState newWeaponInputState = GetNetworkInputState();
                 // Execute Input
-                ExecuteAction(newWeaponInputState, transformState);
+                _playerInventory.ActiveItemObject?.UpdateItem(newWeaponInputState, transformState);
+                _currentWeaponInputState = newWeaponInputState;
+
                 if (IsHost)
                     _serverWeaponInputState.Value = newWeaponInputState;
                 else
@@ -94,35 +96,12 @@ namespace ExoplanetStudios.ExtractionShooter
             newWeaponInputState.SetTickDiff();
             for (int tick = _currentWeaponInputState.Tick + 1; tick < newWeaponInputState.Tick; tick++)
                     if (_firstPersonController.GetState(tick, out NetworkTransformState playerStateAtTick))
-                        ExecuteAction(_currentWeaponInputState, playerStateAtTick);
+                        _playerInventory.ActiveItemObject?.UpdateItem(_currentWeaponInputState, playerStateAtTick);
 
             if (_firstPersonController.GetState(newWeaponInputState.Tick, out NetworkTransformState playerState))
-                ExecuteAction(newWeaponInputState, playerState);
-        }
-        private void ExecuteAction(NetworkWeaponInputState weaponInputState, NetworkTransformState transformState)
-        {
-            if (weaponInputState.PrimaryAction != _currentWeaponInputState.PrimaryAction)
-            {
-                if (weaponInputState.PrimaryAction)
-                    _playerInventory.ActiveItemObject?.StartPrimaryAction();
-                else
-                    _playerInventory.ActiveItemObject?.StopPrimaryAction();
-            }
-
-            if (weaponInputState.SecondaryAction != _currentWeaponInputState.SecondaryAction)
-            {
-                if (weaponInputState.SecondaryAction)
-                    _playerInventory.ActiveItemObject?.StartSecondaryAction();
-                else
-                    _playerInventory.ActiveItemObject?.StopSecondaryAction();
-            }
-
-            if (weaponInputState.ReloadAction && !_currentWeaponInputState.ReloadAction)
-                _playerInventory.ActiveItemObject?.Reload();
-
-            _currentWeaponInputState = weaponInputState;
-            // Update weapon
-            _playerInventory.ActiveItemObject?.UpdateItem(_currentWeaponInputState, transformState);
+                _playerInventory.ActiveItemObject?.UpdateItem(newWeaponInputState, playerState);
+            
+            _currentWeaponInputState = newWeaponInputState;
         }
     }
 }

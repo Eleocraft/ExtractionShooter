@@ -12,6 +12,9 @@ namespace ExoplanetStudios.ExtractionShooter
         private bool _threw;
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
+            if (_threw && !weaponInputState.PrimaryAction)
+                _threw = false;
+
             if (_cooldown > 0)
                 _cooldown -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
 
@@ -21,11 +24,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 _threw = true;
                 _cooldown = Cooldown;
             }
-        }
-
-        public override void StopPrimaryAction()
-        {
-            _threw = false;
         }
     }
 }

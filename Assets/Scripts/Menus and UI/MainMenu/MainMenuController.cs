@@ -37,6 +37,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private SteamId _receivedInviteId;
         void Start()
         {
+            Application.targetFrameRate = 60;
             UsedMainMenu = true;
             SteamMatchmaking.OnLobbyInvite += OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;

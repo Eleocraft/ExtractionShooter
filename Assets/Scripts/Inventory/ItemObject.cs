@@ -59,13 +59,6 @@ namespace ExoplanetStudios.ExtractionShooter
             gameObject.SetActive(false);
         }
         public abstract void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
-        
-        public virtual void StartPrimaryAction() { }
-        public virtual void StopPrimaryAction() { }
-        public virtual void StartSecondaryAction() { }
-        public virtual void StopSecondaryAction() { }
-
-        public virtual void Reload() { }
 
         public Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * _cameraTransform.localPosition.y + playerState.Position;
         public Vector3 GetLookDirection(NetworkTransformState playerState) => Quaternion.Euler(playerState.LookRotation.x, playerState.LookRotation.y, 0) * Vector3.forward;

@@ -32,14 +32,13 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _shot = false;
         }
-        public override void StopPrimaryAction()
-        {
-            _shot = false;
-        }
 
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
+
+            if (_shot && !weaponInputState.PrimaryAction)
+                _shot = false;
 
             // first shot shooting
             if (weaponInputState.PrimaryAction && !InADSTransit && !_shot && !IsReloading)
