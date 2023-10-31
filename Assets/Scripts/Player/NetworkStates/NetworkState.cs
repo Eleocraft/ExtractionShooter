@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ExoplanetStudios.ExtractionShooter
@@ -35,7 +36,7 @@ namespace ExoplanetStudios.ExtractionShooter
             get
             {
                 if (_lastReceivedTick - _ticksSaved > tick) // Tick is to old
-                    return null;
+                    return (T)States.Last().GetStateWithTick(tick);
                 
                 for (int i = 0; i < States.Count; i++)
                     if (States[i].Tick <= tick)
