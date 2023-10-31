@@ -27,8 +27,8 @@ namespace ExoplanetStudios.ExtractionShooter
             ServerTickOnCreation = serverTick;
             Tick = tick;
         }
+        public int SetTickDiff() => NetworkManager.Singleton.LocalTime.Tick - ServerTickOnCreation;
         public override NetworkState GetStateWithTick(int tick) => new NetworkWeaponInputState(this, tick);
-        public int SetTickDiff() => TickDiff = NetworkManager.Singleton.ServerTime.Tick - ServerTickOnCreation;
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)
@@ -57,7 +57,8 @@ namespace ExoplanetStudios.ExtractionShooter
             if (otherState is null)
                 return false;
 
-            if (PrimaryAction == otherState.PrimaryAction && SecondaryAction == otherState.SecondaryAction)
+            if (PrimaryAction == otherState.PrimaryAction && SecondaryAction == otherState.SecondaryAction &&
+                ReloadAction == otherState.ReloadAction && ServerTickOnCreation == otherState.ServerTickOnCreation)
                 return true;
             
             return false;
@@ -66,6 +67,50 @@ namespace ExoplanetStudios.ExtractionShooter
         public override int GetHashCode()
         {
             return PrimaryAction ? 1 : 0;
+        }
+    }
+    public class NetworkWeaponInputStateList : NetworkStateList<NetworkWeaponInputState>, INetworkSerializable
+    {
+        public NetworkWeaponInputStateList() { }
+        public NetworkWeaponInputStateList(int ticksSaved)
+        {
+            _ticksSaved = ticksSaved;
+        }
+        public NetworkWeaponInputStateList GetListForTicks(int ticks)
+        {
+            NetworkWeaponInputStateList newList = new(ticks);
+            newList.Insert(this, _lastReceivedTick - ticks);
+
+            if (newList.States.Count <= 0 && States.Count > 0) // make sure there is always at least one tick
+                newList.Add((NetworkWeaponInputState)States[0].GetStateWithTick(newList._lastReceivedTick - ticks));
+
+            return newList;
+        }
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            if (serializer.IsReader)
+            {
+                FastBufferReader reader = serializer.GetFastBufferReader();
+                reader.ReadValueSafe(out int count);
+                States = new();
+                for (int i = 0; i < count; i++)
+                {
+                    reader.ReadValueSafe(out NetworkWeaponInputState state);
+                    States.Add(state);
+                }
+                reader.ReadValueSafe(out _ticksSaved);
+                reader.ReadValueSafe(out _lastReceivedTick);
+            }
+            else
+            {
+                FastBufferWriter writer = serializer.GetFastBufferWriter();
+                writer.WriteValueSafe(States.Count);
+                for (int i = 0; i < States.Count; i++)
+                    writer.WriteValueSafe(States[i]);
+
+                writer.WriteValueSafe(_ticksSaved);
+                writer.WriteValueSafe(_lastReceivedTick);
+            }
         }
     }
 }

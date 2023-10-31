@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Netcode;
-using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -13,76 +12,57 @@ namespace ExoplanetStudios.ExtractionShooter
 
         // Owner
         private InputMaster _controls;
-        
-        // Server
-        private Dictionary<int, NetworkWeaponInputState> _receivedActions; // Serveronly
 
         // NetworkWeaponInputStates
-        private NetworkVariable<NetworkWeaponInputState> _serverWeaponInputState = new NetworkVariable<NetworkWeaponInputState>();
-        private NetworkWeaponInputState _currentWeaponInputState = new();
+        private NetworkWeaponInputStateList _bufferedWeaponInputStates;
+        private NetworkWeaponInputState _lastExecutedState; // Serveronly
+        const int BUFFER_SIZE = 50;
+        private const int INPUT_TICKS_SEND = 30;
 
         public override void OnNetworkSpawn()
         {
             _firstPersonController = GetComponent<FirstPersonController>();
             _playerInventory = GetComponent<PlayerInventory>();
 
-            if (IsServer)
-                _receivedActions = new Dictionary<int, NetworkWeaponInputState>();
             if (IsOwner)
                 _controls = GI.Controls;
                 
             _firstPersonController.TransformStateChanged += TransformStateChanged;
-            _serverWeaponInputState.OnValueChanged += OnServerStateChanged;
+            _bufferedWeaponInputStates = new(BUFFER_SIZE);
+            _lastExecutedState = new();
         }
         public override void OnDestroy()
         {
             base.OnDestroy();
 
             _firstPersonController.TransformStateChanged -= TransformStateChanged;
-            _serverWeaponInputState.OnValueChanged -= OnServerStateChanged;
         }
         private void TransformStateChanged(NetworkTransformState transformState)
         {
             if (IsOwner)
             {
                 NetworkWeaponInputState newWeaponInputState = GetNetworkInputState();
-                // Execute Input
-                _playerInventory.ActiveItemObject?.UpdateItem(newWeaponInputState, transformState);
-                _currentWeaponInputState = newWeaponInputState;
+                _bufferedWeaponInputStates.Add(newWeaponInputState);
 
-                if (IsHost)
-                    _serverWeaponInputState.Value = newWeaponInputState;
-                else
-                    OnInputServerRpc(newWeaponInputState);
+                OnInputServerRpc(_bufferedWeaponInputStates.GetListForTicks(INPUT_TICKS_SEND));
             }
-            else if (IsServer && _receivedActions.ContainsKey(NetworkManager.LocalTime.Tick))
-            {
-                ExecuteInput(_receivedActions[NetworkManager.LocalTime.Tick]);
-
-                _receivedActions.Remove(NetworkManager.LocalTime.Tick);
-                _serverWeaponInputState.Value = _currentWeaponInputState;
-            }
+            ExecuteInputs();
         }
         [ServerRpc]
-        private void OnInputServerRpc(NetworkWeaponInputState state)
+        private void OnInputServerRpc(NetworkWeaponInputStateList states)
         {
-            if (state.Tick < _currentWeaponInputState.Tick)
-                return; // Newer tick already received
-
-            if (state.Tick <= NetworkManager.LocalTime.Tick)
-            {
-                ExecuteInput(state);
-
-                _serverWeaponInputState.Value = _currentWeaponInputState;
-            }
-            else if (state.Tick > NetworkManager.LocalTime.Tick && !_receivedActions.ContainsKey(state.Tick))
-                _receivedActions.Add(state.Tick, state);
+            OnInputClientRpc(states);
         }
-        private void OnServerStateChanged(NetworkWeaponInputState oldState, NetworkWeaponInputState state)
+        [ClientRpc]
+        private void OnInputClientRpc(NetworkWeaponInputStateList states)
         {
-            if (IsServer || IsOwner) return;
+            if (IsOwner)
+                return;
 
-            ExecuteInput(state);
+            if (states.LastTick <= _lastExecutedState.Tick)
+                return; // Newer tick already received
+            
+            _bufferedWeaponInputStates.Insert(states, _lastExecutedState.Tick);
         }
         private NetworkWeaponInputState GetNetworkInputState()
         {
@@ -90,18 +70,19 @@ namespace ExoplanetStudios.ExtractionShooter
                 _controls.Mouse.SecondaryAction.IsPressed(), _controls.Player.Reload.IsPressed(),
                 NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
         }
-        
-        private void ExecuteInput(NetworkWeaponInputState newWeaponInputState)
+        private void ExecuteInputs()
         {
-            newWeaponInputState.SetTickDiff();
-            for (int tick = _currentWeaponInputState.Tick + 1; tick < newWeaponInputState.Tick; tick++)
-                    if (_firstPersonController.GetState(tick, out NetworkTransformState playerStateAtTick))
-                        _playerInventory.ActiveItemObject?.UpdateItem(_currentWeaponInputState, playerStateAtTick);
-
-            if (_firstPersonController.GetState(newWeaponInputState.Tick, out NetworkTransformState playerState))
-                _playerInventory.ActiveItemObject?.UpdateItem(newWeaponInputState, playerState);
+            int maxTickToExecute = Mathf.Min(NetworkManager.LocalTime.Tick, _bufferedWeaponInputStates.LastTick);
+            for (int tick = _lastExecutedState.Tick + 1; tick <= maxTickToExecute; tick++)
+            {
+                if (_firstPersonController.GetState(tick, out NetworkTransformState playerStateAtTick))
+                {
+                    _bufferedWeaponInputStates[tick]?.SetTickDiff();
+                    _playerInventory.ActiveItemObject?.UpdateItem(_bufferedWeaponInputStates[tick], playerStateAtTick);
+                }
+            }
             
-            _currentWeaponInputState = newWeaponInputState;
+            _lastExecutedState = _bufferedWeaponInputStates[maxTickToExecute];
         }
     }
 }
