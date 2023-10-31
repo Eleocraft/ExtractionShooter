@@ -15,7 +15,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
         // NetworkWeaponInputStates
         private NetworkWeaponInputStateList _bufferedWeaponInputStates;
-        private NetworkWeaponInputState _lastExecutedState; // Serveronly
+        private int _lastExecutedStateTick = 0; // Serveronly
         const int BUFFER_SIZE = 50;
         private const int INPUT_TICKS_SEND = 30;
 
@@ -29,7 +29,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 
             _firstPersonController.TransformStateChanged += TransformStateChanged;
             _bufferedWeaponInputStates = new(BUFFER_SIZE);
-            _lastExecutedState = new();
         }
         public override void OnDestroy()
         {
@@ -59,10 +58,10 @@ namespace ExoplanetStudios.ExtractionShooter
             if (IsOwner)
                 return;
 
-            if (states.LastTick <= _lastExecutedState.Tick)
+            if (states.LastTick <= _lastExecutedStateTick)
                 return; // Newer tick already received
             
-            _bufferedWeaponInputStates.Insert(states, _lastExecutedState.Tick);
+            _bufferedWeaponInputStates.Insert(states, _lastExecutedStateTick);
         }
         private NetworkWeaponInputState GetNetworkInputState()
         {
@@ -73,7 +72,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private void ExecuteInputs()
         {
             int maxTickToExecute = Mathf.Min(NetworkManager.LocalTime.Tick, _bufferedWeaponInputStates.LastTick);
-            for (int tick = _lastExecutedState.Tick + 1; tick <= maxTickToExecute; tick++)
+            for (int tick = _lastExecutedStateTick + 1; tick <= maxTickToExecute; tick++)
             {
                 if (_firstPersonController.GetState(tick, out NetworkTransformState playerStateAtTick))
                 {
@@ -82,7 +81,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
             }
             
-            _lastExecutedState = _bufferedWeaponInputStates[maxTickToExecute];
+            _lastExecutedStateTick = maxTickToExecute;
         }
     }
 }
