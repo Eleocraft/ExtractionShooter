@@ -7,7 +7,7 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         public Vector2 MovementInput;
         public Vector2 LookDelta;
-        public bool SlowWalk;
+        public bool Run;
         public bool Crouch;
         public bool Jump;
         public NetworkInputState() {}
@@ -19,7 +19,7 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             MovementInput = oldState.MovementInput;
             LookDelta = oldState.LookDelta;
-            SlowWalk = oldState.SlowWalk;
+            Run = oldState.Run;
             Jump = oldState.Jump;
             Crouch = oldState.Crouch;
             
@@ -30,7 +30,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Tick = tick;
             MovementInput = movementInput;
             LookDelta = lookRotation;
-            SlowWalk = sprint;
+            Run = sprint;
             Jump = jump;
             Crouch = crouch;
         }
@@ -43,7 +43,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 reader.ReadValueSafe(out Tick);
                 reader.ReadValueSafe(out MovementInput);
                 reader.ReadValueSafe(out LookDelta);
-                reader.ReadValueSafe(out SlowWalk);
+                reader.ReadValueSafe(out Run);
                 reader.ReadValueSafe(out Jump);
                 reader.ReadValueSafe(out Crouch);
             }
@@ -53,7 +53,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(Tick);
                 writer.WriteValueSafe(MovementInput);
                 writer.WriteValueSafe(LookDelta);
-                writer.WriteValueSafe(SlowWalk);
+                writer.WriteValueSafe(Run);
                 writer.WriteValueSafe(Jump);
                 writer.WriteValueSafe(Crouch);
             }
@@ -66,7 +66,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 return false;
             
             if (MovementInput == otherState.MovementInput && LookDelta == otherState.LookDelta &&
-                SlowWalk == otherState.SlowWalk && Jump == otherState.Jump && Crouch == otherState.Crouch) return true;
+                Run == otherState.Run && Jump == otherState.Jump && Crouch == otherState.Crouch) return true;
 
             return false;
         }

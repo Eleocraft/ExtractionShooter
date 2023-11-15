@@ -10,8 +10,6 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [Header("Damage + effects")]
         public EnumDictionary<DamageType, float> Damages;
-        public float SlowTime;
-        public float SlowMultiplier = 1f;
 
         [Header("Physics")]
         public float MaxVelocity;

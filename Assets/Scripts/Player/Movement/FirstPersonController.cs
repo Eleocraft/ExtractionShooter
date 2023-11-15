@@ -62,7 +62,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		public Action<NetworkTransformState> TransformStateChanged;
 
 		// player
-		private Dictionary<string, float> _velocityMultipliers = new();
 		private float _jumpVelocity;
 		private bool _jump; // Owner only
 		private Vector2 _lookDelta; // Owner only
@@ -80,7 +79,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		// Buffer
 		private NetworkTransformStateList _bufferedTransformStates;
 		private NetworkInputStateList _bufferedInputStates; // Owner and server
-		private List<float> _bufferedVelocityMultipliers; // Owner and server
 		
 		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>();
 		private NetworkVariable<NetworkTransformState> _safeServerTransformState = new NetworkVariable<NetworkTransformState>();
@@ -136,7 +134,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			{
 				_bufferedInputStates = new(BUFFER_SIZE);
 				_bufferedInputStates.Add(new NetworkInputState(NetworkManager.LocalTime.Tick));
-				_bufferedVelocityMultipliers = new();
 			}
 		}
 		public override void OnDestroy()
@@ -171,9 +168,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 		private void Tick()
 		{
-			if (IsOwner || IsServer)
-				StoreVelocityMultiplierBuffer();
-			
 			if (IsOwner)
 			{
 				NetworkInputState inputState = CreateInputState();
@@ -247,17 +241,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			_lastSaveInput = _bufferedInputStates[Mathf.Max(inputStates.LastTick, _lastSaveInput.Tick)];
 			_lastSaveTransform = _bufferedTransformStates[Mathf.Max(inputStates.LastTick, _lastSaveInput.Tick)];
 		}
-		private void StoreVelocityMultiplierBuffer()
-		{
-			float velocityMultiplier = 1;
-			foreach (float multiplier in _velocityMultipliers.Values)
-				velocityMultiplier *= multiplier;
-
-			_bufferedVelocityMultipliers.Insert(0, velocityMultiplier);
-
-			if (_bufferedVelocityMultipliers.Count > BUFFER_SIZE)
-				_bufferedVelocityMultipliers.RemoveAt(BUFFER_SIZE);
-		}
 		// Clients
 		private void OnSafeServerStateChanged(NetworkTransformState previouseState, NetworkTransformState receivedState)
 		{
@@ -307,13 +290,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			return new NetworkTransformState(NetworkManager.LocalTime.Tick,
 				transform.position, Vector3.forward, Vector3.zero, 0);
 		}
-		private float GetVelocityMultiplier(int tick)
-		{
-			if (NetworkManager.LocalTime.Tick - tick >= _bufferedVelocityMultipliers.Count || NetworkManager.LocalTime.Tick < tick)
-				return 1;
-			
-			return _bufferedVelocityMultipliers[NetworkManager.LocalTime.Tick - tick];
-		}
 		private void ExecuteInput(NetworkInputState inputState)
 		{
 			if (inputState == null)
@@ -333,7 +309,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			PlayerModel.SetCrouchAmount(crouchAmount);
 
 			// movement
-			Vector3 velocity = CalculateVelocity(inputState, GetVelocityMultiplier(inputState.Tick), crouchAmount > 0, lookRotation);
+			Vector3 velocity = CalculateVelocity(inputState, crouchAmount > 0, lookRotation);
 			Vector3 movement = velocity * NetworkManager.LocalTime.FixedDeltaTime;
 			_controller.Move(movement);
 			
@@ -383,13 +359,13 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			return Mathf.MoveTowards(current, crouchInput ? 1f : 0f, CrouchEnterSpeed * NetworkManager.LocalTime.FixedDeltaTime);
 		}
-		private Vector3 CalculateVelocity(NetworkInputState inputState, float velocityMultiplier, bool crouch, Vector2 lookRotation)
+		private Vector3 CalculateVelocity(NetworkInputState inputState, bool crouch, Vector2 lookRotation)
 		{
 			bool grounded = GroundedCheck();
 			float verticalVelocity = CalculateGravity(inputState.Jump, grounded);
 			
 			// set target speed based on if slowWalk or crouch is pressed + what the velocity multiplier is (items + effects ect.)
-			float targetSpeed = (crouch ? CrouchSpeed : inputState.SlowWalk ? WalkSpeed : RunSpeed) * velocityMultiplier;
+			float targetSpeed = crouch ? CrouchSpeed : inputState.Run ? RunSpeed : WalkSpeed;
 
 			// target speed is 0 if no key is pressed
 			if (inputState.MovementInput == Vector2.zero) targetSpeed = 0.0f;
@@ -464,18 +440,6 @@ namespace ExoplanetStudios.ExtractionShooter
 			}
 			transformState = _bufferedTransformStates[tick];
 			return transformState != null;
-		}
-		public void SetMovementSpeedMultiplier(string id, float multiplier)
-		{
-			if (_velocityMultipliers.ContainsKey(id))
-				_velocityMultipliers[id] = multiplier;
-			else
-				_velocityMultipliers.Add(id, multiplier);
-		}
-		public void RemoveMovementSpeedMultiplier(string id)
-		{
-			if (_velocityMultipliers.ContainsKey(id))
-				_velocityMultipliers.Remove(id);
 		}
 	}
 }

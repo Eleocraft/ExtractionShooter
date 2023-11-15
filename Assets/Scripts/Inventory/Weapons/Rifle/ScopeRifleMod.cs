@@ -16,9 +16,9 @@ namespace ExoplanetStudios.ExtractionShooter
         private bool _adsBlocked;
         public override bool CanADS => !_adsBlocked;
 
-        public override void Initialize(ItemObject itemObject, FirstPersonController player)
+        public override void Initialize(ItemObject itemObject, FirstPersonController player, bool isOwner)
         {
-            base.Initialize(itemObject, player);
+            base.Initialize(itemObject, player, isOwner);
             Cam.enabled = false;
         }
         public override void Activate()
@@ -33,7 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void ChangeZoom(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
         {
-            if (!_ads) return;
+            if (!_ads || !_isOwner) return;
 
             _zoom -= ctx.ReadValue<Vector2>().y * ZoomSpeed;
             _zoom = Mathf.Clamp01(_zoom);
@@ -51,7 +51,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 SFXSource.Source.PlayOneShot(Audio);
             else
                 rifle.audioSource.PlayOneShot(Audio);
-            _adsBlocked = true;
+            //_adsBlocked = true;
             
             return true;
         }
@@ -61,6 +61,9 @@ namespace ExoplanetStudios.ExtractionShooter
             
             if (_adsBlocked && !_ads)
                 _adsBlocked = false;
+
+            if (!_isOwner)
+                return;
 
             if (ADS && !Cam.enabled)
             {

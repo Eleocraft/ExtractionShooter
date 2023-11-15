@@ -13,8 +13,6 @@ namespace ExoplanetStudios.ExtractionShooter
         private NetworkVariable<float> _life = new NetworkVariable<float>();
         private FirstPersonController _firstPersonController;
         private float _spawnProtectionTimer; // Serveronly
-        private float _slowDownTimer;
-        private float _slowDownMultiplier = 1f;
 
         private void Start()
         {
@@ -37,12 +35,6 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             if (_spawnProtectionTimer > 0)
                 _spawnProtectionTimer -= NetworkManager.LocalTime.FixedDeltaTime;
-            if (_slowDownTimer > 0)
-            {
-                _slowDownTimer -= NetworkManager.LocalTime.FixedDeltaTime;
-                if (_slowDownTimer <= 0)
-                    ResetSlowDown();
-            }
         }
         public bool OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong ownerId)
         {
@@ -55,7 +47,6 @@ namespace ExoplanetStudios.ExtractionShooter
             else
                 Instantiate(HitParticle, point + transform.position, Quaternion.identity);
 
-            SetSlowDown(info.SlowTime, info.SlowMultiplier);
             Damage(info.GetDamage(damageType, projectileVelocity), ownerId);
             
             return true;
@@ -75,20 +66,6 @@ namespace ExoplanetStudios.ExtractionShooter
                     _firstPersonController.SetPosition(SpawnPoints.GetSpawnPoint()); // Set new position
                 }
             }
-        }
-        private void SetSlowDown(float time, float multiplier)
-        {
-            if (multiplier < _slowDownMultiplier)
-            {
-                _firstPersonController.SetMovementSpeedMultiplier("PlayerLife", multiplier);
-                _slowDownMultiplier = multiplier;
-                _slowDownTimer = time;
-            }
-        }
-        private void ResetSlowDown()
-        {
-            _slowDownMultiplier = 1;
-            _firstPersonController.SetMovementSpeedMultiplier("PlayerLife", 1f);
         }
         [ClientRpc]
         private void PlayerDeadClientRpc(Vector3 position)

@@ -50,7 +50,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 }
                 _shot = true;
             }
-            ((RifleItemModifier)Modifiers[ActiveModifier]).UpdateItem(InADS);
+            ((RifleItemModifier)Modifiers[ActiveModifier]).UpdateItem(InADS || InADSTransit);
         }
     }
     public abstract class RifleItemModifier : ItemModifier

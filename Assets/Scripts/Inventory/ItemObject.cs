@@ -12,7 +12,6 @@ namespace ExoplanetStudios.ExtractionShooter
         [ReadOnly] public string ItemID;
         public Sprite Icon;
         [HideInInspector] public int Ammunition;
-        public float VelocityMultiplier;
         protected Transform _cameraTransform;
         [Header("Modifiers")]
         private int _activeModifier;
@@ -39,7 +38,7 @@ namespace ExoplanetStudios.ExtractionShooter
             }
 
             foreach(ItemModifier modifier in Modifiers)
-                modifier.Initialize(this, controller);
+                modifier.Initialize(this, controller, isOwner);
 
             _cameraTransform = controller.PlayerModel.CameraSocket;
             _firstPersonController = controller;
@@ -51,11 +50,9 @@ namespace ExoplanetStudios.ExtractionShooter
             ItemID = Utility.CreateID(name);
         }
         public virtual void Activate() {
-            _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", VelocityMultiplier);
             gameObject.SetActive(true);
         }
         public virtual void Deactivate() {
-            _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ItemSlow", 1f);
             gameObject.SetActive(false);
         }
         public abstract void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
@@ -70,11 +67,13 @@ namespace ExoplanetStudios.ExtractionShooter
         [TextArea] public string Description;
         public Sprite Icon;
         protected ItemObject _itemObject;
+        protected bool _isOwner;
         [SerializeField] private Transform IconPos;
 
-        public virtual void Initialize(ItemObject itemObject, FirstPersonController player)
+        public virtual void Initialize(ItemObject itemObject, FirstPersonController player, bool isOwner)
         {
             _itemObject = itemObject;
+            _isOwner = isOwner;
         }
         public virtual void Activate() {
             gameObject.SetActive(true);

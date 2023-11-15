@@ -33,38 +33,19 @@ namespace ExoplanetStudios.ExtractionShooter
             base.Deactivate();
 
             if (_adsState > 0)
-            {
-                StopADS();
                 _adsState = 0;
-            }
                 
             if (_camera != null)
                 _camera.m_Lens.FieldOfView = _defaultFOV;
-        }
-        private void StartADS() {
-            _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ADS", ADSVelocityMul);
-        }
-        private void StopADS() {
-            _firstPersonController.SetMovementSpeedMultiplier(GetInstanceID()+"ADS", 1f);
         }
         public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
             
             if (CanADS && weaponInputState.SecondaryAction && !IsReloading)
-            {
-                if (_adsState <= 0)
-                    StartADS();
-
                 _adsState += NetworkManager.Singleton.LocalTime.FixedDeltaTime;
-            }
             else
-            {
-                if (_adsState > 0 && _adsState - NetworkManager.Singleton.LocalTime.FixedDeltaTime <= 0)
-                    StopADS();
-
                 _adsState -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
-            }
             
             _adsState = Mathf.Clamp(_adsState, 0, TransitTime);
 
