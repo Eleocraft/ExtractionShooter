@@ -32,8 +32,10 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             base.Deactivate();
 
-            if (_adsState > 0)
+            if (_adsState > 0) {
                 _adsState = 0;
+                transform.localPosition = _weaponDefaultPos;
+            }
                 
             if (_camera != null)
                 _camera.m_Lens.FieldOfView = _defaultFOV;

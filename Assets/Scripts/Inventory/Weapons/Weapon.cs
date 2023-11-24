@@ -36,12 +36,12 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override void Activate() {
             base.Activate();
-
+            
             MagazineDisplay.SetMagazineInfo(OwnerId, BulletsLoaded, MagSize, true);
         }
         public override void Deactivate() {
             base.Deactivate();
-            
+                
             MagazineDisplay.SetMagazineInfo(OwnerId, 0, 0, false);
 
             _reloadTimer = 0;
@@ -67,8 +67,14 @@ namespace ExoplanetStudios.ExtractionShooter
                 _reloadTimer -= NetworkManager.Singleton.LocalTime.FixedDeltaTime;
                 transform.localRotation = Quaternion.AngleAxis(Mathf.Clamp01(_reloadTimer / ReloadTime) * 360, Vector3.forward); // Temp
                 if (_reloadTimer <= 0)
-                    BulletsLoaded = MagSize;
+                    FinishReload();
             }
+        }
+        public override void UpdateModifier()
+        {
+            base.UpdateModifier();
+
+            FinishReload();
         }
 
         private void Reload() {
@@ -80,6 +86,9 @@ namespace ExoplanetStudios.ExtractionShooter
                 SFXSource.Source.PlayOneShot(ReloadSound);
             else
                 audioSource.PlayOneShot(ReloadSound);
+        }
+        private void FinishReload() {
+            BulletsLoaded = MagSize;
         }
 
         public Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)

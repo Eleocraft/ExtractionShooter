@@ -24,6 +24,7 @@ namespace ExoplanetStudios.ExtractionShooter
                     Modifiers[value].Activate();
                 }
                 _activeModifier = value;
+                UpdateModifier();
             }
         }
         
@@ -55,6 +56,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public virtual void Deactivate() {
             gameObject.SetActive(false);
         }
+        public virtual void UpdateModifier() {}
         public abstract void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState);
 
         public Vector3 GetCameraPosition(NetworkTransformState playerState) => Vector3.up * _cameraTransform.localPosition.y + playerState.Position;
