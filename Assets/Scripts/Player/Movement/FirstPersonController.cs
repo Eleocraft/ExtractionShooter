@@ -370,7 +370,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// target speed is 0 if no key is pressed
 			if (inputState.MovementInput == Vector2.zero) targetSpeed = 0.0f;
 
-			Vector2 targetHorizontalVelocity = inputState.MovementInput.Rotate(lookRotation.y) * targetSpeed;
+			Vector2 targetHorizontalVelocity = inputState.MovementInput.normalized.Rotate(lookRotation.y) * targetSpeed;
 			Vector2 horizontalVelocity = _currentTransformState.Velocity.XZ();
 
 			// accelerate or decelerate to target speed
