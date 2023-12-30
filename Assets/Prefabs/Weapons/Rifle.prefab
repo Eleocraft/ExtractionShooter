@@ -134,7 +134,7 @@ MonoBehaviour:
   Description: Moar bullets
   Icon: {fileID: 21300000, guid: e726065b16534774d95ba31e5feb8478, type: 3}
   IconPos: {fileID: 5816175267796711699}
-  Audio: {fileID: 8300000, guid: cda9d5b5efd826a45a50550f924c1ff6, type: 3}
+  Audio: {fileID: 8300000, guid: 7a1de215bc0990045b7ab6b8970241de, type: 3}
   Info: {fileID: 11400000, guid: 1c8200d26dd04c94ca313fb8dc068bf6, type: 2}
   Spray: 0.3
   SprayADS: 0.2
@@ -1205,7 +1205,7 @@ MonoBehaviour:
   Description: Scope
   Icon: {fileID: 21300000, guid: bc97fbe9322fb224fa5b971c1753595b, type: 3}
   IconPos: {fileID: 4871709627925192988}
-  Audio: {fileID: 8300000, guid: cda9d5b5efd826a45a50550f924c1ff6, type: 3}
+  Audio: {fileID: 8300000, guid: 9d118d37c3e848549a5f4ea923286241, type: 3}
   Info: {fileID: 11400000, guid: 33af985dd1b9c8049913936d43f631c2, type: 2}
   Spray: 0.6
   SprayADS: 0
@@ -1324,7 +1324,7 @@ MonoBehaviour:
   Description: Default rifle, one shot it is
   Icon: {fileID: 21300000, guid: 717f21feb6072394f98ca5466250f09d, type: 3}
   IconPos: {fileID: 653135589166040498}
-  Audio: {fileID: 8300000, guid: 1b6c6eca90d32004b905ef027fecb4d4, type: 3}
+  Audio: {fileID: 8300000, guid: da8d1e480c311bf449e72b034ccc50f4, type: 3}
   Info: {fileID: 11400000, guid: 4bea404660201ce49be417cb69ee1b56, type: 2}
   Spray: 0.125
   SprayADS: 0

@@ -10,6 +10,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private GameObject BreakParticles;
         [SerializeField] private GameObject HitParticle;
         [SerializeField] private GameObject HeadshotParticle;
+        [SerializeField] private AudioClip HitNotificationAudio;
         private NetworkVariable<float> _life = new NetworkVariable<float>();
         private FirstPersonController _firstPersonController;
         private float _spawnProtectionTimer; // Serveronly
@@ -36,10 +37,13 @@ namespace ExoplanetStudios.ExtractionShooter
             if (_spawnProtectionTimer > 0)
                 _spawnProtectionTimer -= NetworkManager.LocalTime.FixedDeltaTime;
         }
-        public bool OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong ownerId)
+        public bool OnHit(ProjectileInfo info, Vector3 point, DamageType damageType, float projectileVelocity, ulong bulletOwnerId)
         {
-            if (OwnerClientId == ownerId)
+            if (OwnerClientId == bulletOwnerId)
                 return false;
+
+            if (bulletOwnerId == NetworkManager.LocalClientId)
+                SFXSource.Source.PlayOneShot(HitNotificationAudio);
 
             // Particle Effects
             if (damageType == DamageType.Headshot)
@@ -47,7 +51,7 @@ namespace ExoplanetStudios.ExtractionShooter
             else
                 Instantiate(HitParticle, point + transform.position, Quaternion.identity);
 
-            Damage(info.GetDamage(damageType, projectileVelocity), ownerId);
+            Damage(info.GetDamage(damageType, projectileVelocity), bulletOwnerId);
             
             return true;
         }
