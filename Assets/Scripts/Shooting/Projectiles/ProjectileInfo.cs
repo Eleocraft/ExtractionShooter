@@ -10,6 +10,8 @@ namespace ExoplanetStudios.ExtractionShooter
     {
         [Header("Damage + effects")]
         public EnumDictionary<DamageType, float> Damages;
+        public float DamageDropoffVelocityPercent = 0.8f;
+        public bool Stun;
 
         [Header("Physics")]
         public float MaxVelocity;
@@ -32,7 +34,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public float GetDamage(DamageType damageType, float projectileVelocity)
         {
             Damages.Update();
-            return Damages[damageType] * (projectileVelocity / MaxVelocity);
+            return Damages[damageType] * MathF.Max(projectileVelocity / (MaxVelocity * DamageDropoffVelocityPercent), 1);
         }
     }
 }

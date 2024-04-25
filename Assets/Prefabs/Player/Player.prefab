@@ -145,6 +145,7 @@ GameObject:
   - component: {fileID: -3934378158165779511}
   - component: {fileID: 75289227857450993}
   - component: {fileID: 1812524978315356328}
+  - component: {fileID: 6496199023847899333}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -228,16 +229,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Playermodel: {fileID: 3637600293124795170, guid: 35200bd5f0019b44ca8fa7e8d605a211,
     type: 3}
-  WalkSpeed: 2
-  RunSpeed: 5
+  WalkSpeed: 3
+  RunSpeed: 6
   CrouchSpeed: 2
-  RotationSensitivity: 0.2
+  RotationSensitivity: 0.3
   GroundAccelerationRate: 10
   GroundDecelerationRate: 20
   AirSpeedChangeRate: 5
   CrouchEnterSpeed: 10
-  JumpHeight: 0.5
-  Gravity: -30
+  JumpHeight: 0.8
+  Gravity: -20
   JumpTimeout: 0.1
   FallTimeout: 0.15
   GroundedOffset: 0.195
@@ -338,3 +339,15 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 39904b0115df93e42b6700acb6455308, type: 3}
   WalkingSoundInterval: 0.6
   RunningSoundInterval: 0.3
+--- !u!114 &6496199023847899333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5565047739996945905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c05811c9c75b89d40a810ae0fd0239bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

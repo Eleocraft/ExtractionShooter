@@ -17,6 +17,10 @@ namespace ExoplanetStudios.ExtractionShooter
             _tickDiff = tickDiff;
             GetComponent<Rigidbody>().velocity = direction * Speed;
             GetComponent<FadeController>().StartTimer(Lifetime, Fadetime, () => Destroy(gameObject));
+            PlayerBulletHitboxManager.AddBullet(_tickDiff);
+        }
+        private void OnDestroy() {
+            PlayerBulletHitboxManager.RemoveBullet(_tickDiff);
         }
         private void Update()
         {
@@ -24,7 +28,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         private void OnTriggerEnter(Collider col)
         {
-            if (col.attachedRigidbody?.TryGetComponent(out IDamagable damagable) == true)
+            if (col.transform.TryGetComponent(out IDamagable damagable) == true)
                 damagable.Damage(Damage, _ownerID, _tickDiff);
         }
     }

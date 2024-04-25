@@ -13,6 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private AudioClip HitNotificationAudio;
         private NetworkVariable<float> _life = new NetworkVariable<float>();
         private FirstPersonController _firstPersonController;
+        private PlayerEffectManager _playerEffectManager;
         private float _spawnProtectionTimer; // Serveronly
 
         private void Start()
@@ -21,6 +22,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _life.Value = MaxLife;
 
             _firstPersonController = GetComponent<FirstPersonController>();
+            _playerEffectManager = GetComponent<PlayerEffectManager>();
             _life.OnValueChanged += OnLifeChanged;
             NetworkManager.NetworkTickSystem.Tick += Tick;
         }
@@ -52,6 +54,8 @@ namespace ExoplanetStudios.ExtractionShooter
                 Instantiate(HitParticle, point + transform.position, Quaternion.identity);
 
             Damage(info.GetDamage(damageType, projectileVelocity), bulletOwnerId);
+            if (info.Stun)
+                _playerEffectManager.Stun();
             
             return true;
         }

@@ -29,7 +29,6 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private GameObject InvitePanel;
         
     
-        public static bool UsedMainMenu;
         public static Lobby? MainLobby;
         private Dictionary<ulong, Playercard> _playerCards = new();
         private Dictionary<ulong, string> _players = new();
@@ -38,18 +37,18 @@ namespace ExoplanetStudios.ExtractionShooter
         void Start()
         {
             Application.targetFrameRate = 60;
-            UsedMainMenu = true;
+            NetworkManager.OnClientDisconnectCallback += OnServerLeave;
+
             SteamMatchmaking.OnLobbyInvite += OnGameLobbyJoinRequested;
             SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;
-            NetworkManager.OnClientDisconnectCallback += OnServerLeave;
         }
         public override void OnDestroy()
         {
-            SteamMatchmaking.OnLobbyInvite -= OnGameLobbyJoinRequested;
-            SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
-
             if (NetworkManager != null)
                 NetworkManager.OnClientDisconnectCallback -= OnServerLeave;
+
+            SteamMatchmaking.OnLobbyInvite -= OnGameLobbyJoinRequested;
+            SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
         }
         public async void StartHost()
         {

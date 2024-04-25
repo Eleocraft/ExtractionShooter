@@ -9,6 +9,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public Vector2 LookRotation;
         public Vector3 Velocity;
         public float CrouchAmount;
+        public float SpeedMultiplier;
 
         public NetworkTransformState() {}
         public NetworkTransformState(int tick)
@@ -21,16 +22,18 @@ namespace ExoplanetStudios.ExtractionShooter
             LookRotation = oldState.LookRotation;
             Velocity = oldState.Velocity;
             CrouchAmount = oldState.CrouchAmount;
+            SpeedMultiplier = oldState.SpeedMultiplier;
             
             Tick = tick;
         }
-        public NetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, Vector3 veloctiy, float crouch)
+        public NetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, Vector3 veloctiy, float crouch, float speedMultiplier)
         {
             Tick = tick;
             Position = position;
             LookRotation = lookRotation;
             Velocity = veloctiy;
             CrouchAmount = crouch;
+            SpeedMultiplier = speedMultiplier;
         }
         public override NetworkState GetStateWithTick(int tick) => new NetworkTransformState(this, tick);
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -43,6 +46,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 reader.ReadValueSafe(out LookRotation);
                 reader.ReadValueSafe(out Velocity);
                 reader.ReadValueSafe(out CrouchAmount);
+                reader.ReadValueSafe(out SpeedMultiplier);
             }
             else
             {
@@ -52,6 +56,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(LookRotation);
                 writer.WriteValueSafe(Velocity);
                 writer.WriteValueSafe(CrouchAmount);
+                writer.WriteValueSafe(SpeedMultiplier);
             }
         }
         public static bool operator==(NetworkTransformState s1, NetworkTransformState s2)
@@ -74,7 +79,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 return false;
 
             if (Position == otherState.Position && LookRotation == otherState.LookRotation &&
-                Velocity == otherState.Velocity && CrouchAmount == otherState.CrouchAmount)
+                Velocity == otherState.Velocity && CrouchAmount == otherState.CrouchAmount && SpeedMultiplier == otherState.SpeedMultiplier)
                 return true;
 
             return false;

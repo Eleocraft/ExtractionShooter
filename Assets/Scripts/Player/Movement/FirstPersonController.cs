@@ -74,6 +74,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
 		private InputMaster _controls; // Owneronly
 		private CharacterController _controller;
+		private PlayerEffectManager _effectManager;
 
 		// Buffer
 		private NetworkTransformStateList _bufferedTransformStates;
@@ -92,7 +93,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		// Constants
 		private const int BUFFER_SIZE = 200;
 		private const int INPUT_TICKS_SEND = 30;
-		private const float MOVEMENT_ERROR_THRESHOLD = 0.03f;
+		private const float MOVEMENT_ERROR_THRESHOLD = 0.02f;
 		private const float ROTATION_ERROR_THRESHOLD = 0.02f;
 
 		private void Awake()
@@ -105,6 +106,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// the square root of H * -2 * G = how much velocity needed to reach desired height
 			_jumpVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 			_controller = GetComponent<CharacterController>();
+			_effectManager = GetComponent<PlayerEffectManager>();
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
@@ -115,7 +117,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// reset Network Variables
 			if (IsServer)
 			{
-				SetServerTransformStates(new NetworkTransformState(NetworkManager.LocalTime.Tick, transform.position, Vector2.zero, Vector3.zero, 0));
+				SetServerTransformStates(new NetworkTransformState(NetworkManager.LocalTime.Tick, transform.position, Vector2.zero, Vector3.zero, 0, 1));
 				_lastSaveInput = new NetworkInputState(NetworkManager.LocalTime.Tick);
 				_lastSaveTransform = new NetworkTransformState(NetworkManager.LocalTime.Tick);
 			}
@@ -282,12 +284,12 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			return new NetworkInputState(NetworkManager.LocalTime.Tick,
 				Walk ? Vector2.up : _controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
-				_controls.Player.SlowWalk.IsPressed(), _jump, _controls.Player.Crouch.IsPressed());
+				_controls.Player.Run.IsPressed(), _jump, _controls.Player.Crouch.IsPressed());
 		}
 		private NetworkTransformState CreateTransformState()
 		{
 			return new NetworkTransformState(NetworkManager.LocalTime.Tick,
-				transform.position, Vector3.forward, Vector3.zero, 0);
+				transform.position, Vector3.forward, Vector3.zero, 0, 1);
 		}
 		private void ExecuteInput(NetworkInputState inputState)
 		{
@@ -313,7 +315,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			_controller.Move(movement);
 			
 			// Set new transform state
-			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity, crouchAmount);
+			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity, crouchAmount, _effectManager.Slowdown);
 
 			// End interpolation state
 			PlayerModel.SetEndInterpolationState(_currentTransformState);
@@ -369,7 +371,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			// target speed is 0 if no key is pressed
 			if (inputState.MovementInput == Vector2.zero) targetSpeed = 0.0f;
 
-			Vector2 targetHorizontalVelocity = inputState.MovementInput.normalized.Rotate(lookRotation.y) * targetSpeed;
+			Vector2 targetHorizontalVelocity = inputState.MovementInput.normalized.Rotate(lookRotation.y) * targetSpeed * _currentTransformState.SpeedMultiplier;
 			Vector2 horizontalVelocity = _currentTransformState.Velocity.XZ();
 
 			// accelerate or decelerate to target speed

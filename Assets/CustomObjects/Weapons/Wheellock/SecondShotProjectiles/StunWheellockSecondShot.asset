@@ -20,8 +20,8 @@ MonoBehaviour:
     - name: Headshot
       key: 1
       value: 150
-  SlowTime: 0.5
-  SlowMultiplier: 0
+  DamageDropoffVelocityPercent: 0.8
+  Stun: 1
   MaxVelocity: 150
   Drag: 0.8
   Dropoff: 11.83

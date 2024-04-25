@@ -12,6 +12,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
             float spray = weaponInputState.SecondaryAction ? SprayADS : Spray;
             Vector3 direction = rifle.GetShootDirection(playerState, spray, rifle.MovementError);
+
             Projectile.SpawnProjectile(Info, rifle.ShotSource.position, rifle.GetCameraPosition(playerState), direction, rifle.OwnerId, weaponInputState.TickDiff);
             if (isOwner)
                 SFXSource.Source.PlayOneShot(Audio);

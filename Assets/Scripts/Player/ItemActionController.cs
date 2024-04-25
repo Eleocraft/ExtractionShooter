@@ -36,17 +36,6 @@ namespace ExoplanetStudios.ExtractionShooter
 
             _firstPersonController.TransformStateChanged -= TransformStateChanged;
         }
-        private void TransformStateChanged(NetworkTransformState transformState)
-        {
-            if (IsOwner)
-            {
-                NetworkWeaponInputState newWeaponInputState = GetNetworkInputState();
-                _bufferedWeaponInputStates.Add(newWeaponInputState);
-
-                OnInputServerRpc(_bufferedWeaponInputStates.GetListForTicks(INPUT_TICKS_SEND));
-            }
-            ExecuteInputs();
-        }
         [ServerRpc]
         private void OnInputServerRpc(NetworkWeaponInputStateList states)
         {
@@ -68,6 +57,17 @@ namespace ExoplanetStudios.ExtractionShooter
             return new NetworkWeaponInputState(_controls.Mouse.PrimaryAction.IsPressed(),
                 _controls.Mouse.SecondaryAction.IsPressed(), _controls.Player.Reload.IsPressed(),
                 NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
+        }
+        private void TransformStateChanged(NetworkTransformState transformState)
+        {
+            if (IsOwner)
+            {
+                NetworkWeaponInputState newWeaponInputState = GetNetworkInputState();
+                _bufferedWeaponInputStates.Add(newWeaponInputState);
+
+                OnInputServerRpc(_bufferedWeaponInputStates.GetListForTicks(INPUT_TICKS_SEND));
+            }
+            ExecuteInputs();
         }
         private void ExecuteInputs()
         {
