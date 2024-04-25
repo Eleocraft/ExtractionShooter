@@ -1,7 +1,6 @@
 using Unity.Netcode;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -13,6 +12,9 @@ namespace ExoplanetStudios.ExtractionShooter
         private static Dictionary<ulong, ScoreboardItem> _scoreboardItems = new();
         private void Start()
         {
+            if (_names == null)
+                _names = new();
+                
             foreach(KeyValuePair<ulong, string> player in _names)
             {
                 ScoreboardItem item = Instantiate(Prefab, ScoreboardParent);

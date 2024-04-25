@@ -1,7 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
@@ -14,17 +13,10 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private GameObject HostPanel;
         [SerializeField] private GameObject ClientPanel;
         
-    
-        private Dictionary<ulong, string> _players = new();
+
         void Start()
         {
             Application.targetFrameRate = 60;
-            NetworkManager.OnClientDisconnectCallback += OnServerLeave;
-        }
-        public override void OnDestroy()
-        {
-            if (NetworkManager != null)
-                NetworkManager.OnClientDisconnectCallback -= OnServerLeave;
         }
         public void StartHost()
         {
@@ -44,13 +36,6 @@ namespace ExoplanetStudios.ExtractionShooter
             HostPanel.SetActive(false);
             ClientPanel.SetActive(false);
             NetworkManager.Shutdown();
-        }
-        private void OnServerLeave(ulong id)
-        {
-            if (_players.ContainsKey(id))
-                _players.Remove(id);
-
-            Scoreboard.SetNames(_players);
         }
         public void StartGame()
         {
