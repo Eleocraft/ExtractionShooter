@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 
@@ -34,7 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public float GetDamage(DamageType damageType, float projectileVelocity)
         {
             Damages.Update();
-            return Damages[damageType] * MathF.Max(projectileVelocity / (MaxVelocity * DamageDropoffVelocityPercent), 1);
+            return Damages[damageType] * Mathf.Max(projectileVelocity / (MaxVelocity * DamageDropoffVelocityPercent), 1);
         }
     }
 }

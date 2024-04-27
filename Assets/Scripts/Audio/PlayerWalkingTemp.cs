@@ -17,16 +17,16 @@ namespace ExoplanetStudios.ExtractionShooter
             GetComponent<FirstPersonController>().TransformStateChanged += TransformStateChanged;
         }
         void TransformStateChanged(NetworkTransformState state){
-            if (state.Velocity.magnitude > 1 && !moving) {
+            if (state.Velocity.XZ().magnitude > 1 && Mathf.Abs(state.Velocity.y) < 0.01 && !moving) {
                 moving = true;
                 coroutine = StartCoroutine("PlayWalkingSound");
             }
-            else if (state.Velocity.magnitude <= 1 && moving) {
+            else if ((state.Velocity.XZ().magnitude <= 1 || Mathf.Abs(state.Velocity.y) > 0.01) && moving) {
                 moving = false;
                 StopCoroutine(coroutine);
             }
 
-            if (state.Velocity.magnitude > 3)
+            if (state.Velocity.XZ().magnitude > 3)
                 running = true;
             else
                 running = false;

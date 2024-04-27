@@ -17,12 +17,12 @@ namespace ExoplanetStudios.ExtractionShooter
         private Dictionary<IProjectileTarget, float> hitObjects = new();
 
         private int _tickDiff;
-        private void Initialize(ProjectileInfo info, Vector3 graphicsSource, Vector3 velocity, ulong ownerId, int tickDiff)
+        private void Initialize(ProjectileInfo info, Vector3 graphicsSource, Vector3 direction, ulong ownerId, int tickDiff)
         {
             // Graphics
             _displayObject = Instantiate(info.Prefab, transform.position, Quaternion.identity);
             // Physics
-            _velocity = velocity;
+            _velocity = direction * info.MaxVelocity;
 
             _spawnPosition = transform.position;
 
@@ -38,10 +38,10 @@ namespace ExoplanetStudios.ExtractionShooter
             NetworkManager.Singleton.NetworkTickSystem.Tick += Tick;
             PlayerBulletHitboxManager.AddBullet(_tickDiff);
         }
-        public static void SpawnProjectile(ProjectileInfo info, Vector3 graphicsSource, Vector3 position, Vector3 velocity, ulong ownerId, int tickDiff, bool useProjectileVelocity = true)
+        public static void SpawnProjectile(ProjectileInfo info, Vector3 graphicsSource, Vector3 position, Vector3 direction, ulong ownerId, int tickDiff)
         {
             GameObject projectileObj = Instantiate(PrefabHolder.Prefabs[PrefabTypes.Projectile], position, Quaternion.identity);
-            projectileObj.GetComponent<Projectile>().Initialize(info, graphicsSource, useProjectileVelocity ? velocity.normalized * info.MaxVelocity : velocity, ownerId, tickDiff);
+            projectileObj.GetComponent<Projectile>().Initialize(info, graphicsSource, direction, ownerId, tickDiff);
         }
         private void Tick()
         {

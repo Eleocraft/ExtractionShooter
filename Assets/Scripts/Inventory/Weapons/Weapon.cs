@@ -83,7 +83,7 @@ namespace ExoplanetStudios.ExtractionShooter
             
             _reloadTimer = ReloadTime;
             if (_isOwner)
-                SFXSource.Source.PlayOneShot(ReloadSound);
+                SFXSource.PlaySoundEffect(ReloadSound);
             else
                 audioSource.PlayOneShot(ReloadSound);
         }
@@ -97,7 +97,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 shootDirection = GetLookDirection(playerState);
             shootDirection = Quaternion.AngleAxis(-_recoil, Quaternion.Euler(0, 90, 0) * shootDirection.WithHeight(0).normalized) * shootDirection;
             Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
-
+            
             return Quaternion.AngleAxis((spray + maxMovementError * playerState.Velocity.magnitude) * (float)_rng.NextDouble(), rotationVector) * shootDirection;
         }
     }

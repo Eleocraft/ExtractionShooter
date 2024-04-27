@@ -17,6 +17,9 @@ namespace ExoplanetStudios.ExtractionShooter
         public void Stun() {
             stunTimer = maxStun;
         }
+        public void Reset() {
+            stunTimer = 0;
+        }
         private void OnTransformStateChanged(NetworkTransformState state) {
             if (state.SpeedMultiplier < 1)
                 stunTimer -= NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime;

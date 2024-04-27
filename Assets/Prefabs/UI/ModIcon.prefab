@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1619380126623666924}
   - component: {fileID: 3726704919982111583}
   - component: {fileID: 581376636745333832}
+  - component: {fileID: 5589968360372088424}
   m_Layer: 5
   m_Name: ModIcon
   m_TagString: Untagged
@@ -121,6 +122,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5589968360372088424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8393080450575615552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4c127e62abf11d4bb150442f4c50095, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8910535519949074151
 GameObject:
   m_ObjectHideFlags: 0

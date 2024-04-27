@@ -16,7 +16,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 Projectile.SpawnProjectile(Info, wheellock.SecondShotSource.position, wheellock.GetCameraPosition(playerState), direction, wheellock.OwnerId, weaponInputState.TickDiff);
             }
             if (isOwner)
-                SFXSource.Source.PlayOneShot(Audio);
+                SFXSource.PlaySoundEffect(Audio);
             else
                 wheellock.audioSource.PlayOneShot(Audio);
         }

@@ -24,7 +24,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 direction = rifle.GetShootDirection(playerState, spray, rifle.MovementError);
             Projectile.SpawnProjectile(Info, rifle.ShotSource.position, rifle.GetCameraPosition(playerState), direction, rifle.OwnerId, weaponInputState.TickDiff);
             if (isOwner)
-                SFXSource.Source.PlayOneShot(Audio);
+                SFXSource.PlaySoundEffect(Audio);
             else
                 rifle.audioSource.PlayOneShot(Audio);
 

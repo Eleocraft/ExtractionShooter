@@ -12,7 +12,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Vector3 direction = wheellock.GetShootDirection(playerState, spray, wheellock.MovementError);
             Projectile.SpawnProjectile(Info, wheellock.SecondShotSource.position, wheellock.GetCameraPosition(playerState), direction, wheellock.OwnerId, weaponInputState.TickDiff);
             if (isOwner)
-                SFXSource.Source.PlayOneShot(Audio);
+                SFXSource.PlaySoundEffect(Audio);
             else
                 wheellock.audioSource.PlayOneShot(Audio);
         }

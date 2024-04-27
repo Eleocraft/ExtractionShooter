@@ -10,7 +10,6 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private GameObject BreakParticles;
         [SerializeField] private GameObject HitParticle;
         [SerializeField] private GameObject HeadshotParticle;
-        [SerializeField] private AudioClip HitNotificationAudio;
         private NetworkVariable<float> _life = new NetworkVariable<float>();
         private FirstPersonController _firstPersonController;
         private PlayerEffectManager _playerEffectManager;
@@ -44,8 +43,15 @@ namespace ExoplanetStudios.ExtractionShooter
             if (OwnerClientId == bulletOwnerId)
                 return false;
 
-            if (bulletOwnerId == NetworkManager.LocalClientId)
-                SFXSource.Source.PlayOneShot(HitNotificationAudio);
+            if (bulletOwnerId == NetworkManager.LocalClientId) {
+                if (damageType == DamageType.Headshot)
+                    SFXSource.PlaySoundEffect(DefaultSoundEffect.PlayerHeadshot);
+                else
+                    SFXSource.PlaySoundEffect(DefaultSoundEffect.PlayerHit);
+            }
+
+            if (info.Stun)
+                _playerEffectManager.Stun();
 
             // Particle Effects
             if (damageType == DamageType.Headshot)
@@ -54,8 +60,6 @@ namespace ExoplanetStudios.ExtractionShooter
                 Instantiate(HitParticle, point + transform.position, Quaternion.identity);
 
             Damage(info.GetDamage(damageType, projectileVelocity), bulletOwnerId);
-            if (info.Stun)
-                _playerEffectManager.Stun();
             
             return true;
         }
@@ -66,6 +70,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 _life.Value -= damage;
                 if (_life.Value <= 0)
                 {
+                    _playerEffectManager.Reset();
                     _spawnProtectionTimer = SpawnProtectionTime;
                     Scoreboard.AddKill(ownerId, OwnerClientId);
                     NetworkManager.ConnectedClients[ownerId].PlayerObject.GetComponent<PlayerLife>()._life.Value = MaxLife; // Heal shooting player

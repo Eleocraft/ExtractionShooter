@@ -212,6 +212,13 @@ namespace ExoplanetStudios.ExtractionShooter
 					_bufferedTransformStates.Add(_currentTransformState);
 				}
 			}
+			else {
+				Vector3 movement = _currentTransformState.Velocity * NetworkManager.LocalTime.FixedDeltaTime;
+				_controller.Move(movement);
+
+                NetworkTransformState transformState = new(_currentTransformState, NetworkManager.LocalTime.Tick) { Position = transform.position };
+                PlayerModel.SetInterpolationStates(_currentTransformState.LookRotation, transformState);
+			}
 			
 			TransformStateChanged?.Invoke(_currentTransformState);
 		}

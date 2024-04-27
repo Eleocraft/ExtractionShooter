@@ -38,6 +38,10 @@ namespace ExoplanetStudios
             foreach (PanelObject panel in values)
                 dict.Add(panel.key, panel.value);
         }
+        public Dictionary<KeyEnum, Value> GetDictionary() {
+            Update();
+            return dict;
+        }
         public Value this[KeyEnum index]
         {
             get => dict[index];
