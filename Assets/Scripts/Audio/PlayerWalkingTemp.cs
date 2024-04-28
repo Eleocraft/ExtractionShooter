@@ -13,6 +13,7 @@ namespace ExoplanetStudios.ExtractionShooter
         private Coroutine coroutine;
         private bool moving;
         private bool running;
+        private int lastSound = 0;
         void Start() {
             GetComponent<FirstPersonController>().TransformStateChanged += TransformStateChanged;
         }
@@ -26,16 +27,20 @@ namespace ExoplanetStudios.ExtractionShooter
                 StopCoroutine(coroutine);
             }
 
-            if (state.Velocity.XZ().magnitude > 3)
+            if (state.Velocity.XZ().magnitude > 5)
                 running = true;
             else
                 running = false;
         }
         IEnumerator PlayWalkingSound() {
             while (true) {
+                lastSound = running ?
+                    Utility.RandomExcept(0, RunningSounds.Length, lastSound) :
+                    Utility.RandomExcept(0, RunningSounds.Length, lastSound);
+
                 LocalSource.PlayOneShot(running ?
-                    RunningSounds[Random.Range(0, RunningSounds.Length)] :
-                    WalkingSounds[Random.Range(0, WalkingSounds.Length)]);
+                    RunningSounds[lastSound] :
+                    WalkingSounds[lastSound]);
 
                 yield return new WaitForSeconds(running ? RunningSoundInterval : WalkingSoundInterval);
             }

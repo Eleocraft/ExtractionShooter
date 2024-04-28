@@ -285,8 +285,6 @@ MonoBehaviour:
     type: 3}
   HeadshotParticle: {fileID: 3313443488370423343, guid: fc58c1c40dae764479f85d6860fb8477,
     type: 3}
-  HitNotificationAudio: {fileID: 8300000, guid: 6634460b67c33fb48a5288d8175ec90e,
-    type: 3}
 --- !u!114 &-3934378158165779511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -351,3 +349,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05811c9c75b89d40a810ae0fd0239bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxStun: 2

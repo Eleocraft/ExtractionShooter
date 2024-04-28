@@ -36,6 +36,16 @@ namespace ExoplanetStudios
             }
             return 0;
         }
+        public static int RandomExcept(int min, int max, int except) {
+            if (max - min <= 2)
+                return min;
+            while (true)
+            {
+                int rnd = UnityEngine.Random.Range(min, max);
+                if (rnd != except)
+                    return rnd;
+            }
+        }
         // Lerp
         public static float LerpBetween4Values(Vector2 vec, float TL, float TR, float BL, float BR)
         {
