@@ -10,7 +10,6 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private AudioClip ReloadSound;
         public AudioSource audioSource;
         
-        private System.Random _rng;
         public abstract int MagSize { get; }
         public abstract float ReloadTime { get; }
         protected int BulletsLoaded {
@@ -30,9 +29,6 @@ namespace ExoplanetStudios.ExtractionShooter
             base.Initialize(ownerId, isOwner, controller);
 
             BulletsLoaded = MagSize;
-            
-            if (_rng == null)
-                _rng = new System.Random(Seed);
         }
         public override void Activate() {
             base.Activate();
@@ -93,12 +89,12 @@ namespace ExoplanetStudios.ExtractionShooter
 
         public Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)
         {
-            Vector3 randomVector = Quaternion.Euler((float)_rng.NextDouble()*360f-180f, 0, (float)_rng.NextDouble()*360f-180f) * Vector3.up;
+            Vector3 randomVector = Quaternion.Euler(NetworkRNG.Value*360f-180f, 0, NetworkRNG.Value*360f-180f) * Vector3.up;
             Vector3 shootDirection = GetLookDirection(playerState);
             shootDirection = Quaternion.AngleAxis(-_recoil, Quaternion.Euler(0, 90, 0) * shootDirection.WithHeight(0).normalized) * shootDirection;
             Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
             
-            return Quaternion.AngleAxis((spray + maxMovementError * playerState.Velocity.magnitude) * (float)_rng.NextDouble(), rotationVector) * shootDirection;
+            return Quaternion.AngleAxis((spray + maxMovementError * playerState.Velocity.magnitude) * NetworkRNG.Value, rotationVector) * shootDirection;
         }
     }
 }
