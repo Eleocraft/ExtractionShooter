@@ -86,15 +86,18 @@ namespace ExoplanetStudios.ExtractionShooter
         private void FinishReload() {
             BulletsLoaded = MagSize;
         }
+        int RANDOM_VEC_X_SEED = 1023840;
+        int RANDOM_VEC_Y_SEED = 238972;
+        int RANDOM_SPRAY_AMOUNT_SEED = 271254;
 
         public Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)
         {
-            Vector3 randomVector = Quaternion.Euler(NetworkRNG.Value*360f-180f, 0, NetworkRNG.Value*360f-180f) * Vector3.up;
+            Vector3 randomVector = Quaternion.Euler(NetworkRNG.Value(playerState.Tick, RANDOM_VEC_X_SEED)*360f-180f, 0, NetworkRNG.Value(playerState.Tick, RANDOM_VEC_Y_SEED)*360f-180f) * Vector3.up;
             Vector3 shootDirection = GetLookDirection(playerState);
             shootDirection = Quaternion.AngleAxis(-_recoil, Quaternion.Euler(0, 90, 0) * shootDirection.WithHeight(0).normalized) * shootDirection;
             Vector3 rotationVector = Vector3.Cross(shootDirection, randomVector).normalized;
             
-            return Quaternion.AngleAxis((spray + maxMovementError * playerState.Velocity.magnitude) * NetworkRNG.Value, rotationVector) * shootDirection;
+            return Quaternion.AngleAxis((spray + maxMovementError * playerState.Velocity.magnitude) * NetworkRNG.Value(playerState.Tick, RANDOM_SPRAY_AMOUNT_SEED), rotationVector) * shootDirection;
         }
     }
 }
