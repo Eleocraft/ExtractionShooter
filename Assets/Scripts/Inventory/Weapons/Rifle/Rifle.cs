@@ -33,7 +33,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _shot = false;
         }
 
-        public override void UpdateItem(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState)
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
 
@@ -64,7 +64,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public virtual bool CanADS => true;
         public virtual Vector3 ADSPos => new Vector3(0, -0.05f, 0.3f);
         
-        public abstract bool Shot(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState, bool isOwner);
+        public abstract bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner);
         public virtual void UpdateItem(bool ADS) { }
     }
 }

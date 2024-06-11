@@ -4,7 +4,7 @@ namespace ExoplanetStudios.ExtractionShooter
 {
     public class AccurateModifier : WheellockItemModifier
     {
-        public override void SecondShot(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState, bool isOwner)
+        public override void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner)
         {
             Wheellock wheellock = _itemObject as Wheellock;
             

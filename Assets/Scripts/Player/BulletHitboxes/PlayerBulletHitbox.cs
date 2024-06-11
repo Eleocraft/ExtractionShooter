@@ -44,11 +44,11 @@ namespace ExoplanetStudios.ExtractionShooter
             if (tickDiff == _tickDiff)
                 _playerLife.Damage(damage, ownerId);
         }
-        private void TransformStateChanged(PlayerNetworkTransformState transformState)
+        private void TransformStateChanged(NetworkTransformState transformState)
         {
             if (!_active)
                 return;
-            if (_controller.GetState(NetworkManager.Singleton.LocalTime.Tick - _tickDiff, out PlayerNetworkTransformState state))
+            if (_controller.GetState(NetworkManager.Singleton.LocalTime.Tick - _tickDiff, out NetworkTransformState state))
             {
                 transform.position = state.Position;
                 transform.rotation = Quaternion.Euler(0, state.LookRotation.y, 0);

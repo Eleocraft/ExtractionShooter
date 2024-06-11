@@ -50,7 +50,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _relativeSpray = 0;
             _cooldown = 0;
         }
-        public override void UpdateItem(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState)
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
 

@@ -3,19 +3,19 @@ using Unity.Netcode;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class PlayerNetworkInputState : NetworkState, INetworkSerializable
+    public class NetworkInputState : NetworkState, INetworkSerializable
     {
         public Vector2 MovementInput;
         public Vector2 LookDelta;
         public bool Run;
         public bool Crouch;
         public bool Jump;
-        public PlayerNetworkInputState() {}
-        public PlayerNetworkInputState(int tick)
+        public NetworkInputState() {}
+        public NetworkInputState(int tick)
         {
             Tick = tick;
         }
-        public PlayerNetworkInputState(PlayerNetworkInputState oldState, int tick)
+        public NetworkInputState(NetworkInputState oldState, int tick)
         {
             MovementInput = oldState.MovementInput;
             LookDelta = oldState.LookDelta;
@@ -25,7 +25,7 @@ namespace ExoplanetStudios.ExtractionShooter
             
             Tick = tick;
         }
-        public PlayerNetworkInputState(int tick, Vector2 movementInput, Vector2 lookRotation, bool sprint, bool jump, bool crouch)
+        public NetworkInputState(int tick, Vector2 movementInput, Vector2 lookRotation, bool sprint, bool jump, bool crouch)
         {
             Tick = tick;
             MovementInput = movementInput;
@@ -34,7 +34,7 @@ namespace ExoplanetStudios.ExtractionShooter
             Jump = jump;
             Crouch = crouch;
         }
-        public override NetworkState GetStateWithTick(int tick) => new PlayerNetworkInputState(this, tick);
+        public override NetworkState GetStateWithTick(int tick) => new NetworkInputState(this, tick);
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)
@@ -60,7 +60,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override bool Equals(object obj)
         {
-            PlayerNetworkInputState otherState = (PlayerNetworkInputState)obj;
+            NetworkInputState otherState = (NetworkInputState)obj;
             
             if (otherState is null)
                 return false;
@@ -75,10 +75,23 @@ namespace ExoplanetStudios.ExtractionShooter
             return (int)MovementInput.x + (int)MovementInput.y + (int)LookDelta.x + (int)LookDelta.y;
         }
     }
-    public class PlayerNetworkInputList : NetworkStateList<PlayerNetworkInputState>, INetworkSerializable
+    public class NetworkInputStateList : NetworkStateList<NetworkInputState>, INetworkSerializable
     {
-        public PlayerNetworkInputList() : base() { }
-        public PlayerNetworkInputList(int ticksSaved) : base(ticksSaved) {}
+        public NetworkInputStateList() { }
+        public NetworkInputStateList(int ticksSaved)
+        {
+            _ticksSaved = ticksSaved;
+        }
+        public NetworkInputStateList GetListForTicks(int ticks)
+        {
+            NetworkInputStateList newList = new(ticks);
+            newList.Insert(this, _lastReceivedTick - ticks);
+
+            if (newList.States.Count <= 0 && States.Count > 0) // make sure there is always at least one tick
+                newList.Add((NetworkInputState)States[0].GetStateWithTick(newList._lastReceivedTick - ticks));
+
+            return newList;
+        }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)
@@ -88,7 +101,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 States = new();
                 for (int i = 0; i < count; i++)
                 {
-                    reader.ReadValueSafe(out PlayerNetworkInputState state);
+                    reader.ReadValueSafe(out NetworkInputState state);
                     States.Add(state);
                 }
                 reader.ReadValueSafe(out _ticksSaved);

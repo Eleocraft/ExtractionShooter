@@ -45,7 +45,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _firstPersonController.PlayerModel.SetRecoil(0);
             transform.localRotation = Quaternion.identity; // Temp
         }
-        public override void UpdateItem(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState)
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
         {
             if (_recoil > 0)
             {
@@ -90,7 +90,7 @@ namespace ExoplanetStudios.ExtractionShooter
         int RANDOM_VEC_Y_SEED = 238972;
         int RANDOM_SPRAY_AMOUNT_SEED = 271254;
 
-        public Vector3 GetShootDirection(PlayerNetworkTransformState playerState, float spray, float maxMovementError)
+        public Vector3 GetShootDirection(NetworkTransformState playerState, float spray, float maxMovementError)
         {
             Vector3 randomVector = Quaternion.Euler(NetworkRNG.Value(playerState.Tick, RANDOM_VEC_X_SEED)*360f-180f, 0, NetworkRNG.Value(playerState.Tick, RANDOM_VEC_Y_SEED)*360f-180f) * Vector3.up;
             Vector3 shootDirection = GetLookDirection(playerState);

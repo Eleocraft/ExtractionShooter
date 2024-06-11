@@ -52,20 +52,20 @@ namespace ExoplanetStudios.ExtractionShooter
             
             _bufferedWeaponInputStates.Insert(states, _lastExecutedStateTick);
         }
-        private NetworkWeaponInputState GetPlayerNetworkInputState()
+        private NetworkWeaponInputState GetNetworkInputState()
         {
             return new NetworkWeaponInputState(_controls.Mouse.PrimaryAction.IsPressed(),
                 _controls.Mouse.SecondaryAction.IsPressed(), _controls.Player.Reload.IsPressed(),
                 NetworkManager.ServerTime.Tick, NetworkManager.LocalTime.Tick);
         }
-        private void TransformStateChanged(PlayerNetworkTransformState transformState)
+        private void TransformStateChanged(NetworkTransformState transformState)
         {
             if (IsOwner)
             {
-                NetworkWeaponInputState newWeaponInputState = GetPlayerNetworkInputState();
+                NetworkWeaponInputState newWeaponInputState = GetNetworkInputState();
                 _bufferedWeaponInputStates.Add(newWeaponInputState);
 
-                OnInputServerRpc((NetworkWeaponInputStateList)_bufferedWeaponInputStates.GetListForTicks(INPUT_TICKS_SEND));
+                OnInputServerRpc(_bufferedWeaponInputStates.GetListForTicks(INPUT_TICKS_SEND));
             }
             ExecuteInputs();
         }
@@ -74,7 +74,7 @@ namespace ExoplanetStudios.ExtractionShooter
             int maxTickToExecute = Mathf.Min(NetworkManager.LocalTime.Tick, _bufferedWeaponInputStates.LastTick);
             for (int tick = _lastExecutedStateTick + 1; tick <= maxTickToExecute; tick++)
             {
-                if (_firstPersonController.GetState(tick, out PlayerNetworkTransformState playerStateAtTick))
+                if (_firstPersonController.GetState(tick, out NetworkTransformState playerStateAtTick))
                 {
                     _bufferedWeaponInputStates[tick]?.SetTickDiff();
                     _playerInventory.ActiveItemObject?.UpdateItem(_bufferedWeaponInputStates[tick], playerStateAtTick);

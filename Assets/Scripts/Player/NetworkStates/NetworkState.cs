@@ -24,17 +24,12 @@ namespace ExoplanetStudios.ExtractionShooter
         public override abstract bool Equals(object obj);
         public override abstract int GetHashCode();
     }
-    public class NetworkStateList<T> where T : NetworkState
+    public abstract class NetworkStateList<T> where T : NetworkState
     {
         protected int _ticksSaved;
         protected int _lastReceivedTick;
         public int LastTick => _lastReceivedTick;
         public List<T> States = new();
-
-        public NetworkStateList() { }
-        public NetworkStateList(int ticksSaved) {
-            _ticksSaved = ticksSaved;
-        }
 
         public T this[int tick]
         {
@@ -50,16 +45,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 return null;
             }
         }
-        public NetworkStateList<T> GetListForTicks(int ticks)
-        {
-            NetworkStateList<T> newList = new(ticks);
-            newList.Insert(this, _lastReceivedTick - ticks);
-
-            if (newList.States.Count <= 0 && States.Count > 0) // make sure there is always at least one tick
-                newList.Add((T)States[0].GetStateWithTick(newList._lastReceivedTick - ticks));
-
-            return newList;
-        }
+        
         public void Add(T newState)
         {
             if (_lastReceivedTick - _ticksSaved > newState.Tick) // new state is too old

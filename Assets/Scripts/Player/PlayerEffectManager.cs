@@ -20,7 +20,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public void Reset() {
             stunTimer = 0;
         }
-        private void OnTransformStateChanged(PlayerNetworkTransformState state) {
+        private void OnTransformStateChanged(NetworkTransformState state) {
             if (state.SpeedMultiplier < 1)
                 stunTimer -= NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime;
         }

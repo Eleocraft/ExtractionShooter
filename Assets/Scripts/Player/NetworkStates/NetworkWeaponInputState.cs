@@ -71,8 +71,21 @@ namespace ExoplanetStudios.ExtractionShooter
     }
     public class NetworkWeaponInputStateList : NetworkStateList<NetworkWeaponInputState>, INetworkSerializable
     {
-        public NetworkWeaponInputStateList() : base() { }
-        public NetworkWeaponInputStateList(int ticksSaved) : base(ticksSaved) { }
+        public NetworkWeaponInputStateList() { }
+        public NetworkWeaponInputStateList(int ticksSaved)
+        {
+            _ticksSaved = ticksSaved;
+        }
+        public NetworkWeaponInputStateList GetListForTicks(int ticks)
+        {
+            NetworkWeaponInputStateList newList = new(ticks);
+            newList.Insert(this, _lastReceivedTick - ticks);
+
+            if (newList.States.Count <= 0 && States.Count > 0) // make sure there is always at least one tick
+                newList.Add((NetworkWeaponInputState)States[0].GetStateWithTick(newList._lastReceivedTick - ticks));
+
+            return newList;
+        }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)

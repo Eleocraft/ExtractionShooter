@@ -17,7 +17,7 @@ namespace ExoplanetStudios.ExtractionShooter
         void Start() {
             GetComponent<FirstPersonController>().TransformStateChanged += TransformStateChanged;
         }
-        void TransformStateChanged(PlayerNetworkTransformState state){
+        void TransformStateChanged(NetworkTransformState state){
             if (state.Velocity.XZ().magnitude > 1 && Mathf.Abs(state.Velocity.y) < 0.01 && !moving) {
                 moving = true;
                 coroutine = StartCoroutine("PlayWalkingSound");
