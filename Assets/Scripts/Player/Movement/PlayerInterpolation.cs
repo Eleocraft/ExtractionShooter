@@ -32,16 +32,16 @@ namespace ExoplanetStudios.ExtractionShooter
         {
             DontDestroyOnLoad(gameObject);
         }
-        public void SetInterpolationStates(Vector2 lookRotation, NetworkTransformState newState)
+        public void SetInterpolationStates(PlayerNetworkTransformState newState)
         {
-            SetStartInterpolationState(lookRotation);
+            SetStartInterpolationState(_lerpEndInterpolationState.LookRotation);
             SetEndInterpolationState(newState);
         }
         public void SetStartInterpolationState(Vector2 lookRotation)
         {
             _lerpStartInterpolationState = new (transform.position, lookRotation);
         }
-        public void SetEndInterpolationState(NetworkTransformState currentTransformState)
+        public void SetEndInterpolationState(PlayerNetworkTransformState currentTransformState)
         {
             _lerpEndInterpolationState = new (currentTransformState);
             _currentTickDeltaTime = 0;
@@ -88,7 +88,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 Position = position;
                 LookRotation = lookRotation;
             }
-            public InterpolationState(NetworkTransformState state)
+            public InterpolationState(PlayerNetworkTransformState state)
             {
                 Position = state.Position;
                 LookRotation = state.LookRotation;

@@ -10,7 +10,7 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] private float ThrowVelocity;
         private float _cooldown;
         private bool _threw;
-        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState)
         {
             if (_threw && !weaponInputState.PrimaryAction)
                 _threw = false;

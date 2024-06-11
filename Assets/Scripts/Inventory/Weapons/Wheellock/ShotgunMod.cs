@@ -5,7 +5,7 @@ namespace ExoplanetStudios.ExtractionShooter
     public class ShotgunModifier : WheellockItemModifier
     {
         [SerializeField] private int ShotgunProjectileAmount;
-        public override void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner)
+        public override void SecondShot(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState, bool isOwner)
         {
             Wheellock wheellock = _itemObject as Wheellock;
 

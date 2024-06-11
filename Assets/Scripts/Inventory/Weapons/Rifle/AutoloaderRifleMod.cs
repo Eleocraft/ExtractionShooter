@@ -14,7 +14,7 @@ namespace ExoplanetStudios.ExtractionShooter
 
         private float _cooldown;
         private float _relativeSpray;
-        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner)
+        public override bool Shot(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState, bool isOwner)
         {
             if (_cooldown > 0) return false;
 

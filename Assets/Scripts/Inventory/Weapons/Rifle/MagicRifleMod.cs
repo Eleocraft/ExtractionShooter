@@ -8,7 +8,7 @@ namespace ExoplanetStudios.ExtractionShooter
         public override bool CanADS => false;
         [SerializeField] private MagicProjectile Projectile;
 
-        public override bool Shot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner)
+        public override bool Shot(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState, bool isOwner)
         {
             Rifle rifle = _itemObject as Rifle;
 

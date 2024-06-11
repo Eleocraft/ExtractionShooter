@@ -5,7 +5,7 @@ using System;
 namespace ExoplanetStudios.ExtractionShooter
 {
 	[RequireComponent(typeof(CharacterController))]
-	public class FirstPersonController : NetworkBehaviour
+	public class FirstPersonController : PlayerNetworkController
 	{
 		[Header("Player")]
 		[SerializeField] private PlayerInterpolation Playermodel;
@@ -58,8 +58,6 @@ namespace ExoplanetStudios.ExtractionShooter
 		[Header("Test")]
 		[SerializeField] private bool Walk;
 
-		public Action<NetworkTransformState> TransformStateChanged;
-
 		// player
 		private float _jumpVelocity;
 		private bool _jump; // Owner only
@@ -76,23 +74,10 @@ namespace ExoplanetStudios.ExtractionShooter
 		private CharacterController _controller;
 		private PlayerEffectManager _effectManager;
 
-		// Buffer
-		private NetworkTransformStateList _bufferedTransformStates;
-		private NetworkInputStateList _bufferedInputStates; // Owner and server
-		
-		private NetworkVariable<NetworkTransformState> _serverTransformState = new NetworkVariable<NetworkTransformState>();
-		private NetworkVariable<NetworkTransformState> _safeServerTransformState = new NetworkVariable<NetworkTransformState>();
-		private NetworkTransformState _currentTransformState = new(0); // The current transform state
-
-		private NetworkInputState _lastSaveInput; // Serveronly
-		private NetworkTransformState _lastSaveTransform; // Serveronly
-
 		// Interpolation
 		[HideInInspector] public PlayerInterpolation PlayerModel;
 
 		// Constants
-		private const int BUFFER_SIZE = 200;
-		private const int INPUT_TICKS_SEND = 30;
 		private const float MOVEMENT_ERROR_THRESHOLD = 0.02f;
 		private const float ROTATION_ERROR_THRESHOLD = 0.02f;
 
@@ -103,6 +88,8 @@ namespace ExoplanetStudios.ExtractionShooter
 		}
 		public override void OnNetworkSpawn()
 		{
+			base.OnNetworkSpawn();
+
 			// the square root of H * -2 * G = how much velocity needed to reach desired height
 			_jumpVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 			_controller = GetComponent<CharacterController>();
@@ -112,29 +99,12 @@ namespace ExoplanetStudios.ExtractionShooter
 			_fallTimeoutDelta = FallTimeout;
 			// Subscribe to tick and OnServerStateChanged events
 			NetworkManager.NetworkTickSystem.Tick += Tick;
-			_serverTransformState.OnValueChanged += OnServerStateChanged;
-			_safeServerTransformState.OnValueChanged += OnSafeServerStateChanged;
 			// reset Network Variables
-			if (IsServer)
-			{
-				SetServerTransformStates(new NetworkTransformState(NetworkManager.LocalTime.Tick, transform.position, Vector2.zero, Vector3.zero, 0, 1));
-				_lastSaveInput = new NetworkInputState(NetworkManager.LocalTime.Tick);
-				_lastSaveTransform = new NetworkTransformState(NetworkManager.LocalTime.Tick);
-			}
 			if (IsOwner)
 			{
 				PlayerModel.SetOwner();
 				_controls = GI.Controls;
 				_controls.Player.Jump.started += JumpInput;
-			}
-
-			// Buffers
-			_bufferedTransformStates = new(BUFFER_SIZE);
-			_bufferedTransformStates.Add(new NetworkTransformState(NetworkManager.LocalTime.Tick));
-			if (IsOwner || IsServer)
-			{
-				_bufferedInputStates = new(BUFFER_SIZE);
-				_bufferedInputStates.Add(new NetworkInputState(NetworkManager.LocalTime.Tick));
 			}
 		}
 		public override void OnDestroy()
@@ -143,9 +113,8 @@ namespace ExoplanetStudios.ExtractionShooter
 
 			if (NetworkManager?.NetworkTickSystem != null)
 				NetworkManager.NetworkTickSystem.Tick -= Tick;
+
 			
-			_serverTransformState.OnValueChanged -= OnServerStateChanged;
-			_safeServerTransformState.OnValueChanged -= OnSafeServerStateChanged;
 			Destroy(PlayerModel);
 
 			if (IsOwner)
@@ -162,144 +131,42 @@ namespace ExoplanetStudios.ExtractionShooter
 			SetServerTransformStates(_currentTransformState);
 			_lastSaveTransform = _currentTransformState;
 		}
-		private void SetServerTransformStates(NetworkTransformState transformState)
-		{
-			_serverTransformState.Value = transformState;
-			_safeServerTransformState.Value = transformState;
-		}
 		private void Tick()
 		{
-			if (IsOwner)
-			{
-				NetworkInputState inputState = CreateInputState();
-				ExecuteInput(inputState);
-				_bufferedInputStates.Add(inputState);
-				_bufferedTransformStates.Add(_currentTransformState);
-				
-				if (IsHost)
-					SetServerTransformStates(_currentTransformState);
-				else
-					OnInputServerRpc(_bufferedInputStates.GetListForTicks(INPUT_TICKS_SEND));
-				
-				if (_jump)
-					_jump = false;
-
-				_lookDelta = Vector2.zero;
-			}
-			else if (IsServer)
-			{
-				if (_currentTransformState.Tick < NetworkManager.LocalTime.Tick - 1) // missed a tick
-				{
-					NetworkInputState inputState = (NetworkInputState)_lastSaveInput.GetStateWithTick(NetworkManager.LocalTime.Tick - 1);
-					ExecuteInput(inputState);
-					_bufferedTransformStates.Add(_currentTransformState);
-
-					_serverTransformState.Value = _currentTransformState;
-				}
-
-				// If _bufferedInputStates contains current tick
-				if (_bufferedInputStates.Contains(NetworkManager.LocalTime.Tick))
-				{
-					NetworkInputState input = _bufferedInputStates[NetworkManager.LocalTime.Tick];
-					// execute current tick
-					ExecuteInput(input);
-
-					// update _serverTransformState, _bufferedTransformStates and _lastSaveInput/_lastSaveTransform
-					SetServerTransformStates(_currentTransformState);
-
-					_lastSaveInput = input;
-					_lastSaveTransform = _currentTransformState;
-					_bufferedTransformStates.Add(_currentTransformState);
-				}
-			}
-			else {
+			if (!IsOwner && !IsServer && _currentTransformState.Tick < NetworkManager.LocalTime.Tick - 1) { // Extrapolation if ticks are missed
 				Vector3 movement = _currentTransformState.Velocity * NetworkManager.LocalTime.FixedDeltaTime;
 				_controller.Move(movement);
 
-                NetworkTransformState transformState = new(_currentTransformState, NetworkManager.LocalTime.Tick) { Position = transform.position };
-                PlayerModel.SetInterpolationStates(_currentTransformState.LookRotation, transformState);
+                PlayerNetworkTransformState transformState = new(_currentTransformState, NetworkManager.LocalTime.Tick) { Position = transform.position };
+                PlayerModel.SetInterpolationStates(transformState);
 			}
 			
 			TransformStateChanged?.Invoke(_currentTransformState);
 		}
-		[ServerRpc]
-		private void OnInputServerRpc(NetworkInputStateList inputStates)
-		{
-			if (inputStates.LastTick <= _lastSaveInput.Tick)
-				return; // Received states to old
+		protected override void CorrectState(PlayerNetworkTransformState newTransformState) {
 
-			// add all input states after _lastSaveInput to _bufferedInputStates
-			_bufferedInputStates.Insert(inputStates, _lastSaveInput.Tick);
-
-			// execute all input states between _lastSaveInput.Tick and current tick/last received tick (reconceliation)
-			_currentTransformState = _lastSaveTransform;
-			transform.position = _lastSaveTransform.Position;
-			for (int tick = _lastSaveInput.Tick + 1; tick <= NetworkManager.LocalTime.Tick; tick++)
-			{
-				ExecuteInput(_bufferedInputStates[tick]);
-				// update _bufferedTransformStates
-				_bufferedTransformStates.Add(_currentTransformState);
-			}
-
-			// update _serverTransformState and _lastSaveInput/_lastSaveTransform
-			_serverTransformState.Value = _currentTransformState;
-			// _safeServerTransformState is last non-predicted state
-			_safeServerTransformState.Value = _bufferedTransformStates[Mathf.Min(NetworkManager.LocalTime.Tick, _bufferedInputStates.LastTick)];
-
-			_lastSaveInput = _bufferedInputStates[Mathf.Max(inputStates.LastTick, _lastSaveInput.Tick)];
-			_lastSaveTransform = _bufferedTransformStates[Mathf.Max(inputStates.LastTick, _lastSaveInput.Tick)];
+			transform.position = newTransformState.Position;
+			transform.rotation = Quaternion.Euler(0, newTransformState.LookRotation.y, 0);
+			PlayerModel.SetInterpolationStates(newTransformState);
 		}
-		// Clients
-		private void OnSafeServerStateChanged(NetworkTransformState previouseState, NetworkTransformState receivedState)
-		{
-			if (IsOwner && !IsServer)
-			{
-				NetworkTransformState transformState = _bufferedTransformStates[receivedState.Tick];
-				if (transformState != null)
-				{
-					if ((transformState.Position - receivedState.Position).sqrMagnitude <= MOVEMENT_ERROR_THRESHOLD
-						&& (transformState.LookRotation - receivedState.LookRotation).sqrMagnitude <= ROTATION_ERROR_THRESHOLD)
-						return;
-
-					Debug.Log("reconceliation tick: " + receivedState.Tick);
-					// perform reconceliation
-					_currentTransformState = receivedState;
-					transform.position = receivedState.Position;
-					transform.rotation = Quaternion.Euler(0, receivedState.LookRotation.y, 0);
-					for (int tick = receivedState.Tick + 1; tick <= _bufferedInputStates.LastTick; tick++)
-					{
-						ExecuteInput(_bufferedInputStates[tick]);
-						_bufferedTransformStates.Add(_currentTransformState);
-					}
-				}
-				else
-					Debug.Log("state received from server to old");
-			}
+		protected override bool ErrorThresholdPassed(PlayerNetworkTransformState receivedState, PlayerNetworkTransformState currentState) {
+			return (currentState.Position - receivedState.Position).sqrMagnitude > MOVEMENT_ERROR_THRESHOLD
+						|| (currentState.LookRotation - receivedState.LookRotation).sqrMagnitude > ROTATION_ERROR_THRESHOLD;
 		}
-		private void OnServerStateChanged(NetworkTransformState previouseState, NetworkTransformState receivedState)
+		protected override PlayerNetworkInputState CreateInputState()
 		{
-			if (!IsOwner && !IsServer)
-			{
-				_currentTransformState = receivedState;
-				transform.position = _currentTransformState.Position;
-				transform.rotation = Quaternion.Euler(0, receivedState.LookRotation.y, 0);
-				PlayerModel.SetInterpolationStates(previouseState.LookRotation, _currentTransformState);
-				_bufferedTransformStates.Add(receivedState);
-			}
-		}
-		private NetworkInputState CreateInputState()
-		{
-			return new NetworkInputState(NetworkManager.LocalTime.Tick,
+			return new PlayerNetworkInputState(NetworkManager.LocalTime.Tick,
 				Walk ? Vector2.up : _controls.Player.Move.ReadValue<Vector2>(), _lookDelta,
 				_controls.Player.Run.IsPressed(), _jump, _controls.Player.Crouch.IsPressed());
 		}
-		private NetworkTransformState CreateTransformState()
+		protected override PlayerNetworkTransformState CreateTransformState()
 		{
-			return new NetworkTransformState(NetworkManager.LocalTime.Tick,
+			return new PlayerNetworkTransformState(NetworkManager.LocalTime.Tick,
 				transform.position, Vector3.forward, Vector3.zero, 0, 1);
 		}
-		private void ExecuteInput(NetworkInputState inputState)
+		protected override void ExecuteInput(PlayerNetworkInputState state)
 		{
+			PlayerNetworkInputState inputState = state as PlayerNetworkInputState;
 			if (inputState == null)
 				return;
 
@@ -322,7 +189,7 @@ namespace ExoplanetStudios.ExtractionShooter
 			_controller.Move(movement);
 			
 			// Set new transform state
-			_currentTransformState = new NetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity, crouchAmount, _effectManager.Slowdown);
+			_currentTransformState = new PlayerNetworkTransformState(inputState.Tick, transform.position, lookRotation, velocity, crouchAmount, _effectManager.Slowdown);
 
 			// End interpolation state
 			PlayerModel.SetEndInterpolationState(_currentTransformState);
@@ -367,7 +234,7 @@ namespace ExoplanetStudios.ExtractionShooter
 		{
 			return Mathf.MoveTowards(current, crouchInput ? 1f : 0f, CrouchEnterSpeed * NetworkManager.LocalTime.FixedDeltaTime);
 		}
-		private Vector3 CalculateVelocity(NetworkInputState inputState, bool crouch, Vector2 lookRotation)
+		private Vector3 CalculateVelocity(PlayerNetworkInputState inputState, bool crouch, Vector2 lookRotation)
 		{
 			bool grounded = GroundedCheck();
 			float verticalVelocity = CalculateGravity(inputState.Jump, grounded);
@@ -438,16 +305,6 @@ namespace ExoplanetStudios.ExtractionShooter
 				verticalVelocity = 0;
 			
 			return verticalVelocity;
-		}
-		public bool GetState(int tick, out NetworkTransformState transformState)
-		{
-			if (tick == NetworkManager.LocalTime.Tick)
-			{
-				transformState = _currentTransformState;
-				return true;
-			}
-			transformState = _bufferedTransformStates[tick];
-			return transformState != null;
 		}
 	}
 }

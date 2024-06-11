@@ -40,7 +40,7 @@ namespace ExoplanetStudios.ExtractionShooter
             if (_camera != null)
                 _camera.m_Lens.FieldOfView = _defaultFOV;
         }
-        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
             

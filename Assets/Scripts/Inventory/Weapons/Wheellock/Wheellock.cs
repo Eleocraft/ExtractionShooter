@@ -40,7 +40,7 @@ namespace ExoplanetStudios.ExtractionShooter
             _cooldown = 0;
             _shot = false;
         }
-        public override void UpdateItem(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState)
+        public override void UpdateItem(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState)
         {
             base.UpdateItem(weaponInputState, playerState);
 
@@ -97,6 +97,6 @@ namespace ExoplanetStudios.ExtractionShooter
         [SerializeField] protected ProjectileInfo Info;
         [SerializeField] protected float Spray;
         [SerializeField] protected float SprayADS;
-        public abstract void SecondShot(NetworkWeaponInputState weaponInputState, NetworkTransformState playerState, bool isOwner);
+        public abstract void SecondShot(NetworkWeaponInputState weaponInputState, PlayerNetworkTransformState playerState, bool isOwner);
     }
 }

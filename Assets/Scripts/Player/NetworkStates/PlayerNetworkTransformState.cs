@@ -3,7 +3,7 @@ using Unity.Netcode;
 
 namespace ExoplanetStudios.ExtractionShooter
 {
-    public class NetworkTransformState : NetworkState, INetworkSerializable
+    public class PlayerNetworkTransformState : NetworkState, INetworkSerializable
     {
         public Vector3 Position;
         public Vector2 LookRotation;
@@ -11,12 +11,12 @@ namespace ExoplanetStudios.ExtractionShooter
         public float CrouchAmount;
         public float SpeedMultiplier;
 
-        public NetworkTransformState() {}
-        public NetworkTransformState(int tick)
+        public PlayerNetworkTransformState() {}
+        public PlayerNetworkTransformState(int tick)
         {
             Tick = tick;
         }
-        public NetworkTransformState(NetworkTransformState oldState, int tick)
+        public PlayerNetworkTransformState(PlayerNetworkTransformState oldState, int tick)
         {
             Position = oldState.Position;
             LookRotation = oldState.LookRotation;
@@ -26,7 +26,7 @@ namespace ExoplanetStudios.ExtractionShooter
             
             Tick = tick;
         }
-        public NetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, Vector3 veloctiy, float crouch, float speedMultiplier)
+        public PlayerNetworkTransformState(int tick, Vector3 position, Vector2 lookRotation, Vector3 veloctiy, float crouch, float speedMultiplier)
         {
             Tick = tick;
             Position = position;
@@ -35,7 +35,7 @@ namespace ExoplanetStudios.ExtractionShooter
             CrouchAmount = crouch;
             SpeedMultiplier = speedMultiplier;
         }
-        public override NetworkState GetStateWithTick(int tick) => new NetworkTransformState(this, tick);
+        public override NetworkState GetStateWithTick(int tick) => new PlayerNetworkTransformState(this, tick);
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)
@@ -59,13 +59,13 @@ namespace ExoplanetStudios.ExtractionShooter
                 writer.WriteValueSafe(SpeedMultiplier);
             }
         }
-        public static bool operator==(NetworkTransformState s1, NetworkTransformState s2)
+        public static bool operator==(PlayerNetworkTransformState s1, PlayerNetworkTransformState s2)
         {
             if (s1 is null)
                 return s2 is null;
             return s1.Equals(s2);
         }
-        public static bool operator!=(NetworkTransformState s1, NetworkTransformState s2)
+        public static bool operator!=(PlayerNetworkTransformState s1, PlayerNetworkTransformState s2)
         {
             if (s1 is null)
                 return !(s2 is null);
@@ -73,7 +73,7 @@ namespace ExoplanetStudios.ExtractionShooter
         }
         public override bool Equals(object obj)
         {
-            NetworkTransformState otherState = (NetworkTransformState)obj;
+            PlayerNetworkTransformState otherState = (PlayerNetworkTransformState)obj;
 
             if (otherState is null)
                 return false;
@@ -89,13 +89,10 @@ namespace ExoplanetStudios.ExtractionShooter
             return (int)Position.x + (int)Position.y + (int)LookRotation.x + (int)LookRotation.y;
         }
     }
-    public class NetworkTransformStateList : NetworkStateList<NetworkTransformState>, INetworkSerializable
+    public class PlayerNetworkTransformList : NetworkStateList<PlayerNetworkTransformState>, INetworkSerializable
     {
-		public NetworkTransformStateList() { }
-        public NetworkTransformStateList(int ticksSaved)
-        {
-            _ticksSaved = ticksSaved;
-        }
+		public PlayerNetworkTransformList() : base() { }
+        public PlayerNetworkTransformList(int ticksSaved) : base(ticksSaved) { }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             if (serializer.IsReader)
@@ -105,7 +102,7 @@ namespace ExoplanetStudios.ExtractionShooter
                 States = new();
                 for (int i = 0; i < count; i++)
                 {
-                    reader.ReadValueSafe(out NetworkTransformState state);
+                    reader.ReadValueSafe(out PlayerNetworkTransformState state);
                     States.Add(state);
                 }
                 reader.ReadValueSafe(out _ticksSaved);
